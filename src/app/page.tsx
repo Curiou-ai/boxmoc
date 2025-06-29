@@ -1,8 +1,9 @@
 
-import { ArrowRight, Box, BrainCircuit, Paintbrush } from 'lucide-react'
+import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
 export default function LandingPage() {
   return (
@@ -12,7 +13,7 @@ export default function LandingPage() {
           <Box className="h-6 w-6 text-primary" />
           <span className="font-bold text-lg">BoxCanvas</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+        <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
           <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
             Contact
           </Link>
@@ -25,6 +26,35 @@ export default function LandingPage() {
             </Link>
           </Button>
         </nav>
+        <div className="ml-auto md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <nav className="grid gap-6 text-lg font-medium p-6">
+                <Link href="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
+                  <Box className="h-6 w-6 text-primary" />
+                  <span className="font-bold">BoxCanvas</span>
+                </Link>
+                <Link href="/contact" className="text-muted-foreground hover:text-foreground">
+                  Contact
+                </Link>
+                <Link href="/login" className="text-muted-foreground hover:text-foreground">
+                  Sign In
+                </Link>
+                <Button asChild className="mt-4">
+                  <Link href="/creator">
+                    Start Designing
+                  </Link>
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </header>
 
       <main className="flex-1 pt-14">
@@ -33,7 +63,7 @@ export default function LandingPage() {
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
+                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
                     Design Your Perfect Box with AI
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
@@ -71,7 +101,7 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 lg:grid-cols-3 lg:gap-12">
+            <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-1 md:gap-12 lg:grid-cols-3">
               <div className="grid gap-4 text-center items-start">
                 <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
                   <BrainCircuit className="h-10 w-10 text-primary" />
@@ -117,7 +147,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">&copy; 2024 BoxCanvas. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 BoxCanvas. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="/contact" className="text-xs hover:underline underline-offset-4">
             Contact
