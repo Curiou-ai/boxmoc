@@ -1,80 +1,135 @@
-'use client';
 
-import { useState } from 'react';
-import { AppHeader } from '@/components/header';
-import AiDesignForm from '@/components/ai-design-form';
-import ThreePreview from '@/components/three-preview';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Type, Shapes, Package2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Box, BrainCircuit, Paintbrush } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
-export default function Home() {
-  const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
-
+export default function LandingPage() {
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
-      <AppHeader />
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="w-80 lg:w-96 p-4 border-r overflow-y-auto flex flex-col gap-6 bg-card">
-          <Card className="shadow-none border-none">
-            <CardHeader>
-              <CardTitle className="font-headline text-xl">Generate with AI</CardTitle>
-              <CardDescription>Describe your box and let AI create a design for you.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AiDesignForm onDesignGenerated={(newDesign) => setDesign(newDesign)} />
-            </CardContent>
-          </Card>
-          
-          <Separator />
-          
-          <div>
-            <h2 className="text-lg font-semibold font-headline mb-4 px-2">Design Tools</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline"><Upload className="mr-2"/> Upload</Button>
-              <Button variant="outline"><Type className="mr-2"/> Text</Button>
-              <Button variant="outline"><Shapes className="mr-2"/> Shapes</Button>
-              <Button variant="outline"><Brush className="mr-2"/> Edit</Button>
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <header className="px-4 lg:px-6 h-14 flex items-center border-b fixed w-full bg-background/95 backdrop-blur-sm z-20">
+        <Link href="/" className="flex items-center justify-center gap-2">
+          <Box className="h-6 w-6 text-primary" />
+          <span className="font-bold text-lg">BoxCanvas</span>
+        </Link>
+        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+          <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
+            Contact
+          </Link>
+          <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
+            Sign In
+          </Link>
+          <Button asChild>
+            <Link href="/creator">
+              Start Designing <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </nav>
+      </header>
+
+      <main className="flex-1 pt-14">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
+                    Design Your Perfect Box with AI
+                  </h1>
+                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                    Bring your packaging ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom box designs in minutes.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  <Button asChild size="lg">
+                    <Link href="/creator">
+                      Get Started for Free
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+              <Image
+                src="https://placehold.co/600x400.png"
+                width="600"
+                height="500"
+                alt="Hero"
+                data-ai-hint="packaging box design"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
+              />
             </div>
           </div>
-        </aside>
-        
-        <main className="flex-1 flex flex-col p-4 lg:p-6 overflow-hidden">
-          <div className="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <Card className="flex flex-col shadow-lg">
-              <CardHeader>
-                <CardTitle className="font-headline">3D Preview</CardTitle>
-                <CardDescription>A real-time preview of your design.</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 min-h-0">
-                <ThreePreview key={design.imageUrl} imageUrl={design.imageUrl} />
-              </CardContent>
-            </Card>
-            <Card className="flex flex-col shadow-lg">
-              <CardHeader>
-                <CardTitle className="font-headline">AI Generated Design</CardTitle>
-                <CardDescription>The image and description from the AI.</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col gap-4">
-                <div className="w-full aspect-square bg-muted/50 rounded-lg flex items-center justify-center overflow-hidden border">
-                    {design.imageUrl ? (
-                        <img src={design.imageUrl} alt="Generated box design" className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="text-center text-muted-foreground p-4">
-                            <Package2 size={48} className="mx-auto mb-2" />
-                            <p>Your generated design will appear here.</p>
-                        </div>
-                    )}
+        </section>
+
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Key Features</div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Unleash Your Creativity</h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Our platform is packed with features to help you design the perfect packaging for your product.
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 lg:grid-cols-3 lg:gap-12">
+              <div className="grid gap-4 text-center items-start">
+                <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
+                  <BrainCircuit className="h-10 w-10 text-primary" />
                 </div>
-                <div className="p-4 bg-muted/50 rounded-lg text-sm flex-grow h-40 overflow-y-auto border">
-                    <p className="text-muted-foreground">{design.description || "The AI's description of the design will be shown here."}</p>
+                <h3 className="text-xl font-bold font-headline">AI-Powered Generation</h3>
+                <p className="text-muted-foreground">Describe your vision and let our AI generate unique design concepts in seconds. No design skills required.</p>
+              </div>
+              <div className="grid gap-4 text-center items-start">
+                <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
+                  <Box className="h-10 w-10 text-primary" />
                 </div>
-              </CardContent>
-            </Card>
+                <h3 className="text-xl font-bold font-headline">Interactive 3D Preview</h3>
+                <p className="text-muted-foreground">See your design from every angle with our real-time 3D preview. Ensure it's perfect before you finalize.</p>
+              </div>
+              <div className="grid gap-4 text-center items-start">
+                <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
+                  <Paintbrush className="h-10 w-10 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold font-headline">Easy Customization</h3>
+                <p className="text-muted-foreground">Fine-tune every detail. Upload your own assets, add text, and use our design tools for full control.</p>
+              </div>
+            </div>
           </div>
-        </main>
-      </div>
+        </section>
+
+        <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Start designing your custom box today. It's free to get started.
+              </p>
+            </div>
+            <div className="mx-auto w-full max-w-sm space-y-2">
+              <Button asChild size="lg" className="w-full">
+                <Link href="/creator">
+                  Start Designing Now
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
+        <p className="text-xs text-muted-foreground">&copy; 2024 BoxCanvas. All rights reserved.</p>
+        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+          <Link href="/contact" className="text-xs hover:underline underline-offset-4">
+            Contact
+          </Link>
+          <Link href="#" className="text-xs hover:underline underline-offset-4">
+            Terms of Service
+          </Link>
+          <Link href="#" className="text-xs hover:underline underline-offset-4">
+            Privacy
+          </Link>
+        </nav>
+      </footer>
     </div>
-  );
+  )
 }
