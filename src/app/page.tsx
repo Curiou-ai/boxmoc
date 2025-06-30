@@ -116,6 +116,38 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6 max-w-7xl">
+            <div className="p-1 rounded-2xl bg-gradient-to-br from-primary to-accent">
+              <div className="bg-card text-card-foreground rounded-xl p-8 md:p-12 lg:p-16">
+                <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
+                  <div className="space-y-6">
+                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">
+                      Supercharge Your Creativity with Boxmoc AI
+                    </h2>
+                    <p className="text-muted-foreground md:text-lg">
+                      Let our AI be your co-designer. Instantly generate unique concepts, get smart suggestions, and refine your ideas in seconds. Go from a simple prompt to a production-ready design faster than ever before.
+                    </p>
+                    <Button asChild size="lg" className="bg-foreground text-background hover:bg-foreground/90">
+                      <Link href="/creator">Learn More</Link>
+                    </Button>
+                  </div>
+                  <div>
+                    <Image
+                      src="https://placehold.co/600x450.png"
+                      width="600"
+                      height="450"
+                      alt="AI Feature"
+                      data-ai-hint="AI design tool"
+                      className="rounded-xl shadow-2xl"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
             <div className="space-y-3">
