@@ -71,14 +71,14 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
-                <form className="flex flex-col sm:flex-row gap-2">
+                <form className="flex flex-col gap-2">
                   <Input
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1"
+                    className="h-11"
                     aria-label="Email"
                   />
-                  <Button type="submit" asChild size="lg">
+                  <Button type="submit" asChild size="lg" className="w-full">
                     <Link href="/creator">
                       Get Started for Free
                     </Link>
