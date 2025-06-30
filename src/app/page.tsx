@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Input } from '@/components/ui/input'
 
 export default function LandingPage() {
   return (
@@ -60,31 +61,37 @@ export default function LandingPage() {
       <main className="flex-1 pt-14">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card">
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                    Design Your Perfect Box with AI
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Bring your packaging ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom box designs in minutes.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg">
+            <div className="flex flex-col items-center justify-center text-center space-y-6">
+              <div className="space-y-2">
+                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
+                  Design Your Perfect Box with AI
+                </h1>
+                <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
+                  Bring your packaging ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom box designs in minutes.
+                </p>
+              </div>
+              <div className="w-full max-w-sm space-y-2">
+                <form className="flex flex-col sm:flex-row gap-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="flex-1"
+                    aria-label="Email"
+                  />
+                  <Button type="submit" asChild size="lg">
                     <Link href="/creator">
                       Get Started for Free
                     </Link>
                   </Button>
-                </div>
+                </form>
               </div>
               <Image
-                src="https://placehold.co/600x400.png"
-                width="600"
-                height="500"
+                src="https://placehold.co/800x450.png"
+                width="800"
+                height="450"
                 alt="Hero"
-                data-ai-hint="packaging box design"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
+                data-ai-hint="packaging product mockup"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-contain sm:w-full max-w-4xl"
               />
             </div>
           </div>
