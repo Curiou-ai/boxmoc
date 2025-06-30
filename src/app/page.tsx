@@ -74,7 +74,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
-                <form className="flex flex-col gap-2">
+                <form className="flex flex-col gap-4">
                   <Input
                     type="email"
                     placeholder="Enter your email"
