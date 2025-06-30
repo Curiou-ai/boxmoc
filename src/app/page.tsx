@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
+import FeaturesTabs from '@/components/features-tabs'
 
 export default function LandingPage() {
   return (
@@ -101,36 +102,15 @@ export default function LandingPage() {
 
         <section id="features" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 max-w-7xl">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="flex flex-col items-center justify-center space-y-8 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Key Features</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Unleash Your Creativity</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Our platform is packed with features to help you design the perfect packaging for your product.
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">A Better Way to Design</h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
+                  From first idea to final product, BoxCanvas streamlines your creative process. Explore the features that make designing effortless and fun.
                 </p>
               </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-1 md:gap-12 lg:grid-cols-3">
-              <div className="grid gap-4 text-center items-start">
-                <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
-                  <BrainCircuit className="h-10 w-10 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold font-headline">AI-Powered Generation</h3>
-                <p className="text-muted-foreground">Describe your vision and let our AI generate unique design concepts in seconds. No design skills required.</p>
-              </div>
-              <div className="grid gap-4 text-center items-start">
-                <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
-                  <Box className="h-10 w-10 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold font-headline">Interactive 3D Preview</h3>
-                <p className="text-muted-foreground">See your design from every angle with our real-time 3D preview. Ensure it's perfect before you finalize.</p>
-              </div>
-              <div className="grid gap-4 text-center items-start">
-                <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
-                  <Paintbrush className="h-10 w-10 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold font-headline">Easy Customization</h3>
-                <p className="text-muted-foreground">Fine-tune every detail. Upload your own assets, add text, and use our design tools for full control.</p>
+              <div className="w-full max-w-5xl">
+                <FeaturesTabs />
               </div>
             </div>
           </div>
