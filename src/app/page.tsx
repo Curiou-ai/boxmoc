@@ -9,58 +9,60 @@ import { Input } from '@/components/ui/input'
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b fixed w-full bg-background/95 backdrop-blur-sm z-20">
-        <Link href="/" className="flex items-center justify-center gap-2">
-          <Box className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">BoxCanvas</span>
-        </Link>
-        <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
-          <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
-            Contact
+      <header className="fixed w-full border-b bg-background/95 backdrop-blur-sm z-20">
+        <div className="container flex items-center h-14 max-w-7xl px-4 md:px-6">
+          <Link href="/" className="flex items-center justify-center gap-2">
+            <Box className="h-6 w-6 text-primary" />
+            <span className="font-bold text-lg">BoxCanvas</span>
           </Link>
-          <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
-            Sign In
-          </Link>
-          <Button asChild>
-            <Link href="/creator">
-              Start Designing <ArrowRight className="ml-2 h-4 w-4" />
+          <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
+            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
+              Contact
             </Link>
-          </Button>
-        </nav>
-        <div className="ml-auto md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="grid gap-6 text-lg font-medium p-6">
-                <Link href="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
-                  <Box className="h-6 w-6 text-primary" />
-                  <span className="font-bold">BoxCanvas</span>
-                </Link>
-                <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-                  Contact
-                </Link>
-                <Link href="/login" className="text-muted-foreground hover:text-foreground">
-                  Sign In
-                </Link>
-                <Button asChild className="mt-4">
-                  <Link href="/creator">
-                    Start Designing
-                  </Link>
+            <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
+              Sign In
+            </Link>
+            <Button asChild>
+              <Link href="/creator">
+                Start Designing <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </nav>
+          <div className="ml-auto md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle navigation menu</span>
                 </Button>
-              </nav>
-            </SheetContent>
-          </Sheet>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <nav className="grid gap-6 text-lg font-medium p-6">
+                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
+                    <Box className="h-6 w-6 text-primary" />
+                    <span className="font-bold">BoxCanvas</span>
+                  </Link>
+                  <Link href="/contact" className="text-muted-foreground hover:text-foreground">
+                    Contact
+                  </Link>
+                  <Link href="/login" className="text-muted-foreground hover:text-foreground">
+                    Sign In
+                  </Link>
+                  <Button asChild className="mt-4">
+                    <Link href="/creator">
+                      Start Designing
+                    </Link>
+                  </Button>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
       <main className="flex-1 pt-14">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center text-center space-y-6">
               <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
@@ -98,7 +100,7 @@ export default function LandingPage() {
         </section>
 
         <section id="features" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Key Features</div>
@@ -135,7 +137,7 @@ export default function LandingPage() {
         </section>
 
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -153,19 +155,21 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 BoxCanvas. All rights reserved.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="/contact" className="text-xs hover:underline underline-offset-4">
-            Contact
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4">
-            Terms of Service
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4">
-            Privacy
-          </Link>
-        </nav>
+      <footer className="w-full shrink-0 border-t">
+        <div className="container flex flex-col gap-2 sm:flex-row py-6 max-w-7xl items-center px-4 md:px-6">
+            <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 BoxCanvas. All rights reserved.</p>
+            <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+              <Link href="/contact" className="text-xs hover:underline underline-offset-4">
+                Contact
+              </Link>
+              <Link href="#" className="text-xs hover:underline underline-offset-4">
+                Terms of Service
+              </Link>
+              <Link href="#" className="text-xs hover:underline underline-offset-4">
+                Privacy
+              </Link>
+            </nav>
+        </div>
       </footer>
     </div>
   )
