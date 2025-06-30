@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,7 +5,6 @@ import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 const features = [
   {
@@ -58,10 +56,9 @@ export default function FeaturesTabs() {
                     <div className="p-8 md:p-12 space-y-6 flex flex-col justify-center">
                         <h3 className="text-2xl md:text-3xl font-bold font-headline text-left">{feature.title}</h3>
                         <p className="text-muted-foreground text-base md:text-lg text-left">{feature.description}</p>
-                        <Button asChild variant="outline" className="self-start">
+                        <Button asChild className="self-start">
                           <Link href={feature.learnMoreUrl}>
                             Learn More
-                            <ArrowRight />
                           </Link>
                         </Button>
                     </div>
