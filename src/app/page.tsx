@@ -73,7 +73,7 @@ export default function LandingPage() {
                   Bring your packaging ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom box designs in minutes.
                 </p>
               </div>
-              <div className="w-full max-w-sm space-y-2">
+              <div className="w-full max-w-xs space-y-2">
                 <form className="flex flex-col gap-4">
                   <Input
                     type="email"
