@@ -4,6 +4,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const features = [
   {
@@ -11,21 +14,24 @@ const features = [
     title: "AI Generation",
     description: "Describe your vision in plain text. Our advanced AI will generate a variety of unique, professional design concepts in seconds. It's like having a dedicated designer, available 24/7.",
     imageUrl: "https://placehold.co/600x450.png",
-    imageHint: "AI design interface"
+    imageHint: "AI design interface",
+    learnMoreUrl: "#",
   },
   {
     value: "3d-preview",
     title: "3D Previews",
     description: "Don't just imagine it—see it. Rotate, zoom, and inspect your box design from every angle with our dynamic, real-time 3D preview. Ensure every detail is perfect before finalizing.",
     imageUrl: "https://placehold.co/600x450.png",
-    imageHint: "3d box render"
+    imageHint: "3d box render",
+    learnMoreUrl: "#",
   },
   {
     value: "customization",
     title: "Easy Customization",
     description: "Take full control of your design. Easily upload your own logos and assets, add custom text with various fonts, and use our intuitive tools to fine-tune colors, shapes, and layouts.",
     imageUrl: "https://placehold.co/600x450.png",
-    imageHint: "design tool palette"
+    imageHint: "design tool palette",
+    learnMoreUrl: "#",
   }
 ];
 
@@ -49,9 +55,15 @@ export default function FeaturesTabs() {
            <TabsContent key={feature.value} value={feature.value}>
               <Card className="overflow-hidden shadow-lg border-2 border-primary/10">
                 <div className="grid md:grid-cols-2">
-                    <div className="p-8 md:p-12 space-y-4 flex flex-col justify-center">
+                    <div className="p-8 md:p-12 space-y-6 flex flex-col justify-center">
                         <h3 className="text-2xl md:text-3xl font-bold font-headline text-left">{feature.title}</h3>
                         <p className="text-muted-foreground text-base md:text-lg text-left">{feature.description}</p>
+                        <Button asChild variant="outline" className="self-start">
+                          <Link href={feature.learnMoreUrl}>
+                            Learn More
+                            <ArrowRight />
+                          </Link>
+                        </Button>
                     </div>
                     <div className="bg-muted min-h-[300px] md:h-auto order-first md:order-last">
                         <Image
