@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Upload, Brush, Type, Shapes, Package2, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import RequestHelpDialog from '@/components/request-help-dialog';
 
 const DesignSidebarContent = ({ onDesignGenerated, className }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; className?:string }) => (
     <div className={className}>
@@ -31,6 +32,18 @@ const DesignSidebarContent = ({ onDesignGenerated, className }: { onDesignGenera
               <Button variant="outline"><Type className="mr-2 h-4 w-4"/> Text</Button>
               <Button variant="outline"><Shapes className="mr-2 h-4 w-4"/> Shapes</Button>
               <Button variant="outline"><Brush className="mr-2 h-4 w-4"/> Edit</Button>
+            </div>
+        </div>
+
+        <Separator />
+
+        <div>
+            <div className="px-0 sm:px-2">
+                <h2 className="text-lg font-semibold font-headline mb-2">Expert Assistance</h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Need a professional touch? Our design team can help bring your vision to life.
+                </p>
+                <RequestHelpDialog />
             </div>
         </div>
     </div>
