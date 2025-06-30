@@ -14,7 +14,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-center mb-4">
               <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Box className="h-6 w-6" />
-                <span className="text-lg font-bold">BoxCanvas</span>
+                <span className="text-lg font-bold">Boxmoc</span>
               </Link>
             </div>
             <CardTitle className="text-2xl text-center">Login</CardTitle>

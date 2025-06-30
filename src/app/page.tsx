@@ -14,7 +14,7 @@ export default function LandingPage() {
         <div className="container flex items-center h-14 max-w-7xl px-4 md:px-6">
           <Link href="/" className="flex items-center justify-center gap-2">
             <Box className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">BoxCanvas</span>
+            <span className="font-bold text-lg">Boxmoc</span>
           </Link>
           <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
             <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
@@ -41,7 +41,7 @@ export default function LandingPage() {
                 <nav className="grid gap-6 text-lg font-medium p-6">
                   <Link href="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
                     <Box className="h-6 w-6 text-primary" />
-                    <span className="font-bold">BoxCanvas</span>
+                    <span className="font-bold">Boxmoc</span>
                   </Link>
                   <Link href="/contact" className="text-muted-foreground hover:text-foreground">
                     Contact
@@ -137,7 +137,7 @@ export default function LandingPage() {
 
       <footer className="w-full shrink-0 border-t">
         <div className="container flex flex-col gap-2 sm:flex-row py-6 max-w-7xl items-center px-4 md:px-6">
-            <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 BoxCanvas. All rights reserved.</p>
+            <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 Boxmoc. All rights reserved.</p>
             <nav className="sm:ml-auto flex gap-4 sm:gap-6">
               <Link href="/contact" className="text-xs hover:underline underline-offset-4">
                 Contact

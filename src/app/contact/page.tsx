@@ -13,7 +13,7 @@ export default function ContactPage() {
       <header className="px-4 lg:px-6 h-14 flex items-center border-b">
         <Link href="/" className="flex items-center justify-center gap-2">
           <Box className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">BoxCanvas</span>
+          <span className="font-bold text-lg">Boxmoc</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Button asChild variant="ghost">
@@ -34,7 +34,7 @@ export default function ContactPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   <Mail className="h-6 w-6 text-primary" />
-                  <a href="mailto:contact@boxcanvas.com" className="text-lg hover:underline">contact@boxcanvas.com</a>
+                  <a href="mailto:contact@boxmoc.com" className="text-lg hover:underline">contact@boxmoc.com</a>
                 </div>
                 <div className="flex items-center gap-4">
                   <Phone className="h-6 w-6 text-primary" />

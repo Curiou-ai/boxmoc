@@ -20,7 +20,7 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
           <div className="p-2 bg-primary/10 rounded-lg">
               <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
           </div>
-          <h1 className="hidden sm:block text-xl sm:text-2xl font-bold font-headline text-foreground">BoxCanvas</h1>
+          <h1 className="hidden sm:block text-xl sm:text-2xl font-bold font-headline text-foreground">Boxmoc</h1>
         </Link>
       </div>
       <div className="flex items-center gap-2">
