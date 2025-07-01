@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import FeaturesTabs from '@/components/features-tabs'
 import { ServicesAccordion } from '@/components/services-accordion'
 import Testimonials from '@/components/testimonials'
+import { WorkflowSteps } from '@/components/workflow-steps'
 
 export default function LandingPage() {
   return (
@@ -108,7 +109,7 @@ export default function LandingPage() {
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">A Better Way to Design</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                  From first idea to final product, BoxCanvas streamlines your creative process. Explore the features that make designing effortless and fun.
+                  From first idea to final product, Boxmoc streamlines your creative process. Explore the features that make designing effortless and fun.
                 </p>
               </div>
               <div className="w-full max-w-5xl">
@@ -117,6 +118,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <WorkflowSteps />
 
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 max-w-7xl">
