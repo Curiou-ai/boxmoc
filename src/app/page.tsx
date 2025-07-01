@@ -119,8 +119,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <WorkflowSteps />
-
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="p-1 rounded-2xl bg-gradient-to-br from-primary to-accent">
@@ -152,6 +150,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <WorkflowSteps />
 
         <section id="services" className="w-full py-12 md:py-24 min-[896px]:py-32">
           <div className="container px-4 md:px-6 max-w-7xl">
