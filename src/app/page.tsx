@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import FeaturesTabs from '@/components/features-tabs'
 import { ServicesAccordion } from '@/components/services-accordion'
+import Testimonials from '@/components/testimonials'
 
 export default function LandingPage() {
   return (
@@ -171,6 +172,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <Testimonials />
 
         <section id="clients" className="w-full py-12 md:py-24 lg:py-32">
             <div className="container px-4 md:px-6 max-w-7xl">
