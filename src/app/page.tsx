@@ -149,16 +149,16 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="services" className="w-full py-12 md:py-24 lg:py-32">
+        <section id="services" className="w-full py-12 md:py-24 min-[896px]:py-32">
           <div className="container px-4 md:px-6 max-w-7xl">
-            <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
-              <div className="space-y-6 lg:w-1/2">
+            <div className="flex flex-col min-[896px]:flex-row gap-10 min-[896px]:gap-16 items-center">
+              <div className="space-y-6 min-[896px]:w-1/2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
                   The one place where all teams gather to build together
                 </h2>
                 <ServicesAccordion />
               </div>
-              <div className="bg-accent/50 rounded-2xl p-4 md:p-6 lg:p-8 lg:w-1/2">
+              <div className="bg-accent/50 rounded-2xl p-4 md:p-6 min-[896px]:p-8 min-[896px]:w-1/2">
                   <Image
                     src="https://placehold.co/600x500.png"
                     width="600"
