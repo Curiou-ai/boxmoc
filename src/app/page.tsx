@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import FeaturesTabs from '@/components/features-tabs'
+import { ServicesAccordion } from '@/components/services-accordion'
 
 export default function LandingPage() {
   return (
@@ -73,7 +74,7 @@ export default function LandingPage() {
                   Bring your packaging ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom box designs in minutes.
                 </p>
               </div>
-              <div className="w-full max-w-xs space-y-2">
+              <div className="w-full max-w-xs space-y-4">
                 <form className="flex flex-col gap-4">
                   <Input
                     type="email"
@@ -143,6 +144,29 @@ export default function LandingPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6 max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-center">
+              <div className="space-y-6">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
+                  The one place where all teams gather to build together
+                </h2>
+                <ServicesAccordion />
+              </div>
+              <div className="bg-accent/50 rounded-2xl p-4 md:p-6 lg:p-8">
+                  <Image
+                    src="https://placehold.co/600x500.png"
+                    width="600"
+                    height="500"
+                    alt="Design team collaborating"
+                    data-ai-hint="design team collaboration"
+                    className="rounded-xl shadow-2xl w-full h-full object-cover"
+                  />
               </div>
             </div>
           </div>
