@@ -173,8 +173,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <Testimonials />
-
         <section id="clients" className="w-full py-12 md:py-24 lg:py-32">
             <div className="container px-4 md:px-6 max-w-7xl">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 md:mb-16">
@@ -231,6 +229,8 @@ export default function LandingPage() {
                 </div>
             </div>
         </section>
+
+        <Testimonials />
 
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
