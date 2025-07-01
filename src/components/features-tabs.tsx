@@ -26,7 +26,7 @@ const features = [
   {
     value: "customization",
     title: "Easy Customization",
-    description: "Take full control of your designs. Easily upload logos, add custom text with various fonts, and use our intuitive tools to create everything from business cards to complex packaging.",
+    description: "Take full control of your designs. Easily upload logos, add custom text with various fonts, and use our intuitive tools to create everything from business cards to complex packaging. For specialized requests, you can even connect with our expert designers directly through the in-app chat.",
     imageUrl: "https://placehold.co/600x450.png",
     imageHint: "design tool palette",
     learnMoreUrl: "#",

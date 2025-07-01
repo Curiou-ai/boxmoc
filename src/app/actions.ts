@@ -1,6 +1,7 @@
 'use server';
 
 import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
+import { askChatbot, ChatbotInput } from '@/ai/flows/chatbot-flow';
 
 export interface FormState {
   message: string;
@@ -20,6 +21,39 @@ export interface HelpFormState {
     prompt?: string;
     notes?: string;
   };
+}
+
+export interface ChatbotState {
+  response: string;
+  error?: string;
+}
+
+export async function handleChatbotQuery(
+  prevState: ChatbotState,
+  formData: FormData,
+): Promise<ChatbotState> {
+  const query = formData.get('query') as string;
+  const history = JSON.parse(formData.get('history') as string || '[]');
+
+  if (!query) {
+    return {
+      response: '',
+      error: 'Query is missing.'
+    };
+  }
+
+  try {
+    const input: ChatbotInput = { query, history };
+    const result = await askChatbot(input);
+    return { response: result };
+  } catch (error) {
+    console.error(error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return {
+        response: '',
+        error: `An error occurred: ${errorMessage}`
+    };
+  }
 }
 
 export async function handleGenerateDesign(
