@@ -172,6 +172,63 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section id="clients" className="w-full py-12 md:py-24 lg:py-32">
+            <div className="container px-4 md:px-6 max-w-7xl">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 md:mb-16">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">
+                    Built for Endless Creativity
+                </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
+                    From corporate events to e-commerce brands, Boxmoc provides the tools and flexibility for any team to create the perfect packaging.
+                </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
+                {/* Left Column: Client types */}
+                <div>
+                    <div className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-muted/30 mb-8">
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12.22 2h-4.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.44.25a2 2 0 0 1-2 1.73V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.29a2 2 0 0 0-1-1.73l-4.44-2.54a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><path d="M18 13.13V22"></path><path d="M6 13.13V22"></path><path d="M12 13.13V22"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="m7.5 4.27 9 5.15"></path><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M12 12h.01"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><circle cx="12" cy="12" r="10"></circle><path d="m14.31 8 5.74 9.94"></path><path d="M9.69 8h11.48"></path><path d="m7.38 12 5.74-9.94"></path><path d="M9.69 16 3.95 6.06"></path><path d="M14.31 16H2.83"></path><path d="m16.62 12-5.74 9.94"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l10-10A1 1 0 0 0 22 12V2h-4"></path><path d="M7 7h.01"></path></svg></div>
+                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
+                    </div>
+                    <h3 className="text-2xl font-bold font-headline">For Any Industry</h3>
+                    <p className="mt-4 text-muted-foreground">
+                    Whether you're in marketing, events, or retail, Boxmoc provides powerful tools to create packaging that resonates with your audience and elevates your brand.
+                    </p>
+                    <Button asChild variant="secondary" className="mt-6">
+                    <Link href="#">See Use Cases</Link>
+                    </Button>
+                </div>
+
+                {/* Right Column: API / Customization */}
+                <div>
+                    <div className="relative mb-8 overflow-hidden rounded-xl">
+                    <Image
+                        src="https://placehold.co/600x450.png"
+                        width={600}
+                        height={450}
+                        alt="Custom API integration example"
+                        data-ai-hint="code editor API"
+                        className="w-full h-full object-cover"
+                    />
+                    </div>
+                    <h3 className="text-2xl font-bold font-headline">Powerful Customization</h3>
+                    <p className="mt-4 text-muted-foreground">
+                    Take full control with our easy-to-use design tools. Upload assets, tweak designs, and see your vision come to life in stunning 3D detail.
+                    </p>
+                    <Button asChild variant="secondary" className="mt-6">
+                    <Link href="/creator">Explore the Tools</Link>
+                    </Button>
+                </div>
+                </div>
+            </div>
+        </section>
+
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
             <div className="space-y-3">
