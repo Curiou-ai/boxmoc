@@ -1,36 +1,36 @@
 'use server';
 
 /**
- * @fileOverview An AI agent for generating box designs based on user prompts.
+ * @fileOverview An AI agent for generating various designs based on user prompts.
  *
- * - generateBoxDesign - A function that handles the box design generation process.
- * - GenerateBoxDesignInput - The input type for the generateBoxDesign function.
- * - GenerateBoxDesignOutput - The return type for the generateBoxDesign function.
+ * - generateDesign - A function that handles the design generation process.
+ * - GenerateDesignInput - The input type for the generateDesign function.
+ * - GenerateDesignOutput - The return type for the generateDesign function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const GenerateBoxDesignInputSchema = z.object({
-  prompt: z.string().describe('A detailed description of the desired box design.'),
+const GenerateDesignInputSchema = z.object({
+  prompt: z.string().describe('A detailed description of the desired design.'),
 });
-export type GenerateBoxDesignInput = z.infer<typeof GenerateBoxDesignInputSchema>;
+export type GenerateDesignInput = z.infer<typeof GenerateDesignInputSchema>;
 
-const GenerateBoxDesignOutputSchema = z.object({
-  designDescription: z.string().describe('A textual description of the generated box design.'),
-  imageUrl: z.string().describe('A data URI containing the generated box design image.'),
+const GenerateDesignOutputSchema = z.object({
+  designDescription: z.string().describe('A textual description of the generated design.'),
+  imageUrl: z.string().describe('A data URI containing the generated design image.'),
 });
-export type GenerateBoxDesignOutput = z.infer<typeof GenerateBoxDesignOutputSchema>;
+export type GenerateDesignOutput = z.infer<typeof GenerateDesignOutputSchema>;
 
-export async function generateBoxDesign(input: GenerateBoxDesignInput): Promise<GenerateBoxDesignOutput> {
-  return generateBoxDesignFlow(input);
+export async function generateDesign(input: GenerateDesignInput): Promise<GenerateDesignOutput> {
+  return generateDesignFlow(input);
 }
 
-const generateBoxDesignPrompt = ai.definePrompt({
-  name: 'generateBoxDesignPrompt',
-  input: {schema: GenerateBoxDesignInputSchema},
-  output: {schema: GenerateBoxDesignOutputSchema},
-  prompt: `You are an AI-powered box design generator. Based on the user's prompt, create a visually appealing and practical box design.
+const generateDesignPrompt = ai.definePrompt({
+  name: 'generateDesignPrompt',
+  input: {schema: GenerateDesignInputSchema},
+  output: {schema: GenerateDesignOutputSchema},
+  prompt: `You are an AI-powered design generator. Based on the user's prompt, create a visually appealing and practical design. This could be for packaging, marketing materials like flyers or cards, engravings, or event promotions.
 
   Prompt: {{{prompt}}}
 
@@ -38,14 +38,14 @@ const generateBoxDesignPrompt = ai.definePrompt({
   Then, generate a URL to an image depicting the design in the imageUrl field.`, 
 });
 
-const generateBoxDesignFlow = ai.defineFlow(
+const generateDesignFlow = ai.defineFlow(
   {
-    name: 'generateBoxDesignFlow',
-    inputSchema: GenerateBoxDesignInputSchema,
-    outputSchema: GenerateBoxDesignOutputSchema,
+    name: 'generateDesignFlow',
+    inputSchema: GenerateDesignInputSchema,
+    outputSchema: GenerateDesignOutputSchema,
   },
   async input => {
-    const {text} = await generateBoxDesignPrompt(input);
+    const {text} = await generateDesignPrompt(input);
 
     const { media } = await ai.generate({
       // IMPORTANT: ONLY the googleai/gemini-2.0-flash-preview-image-generation model is able to generate images. You MUST use exactly this model to generate images.

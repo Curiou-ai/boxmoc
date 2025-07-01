@@ -14,25 +14,25 @@ const services = [
     {
         value: "item-1",
         title: "Product Design Teams",
-        description: "A single platform for product teams to deliver customer value faster. From strategic planning to a production-ready box design, it all lives here.",
+        description: "A single platform for product teams to deliver customer value faster. From strategic planning to production-ready packaging and promotional materials, it all lives here.",
         learnMoreUrl: "#"
     },
     {
         value: "item-2",
         title: "Marketing Agencies",
-        description: "Empower your marketing campaigns with stunning, on-brand packaging that captures attention and tells a story. Fast, collaborative, and scalable.",
+        description: "Empower your marketing campaigns with stunning, on-brand designs for packaging, flyers, and event materials that capture attention. Fast, collaborative, and scalable.",
         learnMoreUrl: "#"
     },
     {
         value: "item-3",
         title: "E-commerce Brands",
-        description: "Create unforgettable unboxing experiences for your customers. Design, visualize, and order custom packaging that elevates your brand identity.",
+        description: "Create unforgettable brand experiences for your customers. Design everything from custom packaging to thank you cards and promotional inserts that elevate your brand identity.",
         learnMoreUrl: "#"
     },
     {
         value: "item-4",
-        title: "Packaging Engineers",
-        description: "Streamline your workflow with powerful 3D previews and AI-powered tools. Test structural integrity and design aesthetics in one place.",
+        title: "Event Planners",
+        description: "Design captivating event materials, from invitations and banners to custom gift boxes and swag. Ensure every touchpoint is perfectly on-brand.",
         learnMoreUrl: "#"
     }
 ]

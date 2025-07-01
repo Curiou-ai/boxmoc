@@ -54,7 +54,7 @@ export default function RequestHelpForm({ onSubmitted }: { onSubmitted: () => vo
         <Textarea
           id="design-prompt"
           name="prompt"
-          placeholder="Describe your box idea. You can copy your prompt from the AI generator here."
+          placeholder="Describe your design idea. You can copy your prompt from the AI generator here."
           rows={4}
           required
           defaultValue={state.fields?.prompt}

@@ -52,7 +52,7 @@ export default function AiDesignForm({ onDesignGenerated }: AiDesignFormProps) {
         <Textarea
           id="prompt"
           name="prompt"
-          placeholder="e.g., a sleek, minimalist black box with a gold logo for a luxury watch brand"
+          placeholder="e.g., a floral thank you card for a wedding, or a sleek, minimalist black box for a luxury watch"
           rows={5}
           required
           defaultValue={state.fields?.prompt}

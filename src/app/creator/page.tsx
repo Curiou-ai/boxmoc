@@ -16,7 +16,7 @@ const DesignSidebarContent = ({ onDesignGenerated, className }: { onDesignGenera
         <Card className="shadow-none border-none bg-transparent">
             <CardHeader className="px-0 pt-0 sm:px-2">
               <CardTitle className="font-headline text-xl">Generate with AI</CardTitle>
-              <CardDescription>Describe your box and let AI create a design for you.</CardDescription>
+              <CardDescription>Describe your idea and let AI create a design for you.</CardDescription>
             </CardHeader>
             <CardContent className="px-0 sm:px-2">
               <AiDesignForm onDesignGenerated={onDesignGenerated} />

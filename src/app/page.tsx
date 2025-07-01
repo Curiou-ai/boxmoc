@@ -69,10 +69,10 @@ export default function LandingPage() {
             <div className="flex flex-col items-center justify-center text-center space-y-6">
               <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                  Design Your Perfect Box with AI
+                  Design Your Perfect Creation with AI
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-                  Bring your packaging ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom box designs in minutes.
+                  Bring your creative ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom designs for packaging, marketing materials, and events in minutes.
                 </p>
               </div>
               <div className="w-full max-w-xs space-y-4">
@@ -128,7 +128,7 @@ export default function LandingPage() {
                       Supercharge Your Creativity with Boxmoc AI
                     </h2>
                     <p className="text-muted-foreground md:text-lg">
-                      Let our AI be your co-designer. Instantly generate unique concepts, get smart suggestions, and refine your ideas in seconds. Go from a simple prompt to a production-ready design faster than ever before.
+                      Let our AI be your co-designer. Instantly generate unique concepts for packaging, flyers, cards, and more. Get smart suggestions and refine your ideas in seconds. Go from a simple prompt to a production-ready design faster than ever before.
                     </p>
                     <Button asChild size="lg" className="bg-foreground text-background hover:bg-foreground/90">
                       <Link href="/creator">Learn More</Link>
@@ -180,7 +180,7 @@ export default function LandingPage() {
                     Built for Endless Creativity
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                    From corporate events to e-commerce brands, Boxmoc provides the tools and flexibility for any team to create the perfect packaging.
+                    From corporate events to e-commerce brands, Boxmoc provides the tools and flexibility for any team to create the perfect promotional materials, packaging, and more.
                 </p>
                 </div>
 
@@ -199,7 +199,7 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-2xl font-bold font-headline">For Any Industry</h3>
                     <p className="mt-4 text-muted-foreground">
-                    Whether you're in marketing, events, or retail, Boxmoc provides powerful tools to create packaging that resonates with your audience and elevates your brand.
+                    Whether you're in marketing, events, or retail, Boxmoc provides powerful tools to create designs that resonate with your audience and elevates your brand.
                     </p>
                     <Button asChild variant="secondary" className="mt-6">
                     <Link href="#">See Use Cases</Link>
@@ -220,7 +220,7 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-2xl font-bold font-headline">Powerful Customization</h3>
                     <p className="mt-4 text-muted-foreground">
-                    Take full control with our easy-to-use design tools. Upload assets, tweak designs, and see your vision come to life in stunning 3D detail.
+                    Take full control with our easy-to-use design tools. Upload assets, create designs for cards, flyers, and packaging, and see your vision come to life in stunning 3D.
                     </p>
                     <Button asChild variant="secondary" className="mt-6">
                     <Link href="/creator">Explore the Tools</Link>
@@ -237,7 +237,7 @@ export default function LandingPage() {
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Start designing your custom box today. It's free to get started.
+                Start creating your custom designs today. It's free to get started.
               </p>
             </div>
             <div className="mx-auto w-full max-w-sm space-y-2">

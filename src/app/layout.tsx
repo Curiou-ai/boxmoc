@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'Boxmoc',
-  description: 'Design beautiful boxes with AI',
+  description: 'Create stunning designs for packaging, promotions, and events with AI',
 };
 
 export default function RootLayout({

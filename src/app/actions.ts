@@ -1,6 +1,6 @@
 'use server';
 
-import { generateBoxDesign, GenerateBoxDesignInput } from '@/ai/flows/generate-box-design';
+import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
 
 export interface FormState {
   message: string;
@@ -36,8 +36,8 @@ export async function handleGenerateDesign(
   }
   
   try {
-    const input: GenerateBoxDesignInput = { prompt };
-    const result = await generateBoxDesign(input);
+    const input: GenerateDesignInput = { prompt };
+    const result = await generateDesign(input);
     
     if (!result.imageUrl || !result.designDescription) {
         throw new Error("AI failed to generate a complete design.");
