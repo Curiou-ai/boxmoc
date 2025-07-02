@@ -97,7 +97,7 @@ export default function LandingPage() {
                 height="450"
                 alt="Hero"
                 data-ai-hint="packaging product mockup"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-contain sm:w-full max-w-4xl"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-contain w-full max-w-4xl"
               />
             </div>
           </div>

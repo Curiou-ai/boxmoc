@@ -53,30 +53,26 @@ const ArrowConnectorDown = () => (
     </div>
 );
 
-const VerticalArrowConnector = () => (
-    <div className="flex justify-center h-20">
-        <svg viewBox="0 0 20 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-auto h-full">
+const ZigZagArrowConnector = ({ reverse = false }: { reverse?: boolean }) => (
+    <div className="h-20 w-full flex justify-center">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-auto h-full">
             <defs>
-                <marker id="arrowhead-vertical" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto-start-reverse">
+                <marker id="arrowhead-zigzag" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto-start-reverse">
                     <polygon points="0 0, 7 2.5, 0 5" className="fill-primary" />
                 </marker>
             </defs>
             <path 
-                d="M 10 0 C -10 20, 30 60, 10 80" 
+                d={reverse ? "M 70 0 C 10 20, 70 60, 10 80" : "M 10 0 C 70 20, 10 60, 70 80"}
                 stroke="currentColor" 
                 strokeWidth="1.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
                 className="text-primary/30" 
-                markerEnd="url(#arrowhead-vertical)" 
+                markerEnd="url(#arrowhead-zigzag)" 
             />
-            <path 
-                d="M 10 0 C -10 20, 30 60, 10 80"
+             <path 
+                d={reverse ? "M 70 0 C 10 20, 70 60, 10 80" : "M 10 0 C 70 20, 10 60, 70 80"}
                 stroke="currentColor" 
                 strokeWidth="1.5" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeDasharray="6 6" 
+                strokeDasharray="6 6"
                 className="text-primary animate-dash-flow" 
             />
         </svg>
@@ -98,7 +94,7 @@ const WorkflowCard = ({ step }: { step: typeof workflowSteps[0] }) => (
 
 export function WorkflowSteps() {
   return (
-    <section id="workflow" className="w-full py-12 md:py-24 lg:py-32 bg-card">
+    <section id="workflow" className="w-full py-12 md:py-24 lg:py-32 bg-card overflow-hidden">
       <div className="container px-4 md:px-6 max-w-7xl">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 lg:mb-20">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">
@@ -123,12 +119,16 @@ export function WorkflowSteps() {
             ))}
         </div>
         
-        {/* Mobile vertical layout */}
-        <div className="lg:hidden flex flex-col items-center gap-4 max-w-xs mx-auto">
+        {/* Mobile zig-zag layout */}
+        <div className="lg:hidden flex flex-col items-center">
              {workflowSteps.map((step, index) => (
                 <React.Fragment key={`mobile-${index}`}>
-                    <WorkflowCard step={step} />
-                    {index < workflowSteps.length - 1 && <VerticalArrowConnector />}
+                    <div className={`w-full flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
+                      <div className="w-4/5 sm:w-3/5">
+                        <WorkflowCard step={step} />
+                      </div>
+                    </div>
+                    {index < workflowSteps.length - 1 && <ZigZagArrowConnector reverse={index % 2 === 0} />}
                 </React.Fragment>
              ))}
         </div>
