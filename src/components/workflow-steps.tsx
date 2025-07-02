@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrainCircuit, Paintbrush, PackageCheck, Truck } from 'lucide-react';
 
@@ -24,12 +25,30 @@ const workflowSteps = [
     }
 ];
 
-const ArrowConnector = () => (
-    <div className="flex-grow pt-16">
-        <svg viewBox="0 0 82 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto max-w-[82px] mx-auto">
-            <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" />
-            <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 8" className="text-primary animate-dash-flow" />
-            <path d="M71 2L81 12L71 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
+const ArrowConnectorUp = () => (
+    <div className="flex-1 h-32">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+             <defs>
+                <marker id="arrowhead-up" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto">
+                    <polygon points="0 0, 7 2.5, 0 5" className="fill-primary" />
+                </marker>
+            </defs>
+            <path d="M5 95C25 95, 25 5, 95 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" markerEnd="url(#arrowhead-up)" />
+            <path d="M5 95C25 95, 25 5, 95 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="8 8" className="text-primary animate-dash-flow" />
+        </svg>
+    </div>
+);
+
+const ArrowConnectorDown = () => (
+    <div className="flex-1 h-32">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <defs>
+                <marker id="arrowhead-down" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto">
+                    <polygon points="0 0, 7 2.5, 0 5" className="fill-primary" />
+                </marker>
+            </defs>
+            <path d="M5 5C25 5, 25 95, 95 95" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" markerEnd="url(#arrowhead-down)" />
+            <path d="M5 5C25 5, 25 95, 95 95" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="8 8" className="text-primary animate-dash-flow" />
         </svg>
     </div>
 );
@@ -41,14 +60,14 @@ const VerticalLineConnector = () => (
 );
 
 const WorkflowCard = ({ step }: { step: typeof workflowSteps[0] }) => (
-    <div className="flex flex-col items-center text-center group h-full">
-        <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 min-h-[10rem] w-full flex flex-col items-center justify-center">
-            <div className="p-4 bg-primary/10 rounded-full transition-colors group-hover:bg-primary/20">
+    <div className="flex flex-col items-center text-center group">
+        <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 w-full">
+            <div className="inline-block p-4 bg-primary/10 rounded-full transition-colors group-hover:bg-primary/20">
                 {step.icon}
             </div>
+            <h3 className="text-xl font-bold font-headline mt-6 mb-2">{step.title}</h3>
+            <p className="text-muted-foreground text-sm">{step.description}</p>
         </div>
-        <h3 className="text-xl font-bold font-headline mt-6 mb-2">{step.title}</h3>
-        <p className="text-muted-foreground text-sm">{step.description}</p>
     </div>
 );
 
@@ -65,35 +84,28 @@ export function WorkflowSteps() {
           </p>
         </div>
 
-        {/* Desktop horizontal layout */}
-        <div className="hidden lg:flex items-start justify-between gap-4 xl:gap-8">
+        {/* Desktop horizontal staggered layout */}
+        <div className="hidden lg:flex items-start justify-center">
             {workflowSteps.map((step, index) => (
                 <React.Fragment key={index}>
-                    <div className="shrink w-56 xl:w-64">
+                    <div className={`w-56 xl:w-64 shrink-0 ${index % 2 !== 0 ? 'pt-32' : 'pt-0'}`}>
                         <WorkflowCard step={step} />
                     </div>
-                    {index < workflowSteps.length - 1 && <ArrowConnector />}
+                    {index < workflowSteps.length - 1 && (
+                       index % 2 === 0 ? <ArrowConnectorDown /> : <ArrowConnectorUp />
+                    )}
                 </React.Fragment>
             ))}
         </div>
         
         {/* Mobile vertical layout */}
-        <div className="lg:hidden flex flex-col items-center gap-8">
-            <div className="w-64">
-                <WorkflowCard step={workflowSteps[0]} />
-            </div>
-            <VerticalLineConnector />
-            <div className="w-64">
-                <WorkflowCard step={workflowSteps[1]} />
-            </div>
-            <VerticalLineConnector />
-            <div className="w-64">
-                <WorkflowCard step={workflowSteps[2]} />
-            </div>
-            <VerticalLineConnector />
-            <div className="w-64">
-                <WorkflowCard step={workflowSteps[3]} />
-            </div>
+        <div className="lg:hidden flex flex-col items-center gap-8 max-w-xs mx-auto">
+             {workflowSteps.map((step, index) => (
+                <React.Fragment key={`mobile-${index}`}>
+                    <WorkflowCard step={step} />
+                    {index < workflowSteps.length - 1 && <VerticalLineConnector />}
+                </React.Fragment>
+             ))}
         </div>
       </div>
     </section>
