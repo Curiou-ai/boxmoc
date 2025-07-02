@@ -1,5 +1,6 @@
 
-import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu } from 'lucide-react'
+
+import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -9,30 +10,72 @@ import FeaturesTabs from '@/components/features-tabs'
 import { ServicesAccordion } from '@/components/services-accordion'
 import Testimonials from '@/components/testimonials'
 import { WorkflowSteps } from '@/components/workflow-steps'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="fixed w-full border-b bg-background/95 backdrop-blur-sm z-20">
-        <div className="container flex items-center h-14 max-w-7xl px-4 md:px-6">
-          <Link href="/" className="flex items-center justify-center gap-2">
-            <Box className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg">Boxmoc</span>
-          </Link>
-          <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
-            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
-              Contact
+      <header className="sticky top-0 z-50 w-full bg-background/90 py-3 backdrop-blur-sm">
+        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border bg-card/75 px-4 shadow-lg sm:px-6">
+          {/* Left Section */}
+          <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2">
+              <Box className="h-6 w-6 text-primary" />
+              <span className="font-bold text-lg">Boxmoc</span>
             </Link>
-            <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
-              Sign In
-            </Link>
-            <Button asChild>
-              <Link href="/creator">
-                Start Designing <ArrowRight className="ml-2 h-4 w-4" />
+            {/* Desktop Navigation */}
+            <nav className="hidden items-center gap-6 md:flex">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                  Product <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Packaging</DropdownMenuItem>
+                  <DropdownMenuItem>Marketing Materials</DropdownMenuItem>
+                  <DropdownMenuItem>Event Promotions</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                  Solutions <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>For E-commerce</DropdownMenuItem>
+                  <DropdownMenuItem>For Agencies</DropdownMenuItem>
+                  <DropdownMenuItem>For Startups</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                  Resources <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Blog</DropdownMenuItem>
+                  <DropdownMenuItem>Help Center</DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                Pricing
               </Link>
+            </nav>
+          </div>
+
+          {/* Right Section */}
+          <div className="hidden items-center gap-2 md:flex">
+            <Button variant="ghost" asChild>
+              <Link href="#">Book a demo</Link>
             </Button>
-          </nav>
-          <div className="ml-auto md:hidden">
+            <Button variant="outline" asChild>
+              <Link href="/login">Login</Link>
+            </Button>
+            <Button className="bg-blue-600 text-white hover:bg-blue-700" asChild>
+              <Link href="/creator">Sign up free</Link>
+            </Button>
+          </div>
+          
+          {/* Mobile Navigation */}
+          <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -41,22 +84,21 @@ export default function LandingPage() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
-                <nav className="grid gap-6 text-lg font-medium p-6">
-                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold mb-4">
+                <nav className="grid gap-4 p-6 text-lg font-medium">
+                  <Link href="/" className="flex items-center gap-2 font-semibold mb-4">
                     <Box className="h-6 w-6 text-primary" />
                     <span className="font-bold">Boxmoc</span>
                   </Link>
-                  <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-                    Contact
-                  </Link>
-                  <Link href="/login" className="text-muted-foreground hover:text-foreground">
-                    Sign In
-                  </Link>
-                  <Button asChild className="mt-4">
-                    <Link href="/creator">
-                      Start Designing
-                    </Link>
-                  </Button>
+                  <Link href="#" className="text-muted-foreground hover:text-foreground">Product</Link>
+                  <Link href="#" className="text-muted-foreground hover:text-foreground">Solutions</Link>
+                  <Link href="#" className="text-muted-foreground hover:text-foreground">Resources</Link>
+                  <Link href="#" className="text-muted-foreground hover:text-foreground">Pricing</Link>
+                  <div className="border-t pt-4 mt-2 grid gap-4">
+                      <Link href="/login" className="text-muted-foreground hover:text-foreground">Login</Link>
+                      <Button asChild className="bg-blue-600 text-white hover:bg-blue-700 w-full">
+                          <Link href="/creator">Sign up free</Link>
+                      </Button>
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -64,7 +106,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1 pt-14">
+      <main className="flex-1 pt-4">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center text-center space-y-6">
