@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrainCircuit, Paintbrush, PackageCheck, Truck } from 'lucide-react';
-import { cn } from "@/lib/utils";
 
 const workflowSteps = [
     {
@@ -25,13 +24,31 @@ const workflowSteps = [
     }
 ];
 
-const Arrow = () => (
-    <div className="hidden lg:flex items-center justify-center flex-shrink-0 px-2 xl:px-8">
-        <svg width="82" height="24" viewBox="0 0 82 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-auto h-6">
+const ArrowConnector = () => (
+    <div className="w-auto pt-16 flex-shrink-0">
+        <svg width="82" height="24" viewBox="0 0 82 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
             <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" />
             <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 8" className="text-primary animate-dash-flow" />
             <path d="M71 2L81 12L71 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
         </svg>
+    </div>
+);
+
+const VerticalLineConnector = () => (
+    <div className="flex justify-center h-12">
+        <div className="w-px bg-border border-dashed" />
+    </div>
+);
+
+const WorkflowCard = ({ step }: { step: typeof workflowSteps[0] }) => (
+    <div className="flex flex-col items-center text-center group">
+        <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 h-40 w-64 flex flex-col items-center justify-center">
+            <div className="p-4 bg-primary/10 rounded-full transition-colors group-hover:bg-primary/20">
+                {step.icon}
+            </div>
+        </div>
+        <h3 className="text-xl font-bold font-headline mt-6 mb-2">{step.title}</h3>
+        <p className="text-muted-foreground text-sm">{step.description}</p>
     </div>
 );
 
@@ -47,27 +64,35 @@ export function WorkflowSteps() {
             Our streamlined process makes bringing your creations to life effortless.
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-4">
-          {workflowSteps.map((step, index) => (
-            <React.Fragment key={index}>
-              <div className="flex flex-col items-center text-center max-w-xs group">
-                <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 h-40 w-64 flex items-center justify-center">
-                    <div className="p-4 bg-primary/10 rounded-full transition-colors group-hover:bg-primary/20">
-                        {step.icon}
-                    </div>
-                </div>
-                <h3 className="text-xl font-bold font-headline mt-6 mb-2">{step.title}</h3>
-                <p className="text-muted-foreground text-sm">{step.description}</p>
-              </div>
 
-              {index < workflowSteps.length - 1 && (
-                <>
-                  <div className="lg:hidden h-12 w-px bg-border border-dashed" />
-                  <Arrow />
-                </>
-              )}
-            </React.Fragment>
-          ))}
+        {/* Desktop horizontal layout */}
+        <div className="hidden lg:flex items-start justify-center gap-4 xl:gap-8">
+            <div className="w-1/4 flex justify-center">
+                <WorkflowCard step={workflowSteps[0]} />
+            </div>
+            <ArrowConnector />
+            <div className="w-1/4 flex justify-center">
+                <WorkflowCard step={workflowSteps[1]} />
+            </div>
+            <ArrowConnector />
+            <div className="w-1/4 flex justify-center">
+                <WorkflowCard step={workflowSteps[2]} />
+            </div>
+            <ArrowConnector />
+            <div className="w-1/4 flex justify-center">
+                <WorkflowCard step={workflowSteps[3]} />
+            </div>
+        </div>
+        
+        {/* Mobile vertical layout */}
+        <div className="lg:hidden flex flex-col items-center gap-8">
+            <WorkflowCard step={workflowSteps[0]} />
+            <VerticalLineConnector />
+            <WorkflowCard step={workflowSteps[1]} />
+            <VerticalLineConnector />
+            <WorkflowCard step={workflowSteps[2]} />
+            <VerticalLineConnector />
+            <WorkflowCard step={workflowSteps[3]} />
         </div>
       </div>
     </section>
