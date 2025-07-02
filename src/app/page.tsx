@@ -69,7 +69,7 @@ export default function LandingPage() {
             <Button variant="outline" asChild>
               <Link href="/login">Login</Link>
             </Button>
-            <Button className="bg-blue-600 text-white hover:bg-blue-700" asChild>
+            <Button asChild>
               <Link href="/creator">Sign up free</Link>
             </Button>
           </div>
@@ -95,7 +95,7 @@ export default function LandingPage() {
                   <Link href="#" className="text-muted-foreground hover:text-foreground">Pricing</Link>
                   <div className="border-t pt-4 mt-2 grid gap-4">
                       <Link href="/login" className="text-muted-foreground hover:text-foreground">Login</Link>
-                      <Button asChild className="bg-blue-600 text-white hover:bg-blue-700 w-full">
+                      <Button asChild className="w-full">
                           <Link href="/creator">Sign up free</Link>
                       </Button>
                   </div>
