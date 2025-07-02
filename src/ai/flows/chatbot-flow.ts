@@ -30,6 +30,12 @@ const TERMS_CONDITIONS = `
 By using Boxmoc, you agree to our terms of service. You are responsible for the content you create and must ensure it does not violate any copyright or trademark laws. Boxmoc provides the tools, but you own your designs.
 `;
 
+const COMPANY_INFO = `
+About Boxmoc: We are a design platform that makes it easy to create stunning, custom designs for packaging, marketing materials, and events using AI.
+Services: We offer AI design generation, an intuitive design editor, 3D previews, and project management. We can create designs for custom packaging, flyers, cards, engravings, and event promotions.
+Contact: You can reach us at contact@boxmoc.com or call us at +1 (234) 567-890.
+`;
+
 // Tools definition
 const getFaq = ai.defineTool(
     {
@@ -60,6 +66,17 @@ const getTermsAndConditions = ai.defineTool(
     },
     async () => TERMS_CONDITIONS
 );
+
+const getCompanyInfo = ai.defineTool(
+    {
+        name: 'getCompanyInfo',
+        description: 'Get information about the company, its services, and how to contact us.',
+        inputSchema: z.object({}),
+        outputSchema: z.string(),
+    },
+    async () => COMPANY_INFO
+);
+
 
 const transferToLiveAgent = ai.defineTool(
     {
@@ -102,12 +119,20 @@ const chatbotPrompt = ai.definePrompt({
     name: 'chatbotPrompt',
     input: { schema: ChatbotInputSchema },
     output: { format: 'text' },
-    tools: [getFaq, getPrivacyPolicy, getTermsAndConditions, transferToLiveAgent],
-    system: `You are a friendly and helpful support assistant for Boxmoc, a design platform.
-    Your goal is to answer user questions about the platform, help them with their design needs, and provide support.
-    Use the available tools to answer questions about FAQs, privacy, or terms.
-    If you cannot answer a question or the user asks to speak to a person, use the 'transferToLiveAgent' tool.
-    Keep your answers concise and helpful.
+    tools: [getFaq, getPrivacyPolicy, getTermsAndConditions, getCompanyInfo, transferToLiveAgent],
+    system: `You are a support assistant for Boxmoc.
+    Your ONLY function is to answer questions about Boxmoc's services, policies, and FAQs using the provided tools.
+    - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or contact information.
+    - Use 'getFaq' for frequently asked questions.
+    - Use 'getPrivacyPolicy' for privacy-related questions.
+    - Use 'getTermsAndConditions' for questions about terms of service.
+    
+    If a user asks a question that is not related to Boxmoc or cannot be answered with your tools, you MUST politely decline. Respond with something like: "I can only answer questions about Boxmoc. How can I help you with our services?"
+    
+    Do not invent information or answer general knowledge questions.
+    
+    If the user asks to speak to a person or agent, use the 'transferToLiveAgent' tool.
+
     Here is the conversation history:
     {{#if history}}
       {{#each history}}
