@@ -15,8 +15,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 w-full bg-background/90 py-3 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border bg-card/75 px-4 shadow-lg sm:px-6">
+      <header className="sticky top-0 z-50 w-full py-3">
+        <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border bg-card/75 px-4 shadow-lg sm:px-6 backdrop-blur-sm">
           {/* Left Section */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
