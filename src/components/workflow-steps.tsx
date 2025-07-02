@@ -25,25 +25,15 @@ const workflowSteps = [
     }
 ];
 
-const Arrow = ({ direction }: { direction: 'down' | 'up' }) => {
-    const path = direction === 'down' 
-        ? "M1 1C24.3333 1 47.6667 81 101 81" 
-        : "M1 81C24.3333 81 47.6667 1 101 1";
-    
-    const arrowHeadPath = direction === 'down'
-        ? "M91 76L101 81L96 71"
-        : "M91 6L101 1L96 11";
-
-    return (
-        <div className="hidden lg:block flex-shrink-0 px-2 xl:px-8 -my-8">
-            <svg width="102" height="82" viewBox="0 0 102 82" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
-                <path d={path} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" />
-                <path d={path} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 8" className="text-primary animate-dash-flow" />
-                <path d={arrowHeadPath} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
-            </svg>
-        </div>
-    );
-};
+const Arrow = () => (
+    <div className="hidden lg:flex items-center justify-center flex-shrink-0 px-2 xl:px-8">
+        <svg width="82" height="24" viewBox="0 0 82 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-auto h-6">
+            <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" />
+            <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 8" className="text-primary animate-dash-flow" />
+            <path d="M71 2L81 12L71 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
+        </svg>
+    </div>
+);
 
 export function WorkflowSteps() {
   return (
@@ -57,26 +47,23 @@ export function WorkflowSteps() {
             Our streamlined process makes bringing your creations to life effortless.
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row items-center justify-center lg:items-start lg:justify-between gap-8 lg:gap-0">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-4">
           {workflowSteps.map((step, index) => (
             <React.Fragment key={index}>
-              <div className={cn(
-                "flex flex-col items-center text-center max-w-xs group",
-                index % 2 !== 0 && "lg:mt-24" // Stagger items
-              )}>
+              <div className="flex flex-col items-center text-center max-w-xs group">
                 <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 h-40 w-64 flex items-center justify-center">
                     <div className="p-4 bg-primary/10 rounded-full transition-colors group-hover:bg-primary/20">
                         {step.icon}
                     </div>
                 </div>
                 <h3 className="text-xl font-bold font-headline mt-6 mb-2">{step.title}</h3>
-                <p className="text-muted-foreground text-sm flex-grow">{step.description}</p>
+                <p className="text-muted-foreground text-sm">{step.description}</p>
               </div>
 
               {index < workflowSteps.length - 1 && (
                 <>
                   <div className="lg:hidden h-12 w-px bg-border border-dashed" />
-                  <Arrow direction={index % 2 === 0 ? 'down' : 'up'} />
+                  <Arrow />
                 </>
               )}
             </React.Fragment>
