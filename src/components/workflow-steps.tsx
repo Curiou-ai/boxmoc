@@ -25,8 +25,8 @@ const workflowSteps = [
 ];
 
 const ArrowConnector = () => (
-    <div className="w-auto pt-16 flex-shrink-0">
-        <svg width="82" height="24" viewBox="0 0 82 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+    <div className="flex-grow pt-16">
+        <svg viewBox="0 0 82 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto max-w-[82px] mx-auto">
             <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/30" />
             <path d="M1 12H81" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 8" className="text-primary animate-dash-flow" />
             <path d="M71 2L81 12L71 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
@@ -41,8 +41,8 @@ const VerticalLineConnector = () => (
 );
 
 const WorkflowCard = ({ step }: { step: typeof workflowSteps[0] }) => (
-    <div className="flex flex-col items-center text-center group">
-        <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 h-40 w-64 flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center text-center group h-full">
+        <div className="p-6 bg-background rounded-xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:-translate-y-2 min-h-[10rem] w-full flex flex-col items-center justify-center">
             <div className="p-4 bg-primary/10 rounded-full transition-colors group-hover:bg-primary/20">
                 {step.icon}
             </div>
@@ -66,33 +66,34 @@ export function WorkflowSteps() {
         </div>
 
         {/* Desktop horizontal layout */}
-        <div className="hidden lg:flex items-start justify-center gap-4 xl:gap-8">
-            <div className="w-1/4 flex justify-center">
-                <WorkflowCard step={workflowSteps[0]} />
-            </div>
-            <ArrowConnector />
-            <div className="w-1/4 flex justify-center">
-                <WorkflowCard step={workflowSteps[1]} />
-            </div>
-            <ArrowConnector />
-            <div className="w-1/4 flex justify-center">
-                <WorkflowCard step={workflowSteps[2]} />
-            </div>
-            <ArrowConnector />
-            <div className="w-1/4 flex justify-center">
-                <WorkflowCard step={workflowSteps[3]} />
-            </div>
+        <div className="hidden lg:flex items-start justify-between gap-4 xl:gap-8">
+            {workflowSteps.map((step, index) => (
+                <React.Fragment key={index}>
+                    <div className="shrink w-56 xl:w-64">
+                        <WorkflowCard step={step} />
+                    </div>
+                    {index < workflowSteps.length - 1 && <ArrowConnector />}
+                </React.Fragment>
+            ))}
         </div>
         
         {/* Mobile vertical layout */}
         <div className="lg:hidden flex flex-col items-center gap-8">
-            <WorkflowCard step={workflowSteps[0]} />
+            <div className="w-64">
+                <WorkflowCard step={workflowSteps[0]} />
+            </div>
             <VerticalLineConnector />
-            <WorkflowCard step={workflowSteps[1]} />
+            <div className="w-64">
+                <WorkflowCard step={workflowSteps[1]} />
+            </div>
             <VerticalLineConnector />
-            <WorkflowCard step={workflowSteps[2]} />
+            <div className="w-64">
+                <WorkflowCard step={workflowSteps[2]} />
+            </div>
             <VerticalLineConnector />
-            <WorkflowCard step={workflowSteps[3]} />
+            <div className="w-64">
+                <WorkflowCard step={workflowSteps[3]} />
+            </div>
         </div>
       </div>
     </section>
