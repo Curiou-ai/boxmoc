@@ -53,11 +53,36 @@ const ArrowConnectorDown = () => (
     </div>
 );
 
-const VerticalLineConnector = () => (
-    <div className="flex justify-center h-12">
-        <div className="w-px bg-border border-dashed" />
+const VerticalArrowConnector = () => (
+    <div className="flex justify-center h-20">
+        <svg viewBox="0 0 20 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-auto h-full">
+            <defs>
+                <marker id="arrowhead-vertical" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto-start-reverse">
+                    <polygon points="0 0, 7 2.5, 0 5" className="fill-primary" />
+                </marker>
+            </defs>
+            <path 
+                d="M 10 0 C -10 20, 30 60, 10 80" 
+                stroke="currentColor" 
+                strokeWidth="1.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="text-primary/30" 
+                markerEnd="url(#arrowhead-vertical)" 
+            />
+            <path 
+                d="M 10 0 C -10 20, 30 60, 10 80"
+                stroke="currentColor" 
+                strokeWidth="1.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeDasharray="6 6" 
+                className="text-primary animate-dash-flow" 
+            />
+        </svg>
     </div>
 );
+
 
 const WorkflowCard = ({ step }: { step: typeof workflowSteps[0] }) => (
     <div className="flex flex-col items-center text-center group">
@@ -99,11 +124,11 @@ export function WorkflowSteps() {
         </div>
         
         {/* Mobile vertical layout */}
-        <div className="lg:hidden flex flex-col items-center gap-8 max-w-xs mx-auto">
+        <div className="lg:hidden flex flex-col items-center gap-4 max-w-xs mx-auto">
              {workflowSteps.map((step, index) => (
                 <React.Fragment key={`mobile-${index}`}>
                     <WorkflowCard step={step} />
-                    {index < workflowSteps.length - 1 && <VerticalLineConnector />}
+                    {index < workflowSteps.length - 1 && <VerticalArrowConnector />}
                 </React.Fragment>
              ))}
         </div>
