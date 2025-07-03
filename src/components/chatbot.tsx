@@ -33,6 +33,12 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
   );
 
+const suggestedPrompts = [
+  'What services do you offer?',
+  'What are your FAQs?',
+  'How can I talk to a person?',
+];
+
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -63,17 +69,18 @@ export function Chatbot() {
     URL.revokeObjectURL(url);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const sendMessage = async (query: string) => {
+    if (!query.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: input };
+    const userMessage: Message = { role: 'user', content: query };
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    if (input === query) {
+        setInput('');
+    }
     setIsPending(true);
 
     const formData = new FormData();
-    formData.append('query', input);
+    formData.append('query', query);
     formData.append('history', JSON.stringify(messages));
 
     const result = await handleChatbotQuery({ response: '' }, formData);
@@ -87,6 +94,11 @@ export function Chatbot() {
       const errorMessage: Message = { role: 'model', content: `Error: ${result.error}` };
       setMessages((prev) => [...prev, errorMessage]);
     }
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessage(input);
   };
 
   return (
@@ -186,6 +198,23 @@ export function Chatbot() {
                 </div>
               </div>
             </CardContent>
+             {messages.length === 0 && !isPending && (
+                <div className="px-4 pb-4 border-t pt-4">
+                    <div className="flex flex-wrap justify-center gap-2">
+                        {suggestedPrompts.map((prompt, i) => (
+                            <Button
+                                key={i}
+                                variant="outline"
+                                size="sm"
+                                className="h-auto py-1.5 px-3 text-xs"
+                                onClick={() => sendMessage(prompt)}
+                            >
+                                {prompt}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            )}
             <CardFooter className="border-t pt-4">
               <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
                 <Input
