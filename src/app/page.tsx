@@ -11,10 +11,12 @@ import { ServicesAccordion } from '@/components/services-accordion'
 import Testimonials from '@/components/testimonials'
 import { WorkflowSteps } from '@/components/workflow-steps'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { AnnouncementBar } from '@/components/announcement-bar'
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <AnnouncementBar />
       <header className="sticky top-0 z-50 w-full py-3">
         <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border bg-card/75 px-4 shadow-lg sm:px-6 backdrop-blur-sm">
           {/* Left Section */}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
@@ -5,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MessageSquare, Send, X, Bot, User } from 'lucide-react';
+import { MessageSquare, Send, X, Bot, User, MoreHorizontal, Download, Expand, Shrink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { handleChatbotQuery } from '@/app/actions';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 interface Message {
   role: 'user' | 'model';
@@ -36,6 +38,7 @@ export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isPending, setIsPending] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,6 +47,22 @@ export function Chatbot() {
     }
   }, [messages]);
   
+  const handleDownloadTranscript = () => {
+    const transcript = messages
+      .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+      .join('\n\n');
+    
+    const blob = new Blob([transcript], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'boxmoc-chat-transcript.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -81,8 +100,11 @@ export function Chatbot() {
       </Button>
 
       {isOpen && (
-        <div className="fixed bottom-20 right-4 z-50">
-          <Card className="w-[350px] h-[500px] flex flex-col shadow-2xl animate-in fade-in zoom-in-95">
+        <div className={cn(
+            "fixed bottom-20 right-4 z-50 transition-all duration-300 ease-in-out",
+            isExpanded ? "w-[65vw] h-[80vh]" : "w-[350px] h-[500px]"
+          )}>
+          <Card className="h-full w-full flex flex-col shadow-2xl animate-in fade-in zoom-in-95">
             <CardHeader className="flex flex-row items-center justify-between border-b">
               <div className="flex items-center gap-3">
                 <Avatar>
@@ -90,12 +112,30 @@ export function Chatbot() {
                 </Avatar>
                 <CardTitle className="text-lg font-headline">Boxmoc Assistant</CardTitle>
               </div>
-               <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="icon">
-                    <WhatsAppIcon className="h-5 w-5" />
-                    <span className="sr-only">Chat on WhatsApp</span>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)}>
+                    {isExpanded ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
+                    <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'} chat</span>
                 </Button>
-              </a>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-5 w-5" />
+                            <span className="sr-only">More options</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onSelect={() => window.open('https://wa.me/1234567890', '_blank')}>
+                            <WhatsAppIcon className="mr-2 h-4 w-4" />
+                            Chat on WhatsApp
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={handleDownloadTranscript}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download Transcript
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
               <div ref={chatContainerRef} className="h-full overflow-y-auto">
@@ -116,7 +156,8 @@ export function Chatbot() {
                         </Avatar>
                       )}
                       <div className={cn(
-                        "p-3 rounded-lg max-w-xs", 
+                        "p-3 rounded-lg",
+                        isExpanded ? "max-w-md" : "max-w-xs", 
                         message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                       )}>
                         <p className="text-sm">{message.content}</p>
