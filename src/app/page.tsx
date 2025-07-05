@@ -26,7 +26,7 @@ export default function LandingPage() {
               <span className="font-bold text-lg">Boxmoc</span>
             </Link>
             {/* Desktop Navigation */}
-            <nav className="hidden items-center gap-6 md:flex">
+            <nav className="hidden items-center gap-6 xl:flex">
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
                   Product <ChevronDown className="h-4 w-4" />
@@ -37,18 +37,16 @@ export default function LandingPage() {
                   <DropdownMenuItem>Event Promotions</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <div className="hidden lg:flex">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
-                    Solutions <ChevronDown className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>For E-commerce</DropdownMenuItem>
-                    <DropdownMenuItem>For Agencies</DropdownMenuItem>
-                    <DropdownMenuItem>For Startups</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                  Solutions <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>For E-commerce</DropdownMenuItem>
+                  <DropdownMenuItem>For Agencies</DropdownMenuItem>
+                  <DropdownMenuItem>For Startups</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
                   Resources <ChevronDown className="h-4 w-4" />
@@ -59,14 +57,14 @@ export default function LandingPage() {
                   <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Link href="#" className="hidden lg:flex text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Pricing
               </Link>
             </nav>
           </div>
 
           {/* Right Section */}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2 xl:flex">
             <Button variant="ghost" asChild>
               <Link href="/contact">Book a demo</Link>
             </Button>
@@ -79,7 +77,7 @@ export default function LandingPage() {
           </div>
           
           {/* Mobile Navigation */}
-          <div className="md:hidden">
+          <div className="xl:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
