@@ -2,8 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Box } from "lucide-react"
+import { Box, Facebook } from "lucide-react"
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" {...props}>
@@ -14,7 +13,14 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 )
 
-export default function LoginPage() {
+const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M12 2C9.462 2 7.5 3.731 7.5 6.125c0 2.261 1.637 3.469 1.637 3.469s-1.887.894-1.887 2.812c0 2.406 2.25 3.337 2.25 3.337s.213 4.25-.188 5.25c.3.025.637.038 1.012.038 1.163 0 2.2-.338 2.925-.763.788.463 1.875.825 3.113.825 2.587 0 4.125-2.075 4.125-4.088 0-2.012-1.288-2.9-2.863-2.9-1.488 0-2.313.887-3.612.887-.138 0-.275 0-.413-.013a.17.17 0 0 1-.162-.125c-.013-.038-.025-.075-.025-.113 0-.025.013-.05.013-.075 0-.612.35-1.163.95-1.575C16.025 8.175 16.5 7.113 16.5 6.025 16.5 3.65 14.537 2 12 2zM12.875.025c.825 0 1.575.45 2.025 1.137.613.975.3 2.45-.775 3.125-.737.512-1.637.662-2.287.162-.7-.6-1.012-1.787-.4-2.837C11.825.437 12.325.025 12.875.025z"/>
+    </svg>
+);
+
+
+export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
        <header className="py-6 px-4 sm:px-6 lg:px-8">
@@ -23,8 +29,8 @@ export default function LoginPage() {
                 <Box className="h-7 w-7 text-primary" />
                 <span className="text-xl font-bold">Boxmoc</span>
             </Link>
-            <Link href="/signup" className="text-sm font-medium hover:underline text-foreground">
-                Sign up
+            <Link href="/login" className="text-sm font-medium hover:underline text-foreground">
+                Log in
             </Link>
         </div>
       </header>
@@ -33,17 +39,26 @@ export default function LoginPage() {
         <div className="w-full max-w-sm px-4">
           <div className="text-center mb-8">
             <Box className="h-10 w-10 text-primary mx-auto" />
-            <h1 className="text-3xl font-bold font-headline mt-4">Log in to your account</h1>
+            <h1 className="text-3xl font-bold font-headline mt-4">Create your account</h1>
             <p className="text-muted-foreground mt-2 text-sm">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="font-medium text-primary hover:underline">
-                Sign up
+              Already have an account?{" "}
+              <Link href="/login" className="font-medium text-primary hover:underline">
+                Log in
               </Link>
             </p>
           </div>
           
           <div className="space-y-6">
-              <form className="space-y-6 text-left">
+              <form className="space-y-4 text-left">
+                <div className="grid gap-2">
+                  <Label htmlFor="full-name">Full Name</Label>
+                  <Input
+                    id="full-name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -53,16 +68,20 @@ export default function LoginPage() {
                     required
                   />
                 </div>
+                 <div className="grid gap-2">
+                  <Label htmlFor="company-name">Company Name</Label>
+                  <Input
+                    id="company-name"
+                    type="text"
+                    placeholder="Your company name"
+                  />
+                </div>
                 <div className="grid gap-2">
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" type="password" required placeholder="Enter your password" />
                 </div>
-                <div className="flex items-center">
-                    <Checkbox id="remember-me" />
-                    <Label htmlFor="remember-me" className="ml-2 text-sm font-normal text-muted-foreground">Remember for 30 days</Label>
-                </div>
                 <Button type="submit" className="w-full">
-                  Sign In
+                  Sign Up
                 </Button>
               </form>
               
@@ -73,24 +92,41 @@ export default function LoginPage() {
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background px-2 text-muted-foreground">
-                      Or
+                      Or sign up with
                     </span>
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full mt-6">
-                  <GoogleIcon className="mr-2" />
-                  Sign in with Google
-                </Button>
+                <div className="grid grid-cols-3 gap-3 mt-6">
+                    <Button variant="outline" className="w-full">
+                      <Facebook className="mr-2 text-[#1877F2]" />
+                      Facebook
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      <GoogleIcon className="mr-2" />
+                      Google
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                      <AppleIcon className="mr-2" />
+                      Apple
+                    </Button>
+                </div>
               </div>
 
-              <div className="text-center">
+              <div className="text-center text-xs text-muted-foreground px-4">
+                 By signing up, you agree to our{" "}
                  <Link
                     href="#"
-                    className="inline-block text-sm font-medium text-primary hover:underline"
+                    className="underline hover:text-primary"
                 >
-                    Forgot password?
-                </Link>
+                    Terms of Use
+                </Link> and {" "}
+                 <Link
+                    href="#"
+                    className="underline hover:text-primary"
+                >
+                    Privacy Policy
+                </Link>.
               </div>
           </div>
 
