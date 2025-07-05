@@ -37,16 +37,18 @@ export default function LandingPage() {
                   <DropdownMenuItem>Event Promotions</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
-                  Solutions <ChevronDown className="h-4 w-4" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>For E-commerce</DropdownMenuItem>
-                  <DropdownMenuItem>For Agencies</DropdownMenuItem>
-                  <DropdownMenuItem>For Startups</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="hidden lg:flex">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                    Solutions <ChevronDown className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem>For E-commerce</DropdownMenuItem>
+                    <DropdownMenuItem>For Agencies</DropdownMenuItem>
+                    <DropdownMenuItem>For Startups</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
                   Resources <ChevronDown className="h-4 w-4" />
@@ -57,7 +59,7 @@ export default function LandingPage() {
                   <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="#" className="hidden lg:flex text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Pricing
               </Link>
             </nav>
@@ -66,7 +68,7 @@ export default function LandingPage() {
           {/* Right Section */}
           <div className="hidden items-center gap-2 md:flex">
             <Button variant="ghost" asChild>
-              <Link href="#">Book a demo</Link>
+              <Link href="/contact">Book a demo</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/login">Login</Link>
