@@ -1,65 +1,101 @@
-
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Box } from "lucide-react"
+
+const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" {...props}>
+        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+        <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z" />
+        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A8 8 0 0 1 24 36c-5.222 0-9.643-3.27-11.283-7.94l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-11.303 8c-1.334 0-2.62-.218-3.828-.621l-6.522 5.025C13.186 42.658 18.347 44 24 44c11.045 0 20-8.955 20-20 0-1.341-.138-2.65-.389-3.917z" />
+    </svg>
+)
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-        <Card className="mx-auto max-w-sm w-full m-4">
-          <CardHeader>
-            <div className="flex items-center justify-center mb-4">
-              <Link href="/" className="flex items-center gap-2 font-semibold">
-                <Box className="h-6 w-6" />
-                <span className="text-lg font-bold">Boxmoc</span>
-              </Link>
-            </div>
-            <CardTitle className="text-2xl text-center">Login</CardTitle>
-            <CardDescription className="text-center">
-              Enter your email below to login to your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-              <Button variant="outline" className="w-full">
-                Login with Google
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+       <header className="py-6 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto flex justify-between items-center max-w-7xl">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+                <Box className="h-7 w-7 text-primary" />
+                <span className="text-xl font-bold">Boxmoc</span>
+            </Link>
+            <Link href="#" className="text-sm font-medium hover:underline text-foreground">
+                Sign up
+            </Link>
+        </div>
+      </header>
+
+      <main className="flex-grow flex items-center justify-center py-12">
+        <div className="w-full max-w-sm px-4">
+          <div className="text-center mb-8">
+            <Box className="h-10 w-10 text-primary mx-auto" />
+            <h1 className="text-3xl font-bold font-headline mt-4">Log in to your account</h1>
+            <p className="text-muted-foreground mt-2 text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="#" className="underline">
+              <Link href="#" className="font-medium text-primary hover:underline">
                 Sign up
               </Link>
-            </div>
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          
+          <div className="space-y-6">
+              <form className="space-y-6 text-left">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="myemail@email.com"
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" required placeholder="Enter your password" />
+                </div>
+                <div className="flex items-center">
+                    <Checkbox id="remember-me" />
+                    <Label htmlFor="remember-me" className="ml-2 text-sm font-normal text-muted-foreground">Remember for 30 days</Label>
+                </div>
+                <Button type="submit" className="w-full">
+                  Sign In
+                </Button>
+              </form>
+              
+              <div>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or
+                    </span>
+                  </div>
+                </div>
+
+                <Button variant="outline" className="w-full mt-6">
+                  <GoogleIcon className="mr-2" />
+                  Sign in with Google
+                </Button>
+              </div>
+
+              <div className="text-center">
+                 <Link
+                    href="#"
+                    className="inline-block text-sm font-medium text-primary hover:underline"
+                >
+                    Forgot password?
+                </Link>
+              </div>
+          </div>
+
+        </div>
+      </main>
     </div>
   )
 }
