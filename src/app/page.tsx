@@ -26,7 +26,7 @@ export default function LandingPage() {
               <span className="font-bold text-lg">Boxmoc</span>
             </Link>
             {/* Desktop Navigation */}
-            <nav className="hidden items-center gap-6 xl:flex">
+            <nav className="hidden items-center gap-6 lg:flex">
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
                   Product <ChevronDown className="h-4 w-4" />
@@ -64,7 +64,7 @@ export default function LandingPage() {
           </div>
 
           {/* Right Section */}
-          <div className="hidden items-center gap-2 xl:flex">
+          <div className="hidden items-center gap-2 lg:flex">
             <Button variant="ghost" asChild>
               <Link href="/contact">Book a demo</Link>
             </Button>
@@ -77,7 +77,7 @@ export default function LandingPage() {
           </div>
           
           {/* Mobile Navigation */}
-          <div className="xl:hidden">
+          <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
