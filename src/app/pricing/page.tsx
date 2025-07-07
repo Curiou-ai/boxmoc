@@ -6,43 +6,43 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import { Box, ArrowLeft, Check, Globe, Rocket, Sparkles } from "lucide-react"
+import { Box, ArrowLeft, Check, Rocket, Sparkles } from "lucide-react"
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 const pricingPlans = [
     {
-        name: 'Smart Business AI Complete',
+        name: 'Starter Trial',
         isTrial: true,
         trialDuration: '7-DAY FREE TRIAL',
         price: 5.99,
         pricePeriod: '/month',
-        description: 'No credit card required for trial',
-        discount: 'Was $19.99 - Save $14 (70% off)',
+        description: 'Billed after trial ends. Cancel anytime.',
+        discount: 'Start creating with our core AI features',
         features: [
-            '40 AI Assistant - Unlimited queries',
-            'AI-powered sales forecasting',
-            'Smart financial insights & analytics',
-            'Intelligent inventory management',
-            'Natural language business queries',
-            'Unlimited transactions & priority support'
+            '10 AI Design Generations / month',
+            'Standard 3D Previews',
+            'Access to Basic Templates',
+            '1 User Seat',
+            'Community Support',
+            'Export Watermarked Designs'
         ],
-        buttonText: 'Start Free Trial Now',
+        buttonText: 'Start Free Trial',
         buttonLink: '/signup',
     },
     {
         name: 'Pro',
         icon: Rocket,
-        description: 'Ideal for growing teams needing more robust tools and integrations.',
-        monthlyPrice: 35,
-        yearlyPrice: 30,
+        description: 'For professionals and small teams who need advanced features and more creative power.',
+        monthlyPrice: 49,
+        yearlyPrice: 40,
         features: [
-            'Advanced task management',
-            'Shared team calendar',
-            'Unlimited team collaboration',
-            '50 GB file storage',
-            'Priority customer support',
-            'Integrations with popular apps'
+            'Unlimited AI Design Generations',
+            'High-Resolution 3D Previews',
+            'Premium Template Library',
+            'Up to 5 Team Members',
+            'Priority Email Support',
+            'Upload Custom Assets & Logos'
         ],
         buttonText: 'Get Pro',
         buttonLink: '/signup',
@@ -51,17 +51,17 @@ const pricingPlans = [
     {
         name: 'Enterprise',
         icon: Sparkles,
-        description: 'Designed for businesses requiring comprehensive, scalable management tools.',
+        description: 'For large organizations requiring custom solutions, advanced security, and dedicated support.',
         priceText: 'Custom',
         features: [
-            'Custom solutions',
-            'Unlimited file storage',
-            'Advanced security',
-            'Detailed analytics',
-            'Dedicated account manager',
-            '24/7 premium support'
+            'Everything in Pro, plus:',
+            'Custom Integrations & API Access',
+            'Advanced Security & Compliance',
+            'Unlimited Team Members',
+            'Dedicated Account Manager',
+            '24/7 Premium Support'
         ],
-        buttonText: 'Get Enterprise',
+        buttonText: 'Contact Sales',
         buttonLink: '/contact',
         popular: false,
     }
@@ -89,9 +89,9 @@ export default function PricingPage() {
       <main className="flex-grow py-12 md:py-24">
         <div className="container px-4 md:px-6 max-w-5xl mx-auto">
           <div className="text-center space-y-4 mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter font-headline">Pricing</h1>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter font-headline">Find the perfect plan for your creative needs</h1>
             <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl">
-              Do more impactful work with a privacy first calendar that plugs into all your apps at work.
+              From solo creators to enterprise teams, our flexible plans are designed to help you create stunning designs with the power of AI.
             </p>
           </div>
           
