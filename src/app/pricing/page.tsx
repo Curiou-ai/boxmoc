@@ -34,7 +34,7 @@ const pricingPlans = [
         name: 'Pro',
         icon: Rocket,
         description: 'For professionals and small teams who need advanced features and more creative power.',
-        monthlyPrice: 49,
+        monthlyPrice: 35,
         yearlyPrice: 40,
         features: [
             'Unlimited AI Design Generations',
