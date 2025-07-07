@@ -57,7 +57,7 @@ export default function LandingPage() {
                   <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <Link href="/pricing" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                 Pricing
               </Link>
             </nav>
@@ -94,7 +94,7 @@ export default function LandingPage() {
                   <Link href="#" className="text-muted-foreground hover:text-foreground">Product</Link>
                   <Link href="#" className="text-muted-foreground hover:text-foreground">Solutions</Link>
                   <Link href="#" className="text-muted-foreground hover:text-foreground">Resources</Link>
-                  <Link href="#" className="text-muted-foreground hover:text-foreground">Pricing</Link>
+                  <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>
                   <div className="border-t pt-4 mt-2 grid gap-4">
                       <Link href="/login" className="text-muted-foreground hover:text-foreground">Login</Link>
                       <Button asChild className="w-full">
