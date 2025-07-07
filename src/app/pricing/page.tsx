@@ -17,6 +17,11 @@ const pricingPlans = [
         description: 'Perfect for individuals and hobbyists starting out with AI-powered design.',
         monthlyPrice: 10.99,
         yearlyPrice: 9,
+        isTrial: true,
+        discountInfo: {
+            text: "Originally $29/mo - Save over 60%",
+            subtext: "No credit card required for trial"
+        },
         features: [
             '10 AI Design Generations / month',
             'Standard 3D Previews',
@@ -25,7 +30,7 @@ const pricingPlans = [
             'Community Support',
             'Export Watermarked Designs'
         ],
-        buttonText: 'Get Started',
+        buttonText: 'Start Free Trial Now',
         buttonLink: '/signup',
         popular: false,
     },
@@ -110,54 +115,69 @@ export default function PricingPage() {
                 const isCustom = plan.priceText === 'Custom';
                 
                 return (
-                  <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border-2 border-pink-500 shadow-xl' : 'border')}>
-                    <CardHeader className="items-start space-y-4">
-                        <div className="flex items-center gap-4 w-full">
-                            <div className="p-3 bg-muted rounded-lg">
-                                <plan.icon className="h-6 w-6 text-primary" />
+                  <div key={plan.name} className="relative pt-6 h-full">
+                    {plan.isTrial && (
+                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 hover:bg-amber-400/90 font-bold px-4 py-1 text-sm">
+                        7-DAY FREE TRIAL
+                      </Badge>
+                    )}
+                    <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border-2 border-pink-500 shadow-xl' : 'border')}>
+                      <CardHeader className="items-start space-y-4">
+                          <div className="flex items-center gap-4 w-full">
+                              <div className="p-3 bg-muted rounded-lg">
+                                  <plan.icon className="h-6 w-6 text-primary" />
+                              </div>
+                              <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
+                              {plan.popular && <Badge className="ml-auto bg-pink-100 text-pink-600 border border-pink-300 hover:bg-pink-100">Most Popular</Badge>}
+                          </div>
+                        <CardDescription className="pt-2">{plan.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-grow space-y-6">
+                          <div className="flex justify-between items-baseline">
+                              {isCustom ? (
+                                  <p className="text-4xl font-bold">{plan.priceText}</p>
+                              ) : (
+                                  <p>
+                                      <span className="text-4xl font-bold">${price}</span>
+                                      <span className="text-muted-foreground"> per month</span>
+                                  </p>
+                              )}
+                              {!isCustom && isYearly && (
+                                  <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
+                              )}
+                          </div>
+
+                          {plan.isTrial && plan.discountInfo && !isYearly && (
+                            <div className="bg-muted/50 text-center p-3 rounded-lg border">
+                              <p className="font-semibold text-sm text-foreground">{plan.discountInfo.text}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{plan.discountInfo.subtext}</p>
                             </div>
-                            <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
-                            {plan.popular && <Badge className="ml-auto bg-pink-100 text-pink-600 border border-pink-300 hover:bg-pink-100">Most Popular</Badge>}
-                        </div>
-                      <CardDescription className="pt-2">{plan.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow space-y-6">
-                        <div className="flex justify-between items-baseline">
-                            {isCustom ? (
-                                <p className="text-4xl font-bold">{plan.priceText}</p>
-                            ) : (
-                                <p>
-                                    <span className="text-4xl font-bold">${price}</span>
-                                    <span className="text-muted-foreground"> per month</span>
-                                </p>
-                            )}
-                            {!isCustom && isYearly && (
-                                <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
-                            )}
-                        </div>
+                          )}
                        
-                      <ul className="space-y-3 text-sm">
-                        {plan.features.map((feature, i) => (
-                          <li key={i} className="flex items-center gap-3">
-                            <Check className="h-5 w-5 text-primary" />
-                            <span className="text-muted-foreground">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                    <CardFooter>
-                       <Button 
-                            asChild 
-                            variant={plan.popular ? 'default' : 'outline'} 
-                            className={cn('w-full', 
-                                plan.name === 'Pro' && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
-                                plan.name === 'Enterprise' && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
-                            )}
-                        >
-                            <Link href={plan.buttonLink}>{plan.buttonText}</Link>
-                       </Button>
-                    </CardFooter>
-                  </Card>
+                        <ul className="space-y-3 text-sm">
+                          {plan.features.map((feature, i) => (
+                            <li key={i} className="flex items-center gap-3">
+                              <Check className="h-5 w-5 text-primary" />
+                              <span className="text-muted-foreground">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                      <CardFooter>
+                        <Button 
+                              asChild 
+                              variant={plan.popular ? 'default' : 'outline'} 
+                              className={cn('w-full', 
+                                  plan.popular && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
+                                  plan.isTrial && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
+                                  plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
+                              )}
+                          >
+                              <Link href={plan.buttonLink}>{plan.buttonText}</Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </div>
                 );
             })}
           </div>
