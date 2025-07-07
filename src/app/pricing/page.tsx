@@ -12,22 +12,23 @@ import { cn } from '@/lib/utils';
 
 const pricingPlans = [
     {
-        name: 'Basic Plan',
-        icon: Globe,
-        description: 'Perfect for individuals or small teams looking to stay organized with basic features.',
-        monthlyPrice: 0,
-        yearlyPrice: 0,
+        name: 'Smart Business AI Complete',
+        isTrial: true,
+        trialDuration: '7-DAY FREE TRIAL',
+        price: 5.99,
+        pricePeriod: '/month',
+        description: 'No credit card required for trial',
+        discount: 'Was $19.99 - Save $14 (70% off)',
         features: [
-            'Basic task management',
-            'Personal calendar',
-            'Task reminders',
-            'Collaboration with 3 team members',
-            'Limited file storage (up to 1 GB)',
-            'Access to mobile and desktop apps'
+            '40 AI Assistant - Unlimited queries',
+            'AI-powered sales forecasting',
+            'Smart financial insights & analytics',
+            'Intelligent inventory management',
+            'Natural language business queries',
+            'Unlimited transactions & priority support'
         ],
-        buttonText: 'Start for free',
+        buttonText: 'Start Free Trial Now',
         buttonLink: '/signup',
-        popular: false,
     },
     {
         name: 'Pro',
@@ -105,6 +106,42 @@ export default function PricingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
             {pricingPlans.map((plan) => {
+                if (plan.isTrial) {
+                    return (
+                        <Card key={plan.name} className="flex flex-col h-full rounded-2xl bg-[#1E2A47] text-white p-6 border-0 shadow-2xl relative">
+                            <CardHeader className="items-center space-y-4 text-center p-0">
+                                <Badge className="bg-[#FBBF24] hover:bg-[#FBBF24]/90 text-black font-bold text-sm py-2 px-4 self-center">
+                                    {plan.trialDuration}
+                                </Badge>
+                                <CardTitle className="font-headline text-3xl pt-4">{plan.name}</CardTitle>
+                                <div className="flex items-end justify-center py-2">
+                                    <span className="text-6xl font-bold">${plan.price}</span>
+                                    <span className="text-xl text-white/70 ml-2 mb-1">{plan.pricePeriod}</span>
+                                </div>
+                                <div className="bg-white/10 rounded-lg p-3 text-center text-sm w-full">
+                                    <p>{plan.discount}</p>
+                                    <p className="text-xs text-white/70 mt-1">{plan.description}</p>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-grow space-y-6 p-0 pt-6">
+                                <ul className="space-y-3 text-sm text-left">
+                                    {plan.features.map((feature, i) => (
+                                      <li key={i} className="flex items-center gap-3">
+                                        <Check className="h-5 w-5 text-[#FBBF24]" />
+                                        <span>{feature}</span>
+                                      </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                            <CardFooter className="p-0 pt-6">
+                                <Button asChild className="w-full bg-[#FBBF24] hover:bg-[#FBBF24]/90 text-black font-bold h-12 text-base">
+                                    <Link href={plan.buttonLink}>{plan.buttonText}</Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    )
+                }
+                
                 const isYearly = billingCycle === 'yearly';
                 const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
                 const isCustom = plan.priceText === 'Custom';
