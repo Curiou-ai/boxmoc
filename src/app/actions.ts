@@ -47,11 +47,11 @@ export async function handleChatbotQuery(
     const result = await askChatbot(input);
     return { response: result };
   } catch (error) {
-    console.error(error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    console.error(error); // Log the actual error for debugging
+    // To keep the UI clean, return a generic error message to the user.
     return {
         response: '',
-        error: `An error occurred: ${errorMessage}`
+        error: 'Error: An error occurred. Please try again later.'
     };
   }
 }
