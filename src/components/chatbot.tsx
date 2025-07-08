@@ -210,7 +210,7 @@ export function Chatbot() {
             </CardContent>
              {messages.length === 0 && !isPending && (
                 <div className="px-4 pb-4">
-                    <div className="flex flex-wrap justify-end gap-2">
+                    <div className="flex flex-col items-end gap-2">
                         {suggestedPrompts.map((prompt, i) => (
                             <Button
                                 key={i}
