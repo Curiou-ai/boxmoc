@@ -10,6 +10,8 @@ import { MessageSquare, Send, X, Bot, User, MoreHorizontal, Download, Expand, Sh
 import { cn } from '@/lib/utils';
 import { handleChatbotQuery } from '@/app/actions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   role: 'user' | 'model';
@@ -172,7 +174,15 @@ export function Chatbot() {
                         isExpanded ? "max-w-md" : "max-w-xs", 
                         message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                       )}>
-                        <p className="text-sm">{message.content}</p>
+                        {message.role === 'user' ? (
+                            <p className="text-sm">{message.content}</p>
+                        ) : (
+                            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:my-0">
+                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {message.content}
+                               </ReactMarkdown>
+                            </div>
+                        )}
                       </div>
                       {message.role === 'user' && (
                          <Avatar className="h-8 w-8">
