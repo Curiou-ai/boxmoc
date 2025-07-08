@@ -36,7 +36,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
   );
 
 const suggestedPrompts = [
-  { label: 'Our Services', query: 'What services do you offer?' },
+  { label: 'Services', query: 'What services do you offer?' },
   { label: 'FAQs', query: 'What are your FAQs?' },
   { label: 'Get Help', query: 'How can I talk to a person?' },
 ];
@@ -209,7 +209,7 @@ export function Chatbot() {
               </div>
             </CardContent>
              {messages.length === 0 && !isPending && (
-                <div className="px-4 pb-4 pt-4">
+                <div className="px-4 pb-4">
                     <div className="flex flex-wrap justify-end gap-2">
                         {suggestedPrompts.map((prompt, i) => (
                             <Button
