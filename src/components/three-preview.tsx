@@ -5,9 +5,10 @@ import * as THREE from 'three';
 
 interface ThreePreviewProps {
   imageUrl?: string;
+  productType?: 'box' | 'card' | 'bag';
 }
 
-const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl }) => {
+const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'box' }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -22,13 +23,27 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl }) => {
     renderer.setPixelRatio(window.devicePixelRatio);
     currentMount.appendChild(renderer.domElement);
     
-    const geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+    let geometry: THREE.BufferGeometry;
+
+    switch(productType) {
+        case 'card':
+            geometry = new THREE.BoxGeometry(3.5, 2, 0.05);
+            break;
+        case 'bag':
+            // A simplified tote bag shape using a thin box
+            geometry = new THREE.BoxGeometry(3, 3.5, 0.1);
+            break;
+        case 'box':
+        default:
+            geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+            break;
+    }
     
     const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0x778BCA, metalness: 0.1, roughness: 0.5 });
     let materials: THREE.Material[] = Array(6).fill(defaultMaterial);
     
-    const box = new THREE.Mesh(geometry, materials);
-    scene.add(box);
+    const mesh = new THREE.Mesh(geometry, materials);
+    scene.add(mesh);
 
     if (imageUrl) {
         const textureLoader = new THREE.TextureLoader();
@@ -36,8 +51,8 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl }) => {
             (texture) => {
                 texture.colorSpace = THREE.SRGBColorSpace;
                 const imageMaterial = new THREE.MeshStandardMaterial({ map: texture, metalness: 0.1, roughness: 0.5 });
-                box.material = Array(6).fill(imageMaterial);
-                (box.material as THREE.Material[]).forEach(mat => mat.needsUpdate = true);
+                mesh.material = Array(6).fill(imageMaterial);
+                (mesh.material as THREE.Material[]).forEach(mat => mat.needsUpdate = true);
             },
             undefined,
             (error) => {
@@ -46,7 +61,7 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl }) => {
         );
     }
 
-    camera.position.z = 4.5;
+    camera.position.z = 5;
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
     scene.add(ambientLight);
@@ -64,8 +79,8 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl }) => {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      box.rotation.y += 0.005;
-      box.rotation.x += 0.002;
+      mesh.rotation.y += 0.005;
+      mesh.rotation.x += 0.002;
       
       // subtle mouse follow
       camera.position.x += (mouseX * 0.5 - camera.position.x) * .05;
@@ -92,10 +107,10 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl }) => {
             currentMount.removeChild(renderer.domElement);
         }
         geometry.dispose();
-        (box.material as THREE.Material[]).forEach(material => material.dispose());
+        (mesh.material as THREE.Material[]).forEach(material => material.dispose());
         renderer.dispose();
     };
-  }, [imageUrl]);
+  }, [imageUrl, productType]);
 
   return <div ref={mountRef} className="w-full h-full rounded-lg" />;
 };

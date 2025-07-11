@@ -7,7 +7,7 @@ import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Type, Shapes, Package2, Menu, Users, Sparkles } from 'lucide-react';
+import { Upload, Brush, Type, Shapes, Package2, Menu, Users, Sparkles, Box, CreditCard, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import RequestHelpDialog from '@/components/request-help-dialog';
@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
   const [open, setOpen] = useState(false);
@@ -113,6 +114,7 @@ const Sidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (design:
 
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
+  const [productType, setProductType] = useState('box');
 
   const handleDesignGenerated = (newDesign: { imageUrl: string; description:string }) => {
     setDesign(newDesign);
@@ -144,11 +146,37 @@ export default function CreatorPage() {
           <div className="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
             <Card className="flex flex-col shadow-lg">
               <CardHeader>
-                <CardTitle className="font-headline">3D Preview</CardTitle>
-                <CardDescription>A real-time preview of your design.</CardDescription>
+                <div className="flex justify-between items-start gap-4">
+                  <div>
+                    <CardTitle className="font-headline">3D Preview</CardTitle>
+                    <CardDescription>A real-time preview of your design.</CardDescription>
+                  </div>
+                  <Select value={productType} onValueChange={setProductType}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="box">
+                        <div className="flex items-center gap-2">
+                          <Box className="h-4 w-4" /> Promotional Box
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="card">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" /> Card
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="bag">
+                        <div className="flex items-center gap-2">
+                          <ShoppingBag className="h-4 w-4" /> Tote Bag
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent className="flex-1 min-h-0">
-                <ThreePreview key={design.imageUrl} imageUrl={design.imageUrl} />
+                <ThreePreview key={`${design.imageUrl}-${productType}`} imageUrl={design.imageUrl} productType={productType} />
               </CardContent>
             </Card>
             <Card className="flex flex-col shadow-lg">
