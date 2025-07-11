@@ -12,6 +12,7 @@ import { handleChatbotQuery } from '@/app/actions';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 interface Message {
   role: 'user' | 'model';
@@ -103,6 +104,131 @@ export function Chatbot() {
     sendMessage(input);
   };
 
+  const ChatWindow = (
+    <Card className="h-full w-full flex flex-col shadow-2xl animate-in fade-in zoom-in-95">
+        <CardHeader className="flex flex-row items-center justify-between border-b">
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarFallback><Bot /></AvatarFallback>
+            </Avatar>
+            <CardTitle className="text-lg font-headline">Boxmoc Assistant</CardTitle>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)}>
+                {isExpanded ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
+                <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'} chat</span>
+            </Button>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-5 w-5" />
+                        <span className="sr-only">More options</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => window.open('https://wa.me/1234567890', '_blank')}>
+                        <WhatsAppIcon className="mr-2 h-4 w-4" />
+                        Chat on WhatsApp
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleDownloadTranscript}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download Transcript
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <div ref={chatContainerRef} className="h-full overflow-y-auto">
+            <div className="p-4 space-y-4">
+              <div className="flex items-start gap-3">
+                  <Avatar className="h-8 w-8">
+                      <AvatarFallback><Bot /></AvatarFallback>
+                  </Avatar>
+                  <div className="bg-muted p-3 rounded-lg max-w-xs">
+                      <p className="text-sm">Hello! How can I help you with your design needs today?</p>
+                  </div>
+              </div>
+              {messages.map((message, index) => (
+                <div key={index} className={cn("flex items-start gap-3", message.role === 'user' ? 'justify-end' : '')}>
+                  {message.role === 'model' && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback><Bot /></AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div className={cn(
+                    "p-3 rounded-lg",
+                    isExpanded ? "max-w-md" : "max-w-xs", 
+                    message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  )}>
+                    {message.role === 'user' ? (
+                        <p className="text-sm">{message.content}</p>
+                    ) : (
+                        <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:my-0">
+                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {message.content}
+                           </ReactMarkdown>
+                        </div>
+                    )}
+                  </div>
+                  {message.role === 'user' && (
+                     <Avatar className="h-8 w-8">
+                      <AvatarFallback><User /></AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              ))}
+              {isPending && (
+                <div className="flex items-start gap-3">
+                    <Avatar className="h-8 w-8">
+                        <AvatarFallback><Bot /></AvatarFallback>
+                    </Avatar>
+                    <div className="bg-muted p-3 rounded-lg max-w-xs">
+                        <div className="flex space-x-1">
+                           <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
+                           <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
+                           <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-pulse"></span>
+                        </div>
+                    </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+         {messages.length === 0 && !isPending && (
+            <div className="px-4 pb-4">
+                <div className="flex flex-col items-end gap-2">
+                    {suggestedPrompts.map((prompt, i) => (
+                        <Button
+                            key={i}
+                            variant="outline"
+                            size="sm"
+                            className="h-auto py-1.5 px-3 text-xs"
+                            onClick={() => sendMessage(prompt.query)}
+                        >
+                            {prompt.label}
+                        </Button>
+                    ))}
+                </div>
+            </div>
+        )}
+        <CardFooter className="border-t pt-4">
+          <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask a question..."
+              disabled={isPending}
+              autoComplete="off"
+            />
+            <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </CardFooter>
+      </Card>
+  );
+
   return (
     <>
       <Button
@@ -113,134 +239,21 @@ export function Chatbot() {
         {isOpen ? <X className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
       </Button>
 
-      {isOpen && (
-        <div className={cn(
-            "fixed bottom-20 right-4 z-50 transition-all duration-300 ease-in-out",
-            isExpanded ? "w-[65vw] h-[80vh]" : "w-[350px] h-[500px]"
-          )}>
-          <Card className="h-full w-full flex flex-col shadow-2xl animate-in fade-in zoom-in-95">
-            <CardHeader className="flex flex-row items-center justify-between border-b">
-              <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarFallback><Bot /></AvatarFallback>
-                </Avatar>
-                <CardTitle className="text-lg font-headline">Boxmoc Assistant</CardTitle>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={() => setIsExpanded(!isExpanded)}>
-                    {isExpanded ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
-                    <span className="sr-only">{isExpanded ? 'Collapse' : 'Expand'} chat</span>
-                </Button>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-5 w-5" />
-                            <span className="sr-only">More options</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => window.open('https://wa.me/1234567890', '_blank')}>
-                            <WhatsAppIcon className="mr-2 h-4 w-4" />
-                            Chat on WhatsApp
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={handleDownloadTranscript}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download Transcript
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-hidden p-0">
-              <div ref={chatContainerRef} className="h-full overflow-y-auto">
-                <div className="p-4 space-y-4">
-                  <div className="flex items-start gap-3">
-                      <Avatar className="h-8 w-8">
-                          <AvatarFallback><Bot /></AvatarFallback>
-                      </Avatar>
-                      <div className="bg-muted p-3 rounded-lg max-w-xs">
-                          <p className="text-sm">Hello! How can I help you with your design needs today?</p>
-                      </div>
-                  </div>
-                  {messages.map((message, index) => (
-                    <div key={index} className={cn("flex items-start gap-3", message.role === 'user' ? 'justify-end' : '')}>
-                      {message.role === 'model' && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback><Bot /></AvatarFallback>
-                        </Avatar>
-                      )}
-                      <div className={cn(
-                        "p-3 rounded-lg",
-                        isExpanded ? "max-w-md" : "max-w-xs", 
-                        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      )}>
-                        {message.role === 'user' ? (
-                            <p className="text-sm">{message.content}</p>
-                        ) : (
-                            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-0 prose-ul:my-0 prose-ol:my-0 prose-li:my-0">
-                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {message.content}
-                               </ReactMarkdown>
-                            </div>
-                        )}
-                      </div>
-                      {message.role === 'user' && (
-                         <Avatar className="h-8 w-8">
-                          <AvatarFallback><User /></AvatarFallback>
-                        </Avatar>
-                      )}
-                    </div>
-                  ))}
-                  {isPending && (
-                    <div className="flex items-start gap-3">
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback><Bot /></AvatarFallback>
-                        </Avatar>
-                        <div className="bg-muted p-3 rounded-lg max-w-xs">
-                            <div className="flex space-x-1">
-                               <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-pulse [animation-delay:-0.3s]"></span>
-                               <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-pulse [animation-delay:-0.15s]"></span>
-                               <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-pulse"></span>
-                            </div>
-                        </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-             {messages.length === 0 && !isPending && (
-                <div className="px-4 pb-4">
-                    <div className="flex flex-col items-end gap-2">
-                        {suggestedPrompts.map((prompt, i) => (
-                            <Button
-                                key={i}
-                                variant="outline"
-                                size="sm"
-                                className="h-auto py-1.5 px-3 text-xs"
-                                onClick={() => sendMessage(prompt.query)}
-                            >
-                                {prompt.label}
-                            </Button>
-                        ))}
-                    </div>
-                </div>
-            )}
-            <CardFooter className="border-t pt-4">
-              <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask a question..."
-                  disabled={isPending}
-                  autoComplete="off"
-                />
-                <Button type="submit" size="icon" disabled={isPending || !input.trim()}>
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
-            </CardFooter>
-          </Card>
-        </div>
+      {isOpen && !isExpanded && (
+         <div className="fixed bottom-20 right-4 z-50 transition-all duration-300 ease-in-out w-[350px] h-[500px]">
+           {ChatWindow}
+         </div>
+      )}
+
+      {isOpen && isExpanded && (
+        <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
+            <DialogContent className="w-[65vw] h-[80vh] max-w-none p-0 border-0">
+                 <DialogHeader className="sr-only">
+                    <DialogTitle>Chatbot</DialogTitle>
+                </DialogHeader>
+                {ChatWindow}
+            </DialogContent>
+        </Dialog>
       )}
     </>
   );
