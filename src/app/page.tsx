@@ -179,7 +179,7 @@ export default function LandingPage() {
             <div className="flex flex-col items-center justify-center text-center space-y-6">
               <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                  {isPending ? 'Translating...' : headline}
+                  {headline}
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
                   Bring your creative ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom designs for packaging, marketing materials, and events in minutes.
