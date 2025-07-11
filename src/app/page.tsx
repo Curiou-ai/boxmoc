@@ -1,6 +1,8 @@
 
+'use client';
 
-import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu, ChevronDown } from 'lucide-react'
+import { useState, useTransition } from 'react';
+import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu, ChevronDown, Languages } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
@@ -10,10 +12,39 @@ import FeaturesTabs from '@/components/features-tabs'
 import { ServicesAccordion } from '@/components/services-accordion'
 import Testimonials from '@/components/testimonials'
 import { WorkflowSteps } from '@/components/workflow-steps'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { AnnouncementBar } from '@/components/announcement-bar'
+import { translateHeadline } from './actions';
+
+const languages = [
+    { code: 'en', name: 'English', original: 'Design Your Perfect Creation with AI' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'de', name: 'German' },
+    { code: 'ja', name: 'Japanese' },
+];
 
 export default function LandingPage() {
+  const [headline, setHeadline] = useState('Design Your Perfect Creation with AI');
+  const [isPending, startTransition] = useTransition();
+
+  const handleLanguageChange = (languageCode: string) => {
+    const selectedLanguage = languages.find(l => l.code === languageCode);
+    if (!selectedLanguage) return;
+
+    if (languageCode === 'en') {
+        setHeadline(selectedLanguage.original!);
+        return;
+    }
+
+    startTransition(async () => {
+        const result = await translateHeadline(headline, selectedLanguage.name);
+        if (result.translatedText) {
+            setHeadline(result.translatedText);
+        }
+    });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <AnnouncementBar />
@@ -65,6 +96,23 @@ export default function LandingPage() {
 
           {/* Right Section */}
           <div className="hidden items-center gap-2 lg:flex">
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                        <Languages className="h-5 w-5" />
+                        <span className="sr-only">Change language</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {languages.map((lang) => (
+                         <DropdownMenuItem key={lang.code} onSelect={() => handleLanguageChange(lang.code)}>
+                            {lang.name}
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="ghost" asChild>
               <Link href="/contact">Book a demo</Link>
             </Button>
@@ -77,7 +125,24 @@ export default function LandingPage() {
           </div>
           
           {/* Mobile Navigation */}
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center gap-2">
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                        <Languages className="h-5 w-5" />
+                        <span className="sr-only">Change language</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                     {languages.map((lang) => (
+                         <DropdownMenuItem key={lang.code} onSelect={() => handleLanguageChange(lang.code)}>
+                            {lang.name}
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -114,7 +179,7 @@ export default function LandingPage() {
             <div className="flex flex-col items-center justify-center text-center space-y-6">
               <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                  Design Your Perfect Creation with AI
+                  {isPending ? 'Translating...' : headline}
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
                   Bring your creative ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom designs for packaging, marketing materials, and events in minutes.

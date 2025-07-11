@@ -2,6 +2,7 @@
 
 import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
 import { askChatbot, ChatbotInput } from '@/ai/flows/chatbot-flow';
+import { translateText, TranslateTextInput, TranslateTextOutput } from '@/ai/flows/translate-flow';
 
 export interface FormState {
   message: string;
@@ -26,6 +27,25 @@ export interface HelpFormState {
 export interface ChatbotState {
   response: string;
   error?: string;
+}
+
+export interface TranslationState {
+    translatedText?: string;
+    error?: string;
+}
+
+export async function translateHeadline(
+    currentText: string,
+    targetLanguage: string
+): Promise<TranslationState> {
+    try {
+        const input: TranslateTextInput = { text: currentText, targetLanguage };
+        const result: TranslateTextOutput = await translateText(input);
+        return { translatedText: result.translatedText };
+    } catch (error) {
+        console.error('Translation error:', error);
+        return { error: 'Failed to translate. Please try again.' };
+    }
 }
 
 export async function handleChatbotQuery(
@@ -130,7 +150,7 @@ export async function handleRequestHelp(
   }
 
   try {
-    // In a real application, you would send this data to a CRM, email service, or database.
+    // In a real application, you would send this data to a CRM, email service, or a database.
     // For this prototype, we'll just log it to the server console.
     console.log('--- New Design Help Request ---');
     console.log('Name:', name);
