@@ -126,7 +126,7 @@ export default function CreatorPage() {
                 <span className="sr-only">Toggle Sidebar</span>
             </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-80 p-0 overflow-y-auto bg-card border-r-0">
+        <SheetContent side="left" className="w-80 p-0 overflow-y-auto bg-card border-r-0 text-white">
             <Sidebar onDesignGenerated={handleDesignGenerated} />
         </SheetContent>
     </Sheet>
