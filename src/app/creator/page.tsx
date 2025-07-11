@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -6,57 +7,126 @@ import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Type, Shapes, Package2, Menu } from 'lucide-react';
+import { Upload, Brush, Type, Shapes, Package2, Menu, Users, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import RequestHelpDialog from '@/components/request-help-dialog';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
-const DesignSidebarContent = ({ onDesignGenerated, className }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; className?:string }) => (
-    <div className={className}>
-        <Card className="shadow-none border-none bg-transparent">
-            <CardHeader className="px-0 pt-0 sm:px-2">
-              <CardTitle className="font-headline text-xl">Generate with AI</CardTitle>
-              <CardDescription>Describe your idea and let AI create a design for you.</CardDescription>
-            </CardHeader>
-            <CardContent className="px-0 sm:px-2">
-              <AiDesignForm onDesignGenerated={onDesignGenerated} />
-            </CardContent>
-        </Card>
-        
-        <Separator />
-        
-        <div>
-            <h2 className="text-lg font-semibold font-headline mb-4 px-0 sm:px-2">Design Tools</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline"><Upload className="mr-2 h-4 w-4"/> Upload</Button>
-              <Button variant="outline"><Type className="mr-2 h-4 w-4"/> Text</Button>
-              <Button variant="outline"><Shapes className="mr-2 h-4 w-4"/> Shapes</Button>
-              <Button variant="outline"><Brush className="mr-2 h-4 w-4"/> Edit</Button>
-            </div>
-        </div>
+const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
+  const [open, setOpen] = useState(false);
+  
+  const handleGenerated = (design: { imageUrl: string; description: string }) => {
+    onDesignGenerated(design);
+    setOpen(false);
+  }
 
-        <Separator />
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild>
+        <DialogTrigger asChild>
+           <Button variant="ghost" className="flex justify-start items-center gap-3 w-full h-12 px-3 text-base">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <span className="lg:inline hidden">Generate with AI</span>
+            </Button>
+        </DialogTrigger>
+      </TooltipTrigger>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle className="font-headline text-xl">Generate with AI</DialogTitle>
+           <DialogDescription>Describe your idea and let AI create a design for you.</DialogDescription>
+        </DialogHeader>
+        <AiDesignForm onDesignGenerated={handleGenerated} />
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-        <div>
-            <div className="px-0 sm:px-2">
-                <h2 className="text-lg font-semibold font-headline mb-2">Expert Assistance</h2>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Need a professional touch? Our design team can help bring your vision to life.
-                </p>
-                <RequestHelpDialog />
-            </div>
-        </div>
-    </div>
-);
+const Sidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; className?: string }) => {
+
+    const tools = [
+        { icon: Upload, label: 'Upload', tooltip: 'Upload Image' },
+        { icon: Type, label: 'Text', tooltip: 'Add Text' },
+        { icon: Shapes, label: 'Shapes', tooltip: 'Add Shape' },
+        { icon: Brush, label: 'Edit', tooltip: 'Edit Design' },
+    ];
+
+    return (
+        <TooltipProvider delayDuration={0}>
+             <div className={cn("flex flex-col h-full", className)}>
+                <div className="p-2 lg:p-4 border-b">
+                    <Button asChild variant="ghost" className="w-full justify-start gap-3 h-12 px-3">
+                        <a href="/">
+                            <Package2 className="h-7 w-7 text-primary" />
+                            <span className="text-xl font-bold lg:inline hidden">Boxmoc</span>
+                        </a>
+                    </Button>
+                </div>
+
+                <nav className="flex-1 p-2 lg:p-4 space-y-2">
+                    <Tooltip>
+                      <AiToolDialog onDesignGenerated={onDesignGenerated} />
+                       <TooltipContent side="right" sideOffset={5} className="lg:hidden">
+                          Generate with AI
+                       </TooltipContent>
+                    </Tooltip>
+                    
+                    <Separator className="my-4 lg:hidden" />
+                    
+                    <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider lg:inline hidden">Tools</p>
+
+                    {tools.map(tool => (
+                        <Tooltip key={tool.label}>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" className="w-full justify-start gap-3 h-12 px-3 text-base">
+                                    <tool.icon className="h-6 w-6" />
+                                    <span className="lg:inline hidden">{tool.label}</span>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" sideOffset={5} className="lg:hidden">
+                                {tool.tooltip}
+                            </TooltipContent>
+                        </Tooltip>
+                    ))}
+                </nav>
+
+                <div className="p-2 lg:p-4 mt-auto border-t">
+                    <RequestHelpDialog>
+                         <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="secondary" className="w-full justify-start gap-3 h-12 px-3 text-base">
+                                    <Users className="h-6 w-6" />
+                                    <span className="lg:inline hidden">Request Help</span>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" sideOffset={5} className="lg:hidden">
+                                Get Expert Help
+                            </TooltipContent>
+                        </Tooltip>
+                    </RequestHelpDialog>
+                </div>
+             </div>
+        </TooltipProvider>
+    );
+};
 
 
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
 
-  const handleDesignGenerated = (newDesign: { imageUrl: string; description: string }) => {
+  const handleDesignGenerated = (newDesign: { imageUrl: string; description:string }) => {
     setDesign(newDesign);
   };
-
+  
   const mobileSidebar = (
     <Sheet>
         <SheetTrigger asChild>
@@ -65,18 +135,18 @@ export default function CreatorPage() {
                 <span className="sr-only">Toggle Sidebar</span>
             </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-80 p-4 overflow-y-auto bg-card">
-            <DesignSidebarContent onDesignGenerated={handleDesignGenerated} className="flex flex-col gap-6" />
+        <SheetContent side="left" className="w-80 p-0 overflow-y-auto bg-card border-r-0">
+            <Sidebar onDesignGenerated={handleDesignGenerated} />
         </SheetContent>
     </Sheet>
   );
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
-      <AppHeader mobileSidebar={mobileSidebar} />
+      <AppHeader mobileSidebar={mobileSidebar} showTitle={false} />
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden md:flex w-80 lg:w-96 p-4 border-r overflow-y-auto bg-card">
-          <DesignSidebarContent onDesignGenerated={handleDesignGenerated} className="flex flex-col gap-6" />
+        <aside className="hidden md:block w-20 lg:w-64 bg-card border-r transition-all duration-300 ease-in-out">
+            <Sidebar onDesignGenerated={handleDesignGenerated} />
         </aside>
         
         <main className="flex-1 flex flex-col p-2 sm:p-4 lg:p-6 overflow-hidden">
