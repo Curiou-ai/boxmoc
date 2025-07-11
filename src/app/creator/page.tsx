@@ -63,16 +63,7 @@ const Sidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (design:
     return (
         <TooltipProvider delayDuration={0}>
              <div className={cn("flex flex-col h-full", className)}>
-                <div className="p-2 lg:p-4 border-b">
-                    <Button asChild variant="ghost" className="w-full justify-start gap-3 h-12 px-3">
-                        <a href="/">
-                            <Package2 className="h-7 w-7 text-primary" />
-                            <span className="text-xl font-bold lg:inline hidden">Boxmoc</span>
-                        </a>
-                    </Button>
-                </div>
-
-                <nav className="flex-1 p-2 lg:p-4 space-y-2">
+                <nav className="flex-1 p-2 lg:p-4 space-y-2 mt-4">
                     <Tooltip>
                       <AiToolDialog onDesignGenerated={onDesignGenerated} />
                        <TooltipContent side="right" sideOffset={5} className="lg:hidden">
@@ -80,7 +71,7 @@ const Sidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (design:
                        </TooltipContent>
                     </Tooltip>
                     
-                    <Separator className="my-4 lg:hidden" />
+                    <Separator className="my-4" />
                     
                     <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider lg:inline hidden">Tools</p>
 
@@ -143,7 +134,7 @@ export default function CreatorPage() {
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
-      <AppHeader mobileSidebar={mobileSidebar} showTitle={false} />
+      <AppHeader mobileSidebar={mobileSidebar} />
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:block w-20 lg:w-64 bg-card border-r transition-all duration-300 ease-in-out">
             <Sidebar onDesignGenerated={handleDesignGenerated} />
