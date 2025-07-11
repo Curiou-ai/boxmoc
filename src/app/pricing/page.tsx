@@ -160,6 +160,7 @@ export default function PricingPage() {
                   <Link href="#" className="text-muted-foreground hover:text-foreground">Resources</Link>
                   <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>
                   <div className="border-t pt-4 mt-2 grid gap-4">
+                      <Link href="/contact" className="text-muted-foreground hover:text-foreground">Book a demo</Link>
                       <Link href="/login" className="text-muted-foreground hover:text-foreground">Login</Link>
                       <Button asChild className="w-full">
                           <Link href="/creator">Sign up free</Link>
