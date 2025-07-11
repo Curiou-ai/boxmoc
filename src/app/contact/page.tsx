@@ -80,40 +80,37 @@ export default function ContactPage() {
                 </div>
             </div>
             
-            <div>
-              <Card>
-                <CardContent className="p-6">
-                  <form className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="first-name">First Name</Label>
-                        <Input id="first-name" placeholder="First Name" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="last-name">Last Name</Label>
-                        <Input id="last-name" placeholder="Last Name" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="Email Address" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="company">Company Name</Label>
-                      <Input id="company" placeholder="Company Name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" type="tel" placeholder="Phone Number" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message</Label>
-                      <Textarea id="message" placeholder="Leave us a message..." rows={5} />
-                    </div>
-                    <Button type="submit" className="w-full">Send Message</Button>
-                  </form>
-                </CardContent>
-              </Card>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold font-headline">Send us a message</h2>
+              <form className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name">First Name</Label>
+                    <Input id="first-name" placeholder="First Name" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name">Last Name</Label>
+                    <Input id="last-name" placeholder="Last Name" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input id="email" type="email" placeholder="Email Address" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company">Company Name</Label>
+                  <Input id="company" placeholder="Company Name" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input id="phone" type="tel" placeholder="Phone Number" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea id="message" placeholder="Leave us a message..." rows={5} />
+                </div>
+                <Button type="submit" className="w-full">Send Message</Button>
+              </form>
             </div>
           </div>
         </div>
