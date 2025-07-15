@@ -9,7 +9,7 @@ import Link from "next/link"
 import { Box, Check, Rocket, Sparkles, Menu, ChevronDown } from "lucide-react"
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AnnouncementBar } from '@/components/announcement-bar';
 
@@ -150,6 +150,9 @@ export default function PricingPage() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
+                <SheetHeader>
+                  <SheetTitle className="sr-only">Main Menu</SheetTitle>
+                </SheetHeader>
                 <nav className="grid gap-4 p-6 text-lg font-medium">
                   <Link href="/" className="flex items-center gap-2 font-semibold mb-4">
                     <Box className="h-6 w-6 text-primary" />
