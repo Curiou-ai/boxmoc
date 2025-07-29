@@ -9,7 +9,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { gemini2Flash } from '@genkit-ai/googleai';
 
 // Static data for tools
 const FAQ_DATA = `
@@ -156,7 +155,7 @@ const chatbotFlow = ai.defineFlow(
     try {
         const { output } = await chatbotPrompt.generate({
             input,
-            model: gemini2Flash,
+            model: 'googleai/gemini-2.0-flash',
             returnToolRequests: false,
         });
         return output as string;
