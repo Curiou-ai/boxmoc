@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { gemini2Flash } from '@genkit-ai/googleai';
 
 // Static data for tools
 const FAQ_DATA = `
@@ -114,13 +115,7 @@ export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
   return chatbotFlow(input);
 }
 
-
-const chatbotPrompt = ai.definePrompt({
-    name: 'chatbotPrompt',
-    input: { schema: ChatbotInputSchema },
-    output: { format: 'text' },
-    tools: [getFaq, getPrivacyPolicy, getTermsAndConditions, getCompanyInfo, transferToLiveAgent],
-    system: `You are a support assistant for Boxmoc.
+const systemPrompt = `You are a support assistant for Boxmoc.
     Your ONLY function is to answer questions about Boxmoc's services, policies, and FAQs using the provided tools.
     - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or contact information.
     - Use 'getFaq' for frequently asked questions.
@@ -133,8 +128,14 @@ const chatbotPrompt = ai.definePrompt({
 
     Format your responses using Markdown. Use paragraphs for longer blocks of text. For lists of items, use bullet points (e.g., using '*' or '-').
     
-    If the user asks to speak to a person or agent, use the 'transferToLiveAgent' tool.
+    If the user asks to speak to a person or agent, use the 'transferToLiveAgent' tool.`;
 
+const chatbotPrompt = ai.definePrompt({
+    name: 'chatbotPrompt',
+    input: { schema: ChatbotInputSchema },
+    output: { format: 'text' },
+    tools: [getFaq, getPrivacyPolicy, getTermsAndConditions, getCompanyInfo, transferToLiveAgent],
+    system: `${systemPrompt}
     Here is the conversation history:
     {{#if history}}
       {{#each history}}
@@ -152,7 +153,56 @@ const chatbotFlow = ai.defineFlow(
     outputSchema: ChatbotOutputSchema,
   },
   async (input) => {
-    const { output } = await chatbotPrompt(input);
-    return output as string;
+    try {
+        const { output } = await chatbotPrompt.generate({
+            input,
+            model: gemini2Flash,
+            returnToolRequests: false,
+        });
+        return output as string;
+    } catch (error) {
+        console.warn('Gemini model failed, switching to OpenAI fallback.', error);
+        try {
+            const openAiUrl = process.env.OPENAI_API_URL;
+            const openAiKey = process.env.OPENAI_API_KEY;
+
+            if (!openAiUrl || !openAiKey) {
+                throw new Error("OpenAI environment variables are not set.");
+            }
+            
+            const messages = [
+                { role: 'system', content: systemPrompt },
+                ...(input.history || []).map(h => ({ role: h.role === 'model' ? 'assistant' : 'user', content: h.content })),
+                { role: 'user', content: input.query }
+            ];
+
+            const response = await fetch(openAiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openAiKey}`,
+                },
+                body: JSON.stringify({
+                    model: 'gpt-4o-mini',
+                    messages: messages,
+                    // Note: Tools are defined for Genkit and won't work here directly.
+                    // The prompt instructs the model on how to behave, but it can't call the Genkit tools.
+                    // For a true fallback, you might need a separate prompt or logic here.
+                }),
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`OpenAI API request failed: ${response.status} ${response.statusText} - ${errorBody}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0]?.message?.content || 'Sorry, the fallback model could not provide a response.';
+            
+        } catch (fallbackError) {
+            console.error('OpenAI fallback model also failed.', fallbackError);
+            return 'Sorry, I am having trouble connecting to my knowledge base right now. Please try again later.';
+        }
+    }
   }
 );
