@@ -153,19 +153,16 @@ const chatbotFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-        const { output } = await chatbotPrompt.generate({
-            input,
-            model: 'googleai/gemini-2.0-flash',
-            returnToolRequests: false,
-        });
+        // Use the ai object to access the configured model and generate content
+        const { output } = await chatbotPrompt(input);
         return output as string;
     } catch (error) {
         console.warn('Gemini model failed, switching to OpenAI fallback.', error);
         try {
-            const openAiUrl = process.env.OPENAI_API_URL;
-            const openAiKey = process.env.OPENAI_API_KEY;
+            const openAiUrl = process.env.OPENAI_API_URL ?? '';
+            const openAiKey = process.env.OPENAI_API_KEY ?? '';
 
-            if (!openAiUrl || !openAiKey) {
+            if (!openAiUrl && !openAiKey) {
                 throw new Error("OpenAI environment variables are not set.");
             }
             
