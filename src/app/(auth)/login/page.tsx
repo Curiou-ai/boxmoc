@@ -43,11 +43,12 @@ export default function LoginPage() {
           </div>
           
           <div className="space-y-6">
-              <form className="space-y-6 text-left">
+              <form className="space-y-6 text-left" action="/api/auth/login" method="POST">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="myemail@email.com"
                     required
@@ -55,7 +56,7 @@ export default function LoginPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required placeholder="Enter your password" />
+                  <Input id="password" name="password" type="password" required placeholder="Enter your password" />
                 </div>
                 <div className="flex items-center">
                     <Checkbox id="remember-me" />
@@ -77,11 +78,12 @@ export default function LoginPage() {
                     </span>
                   </div>
                 </div>
-
-                <Button variant="outline" className="w-full mt-6">
-                  <GoogleIcon className="mr-2" />
-                  Sign in with Google
-                </Button>
+                <form action="/api/auth/google-signin" method="POST">
+                    <Button variant="outline" className="w-full mt-6" type="submit">
+                      <GoogleIcon className="mr-2" />
+                      Sign in with Google
+                    </Button>
+                </form>
               </div>
 
               <div className="text-center">

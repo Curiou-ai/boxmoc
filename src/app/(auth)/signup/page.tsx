@@ -49,11 +49,12 @@ export default function SignUpPage() {
           </div>
           
           <div className="space-y-6">
-              <form className="space-y-4 text-left">
+              <form className="space-y-4 text-left" action="/api/auth/signup" method="POST">
                 <div className="grid gap-2">
                   <Label htmlFor="full-name">Full Name</Label>
                   <Input
                     id="full-name"
+                    name="displayName"
                     type="text"
                     placeholder="Enter your full name"
                     required
@@ -63,6 +64,7 @@ export default function SignUpPage() {
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="myemail@email.com"
                     required
@@ -78,7 +80,7 @@ export default function SignUpPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required placeholder="Enter your password" />
+                  <Input id="password" name="password" type="password" required placeholder="Enter your password" />
                 </div>
                 <Button type="submit" className="w-full">
                   Sign Up
@@ -102,10 +104,12 @@ export default function SignUpPage() {
                       <Facebook className="mr-2 text-[#1877F2]" />
                       Facebook
                     </Button>
-                    <Button variant="outline" className="w-full">
-                      <GoogleIcon className="mr-2" />
-                      Google
-                    </Button>
+                    <form action="/api/auth/google-signin" method="POST" className='w-full'>
+                      <Button variant="outline" className="w-full" type="submit">
+                        <GoogleIcon className="mr-2" />
+                        Google
+                      </Button>
+                    </form>
                     <Button variant="outline" className="w-full">
                       <AppleIcon className="mr-2" />
                       Apple
