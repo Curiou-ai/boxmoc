@@ -21,12 +21,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    // Only run auth state listener in production
+    if (process.env.NODE_ENV === 'production') {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } else {
+      // In development, bypass auth and loading
       setLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
   }, []);
 
   const signOut = async () => {
@@ -38,7 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  if (loading) {
+  // Show loading skeleton only in production during auth check
+  if (loading && process.env.NODE_ENV === 'production') {
     return (
         <div className="flex flex-col space-y-3 p-4">
           <Skeleton className="h-[125px] w-full rounded-xl" />
