@@ -1,8 +1,10 @@
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Box, Facebook } from "lucide-react"
+import PhoneSignIn from "@/components/phone-signin"
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" {...props}>
@@ -88,7 +90,7 @@ export default function SignUpPage() {
               </form>
               
               <div>
-                <div className="relative">
+                <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
                   </div>
@@ -99,21 +101,24 @@ export default function SignUpPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 mt-6">
-                    <Button variant="outline" className="w-full">
-                      <Facebook className="mr-2 text-[#1877F2]" />
-                      Facebook
-                    </Button>
-                    <form action="/api/auth/google-signin" method="POST" className='w-full'>
-                      <Button variant="outline" className="w-full" type="submit">
-                        <GoogleIcon className="mr-2" />
-                        Google
-                      </Button>
-                    </form>
-                    <Button variant="outline" className="w-full">
-                      <AppleIcon className="mr-2" />
-                      Apple
-                    </Button>
+                <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-3">
+                        <Button variant="outline" className="w-full">
+                            <Facebook className="mr-2 text-[#1877F2]" />
+                            Facebook
+                        </Button>
+                        <form action="/api/auth/google-signin" method="POST" className='w-full'>
+                            <Button variant="outline" className="w-full" type="submit">
+                                <GoogleIcon className="mr-2" />
+                                Google
+                            </Button>
+                        </form>
+                        <Button variant="outline" className="w-full">
+                            <AppleIcon className="mr-2" />
+                            Apple
+                        </Button>
+                    </div>
+                    <PhoneSignIn />
                 </div>
               </div>
 

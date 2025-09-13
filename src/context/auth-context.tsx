@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, loading, signOut }}>
+      <div id="recaptcha-container"></div>
       {children}
     </AuthContext.Provider>
   );

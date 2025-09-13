@@ -1,9 +1,11 @@
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Box } from "lucide-react"
+import PhoneSignIn from "@/components/phone-signin"
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" {...props}>
@@ -68,22 +70,26 @@ export default function LoginPage() {
               </form>
               
               <div>
-                <div className="relative">
+                <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background px-2 text-muted-foreground">
-                      Or
+                      Or continue with
                     </span>
                   </div>
                 </div>
-                <form action="/api/auth/google-signin" method="POST">
-                    <Button variant="outline" className="w-full mt-6" type="submit">
-                      <GoogleIcon className="mr-2" />
-                      Sign in with Google
-                    </Button>
-                </form>
+
+                <div className="space-y-4">
+                    <form action="/api/auth/google-signin" method="POST">
+                        <Button variant="outline" className="w-full" type="submit">
+                          <GoogleIcon className="mr-2" />
+                          Sign in with Google
+                        </Button>
+                    </form>
+                     <PhoneSignIn />
+                </div>
               </div>
 
               <div className="text-center">

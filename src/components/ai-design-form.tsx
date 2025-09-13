@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
+import { /*useFormState,*/ useFormStatus } from 'react-dom';
 import { handleGenerateDesign, FormState } from '@/app/actions';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ function SubmitButton() {
 
 export default function AiDesignForm({ onDesignGenerated }: AiDesignFormProps) {
   const initialState: FormState = { message: '' };
-  const [state, formAction] = useFormState(handleGenerateDesign, initialState);
+  const [state, formAction] = useActionState(handleGenerateDesign, initialState);
   const { toast } = useToast();
 
   useEffect(() => {

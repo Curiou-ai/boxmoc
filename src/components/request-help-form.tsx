@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
+import { /*useFormState,*/ useFormStatus } from 'react-dom';
 import { handleRequestHelp, HelpFormState } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ function SubmitButton() {
 
 export default function RequestHelpForm({ onSubmitted }: { onSubmitted: () => void }) {
   const initialState: HelpFormState = { message: '' };
-  const [state, formAction] = useFormState(handleRequestHelp, initialState);
+  const [state, formAction] = useActionState(handleRequestHelp, initialState);
   const { toast } = useToast();
 
   useEffect(() => {
