@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const prodConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,18 +20,41 @@ const devConfig = {
   appId: process.env.NEXT_PUBLIC_DEV_FIREBASE_APP_ID,
 };
 
-const firebaseConfig = process.env.NODE_ENV === 'production' ? prodConfig : devConfig;
+// Function to check if all necessary keys are present and valid
+const isConfigComplete = (config: any) => {
+  return config && Object.values(config).every(value => value);
+};
 
 
-// Initialize Firebase
-let app;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApps()[0];
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+
+if (process.env.NODE_ENV === 'production') {
+  if (isConfigComplete(prodConfig)) {
+    if (!getApps().length) {
+      app = initializeApp(prodConfig);
+    } else {
+      app = getApps()[0];
+    }
+  } else {
+    console.error("Production Firebase config is incomplete. App will not function correctly.");
+  }
+} else { // Development environment
+  if (isConfigComplete(devConfig)) {
+    if (!getApps().length) {
+      app = initializeApp(devConfig);
+    } else {
+      app = getApps()[0];
+    }
+  } else {
+    console.warn("Development Firebase config is incomplete. Running in offline mode.");
+  }
 }
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+if (app) {
+  auth = getAuth(app);
+  db = getFirestore(app);
+}
 
 export { app, auth, db };

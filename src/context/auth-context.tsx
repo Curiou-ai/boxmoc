@@ -13,6 +13,13 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+const mockUser = {
+  uid: 'dev-user-123',
+  displayName: 'Dev User',
+  email: 'dev@example.com',
+  photoURL: 'https://placehold.co/48x48.png',
+} as User;
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -21,30 +28,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Only run auth state listener in production
-    if (process.env.NODE_ENV === 'production') {
+    // In production, always use real Firebase auth
+    if (process.env.NODE_ENV === 'production' && auth) {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         setUser(user);
         setLoading(false);
       });
       return () => unsubscribe();
+    } 
+    // In development, check if auth is configured
+    else if (process.env.NODE_ENV === 'development') {
+      if (auth) { // Firebase is configured, use real auth
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          setUser(user);
+          setLoading(false);
+        });
+        return () => unsubscribe();
+      } else { // Firebase is not configured, use mock user
+        setUser(mockUser);
+        setLoading(false);
+      }
     } else {
-      // In development, bypass auth and loading
+       // In any other case (or if auth is null), stop loading
       setLoading(false);
     }
   }, []);
 
   const signOut = async () => {
+    // If in dev and offline, just clear the mock user
+    if (process.env.NODE_ENV === 'development' && !auth) {
+      setUser(null);
+      router.push('/login');
+      return;
+    }
+    
+    // Otherwise, use real Firebase sign out
     try {
-      await firebaseSignOut(auth);
+      if (auth) {
+        await firebaseSignOut(auth);
+      }
       router.push('/login');
     } catch (error) {
       console.error("Error signing out: ", error);
     }
   };
 
-  // Show loading skeleton only in production during auth check
-  if (loading && process.env.NODE_ENV === 'production') {
+  // Show loading skeleton while checking auth status
+  if (loading) {
     return (
         <div className="flex flex-col space-y-3 p-4">
           <Skeleton className="h-[125px] w-full rounded-xl" />

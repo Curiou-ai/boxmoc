@@ -58,8 +58,8 @@ This guide will walk you through the process of deploying a Next.js project to V
     NEXT_PUBLIC_FIREBASE_APP_ID="your_app_id"
     ```
 3.  **Initialize Firebase**:
-*   Create a file, such as `lib/firebase.js` or `lib/firebase.ts`.
-*   Add the following code to initialize the Firebase app and export the database instance:
+    *   Create a file, such as `lib/firebase.js` or `lib/firebase.ts`.
+    *   Add the following code to initialize the Firebase app and export the database instance:
     ```js
     // lib/firebase.js
     import { initializeApp } from "firebase/app";
@@ -78,7 +78,7 @@ This guide will walk you through the process of deploying a Next.js project to V
     export const db = getFirestore(app);
     ```
 4.  **Use Firebase in your components**:
-*   You can now import the `db` instance to interact with your database. Remember to add `'use client';` for client-side components.
+    *   You can now import the `db` instance to interact with your database. Remember to add `'use client';` for client-side components.
     ```jsx
     // app/page.jsx
     'use client';

@@ -5,7 +5,7 @@ const protectedRoutes = ['/creator'];
 const authRoutes = ['/login', '/signup'];
 
 export function middleware(request: NextRequest) {
-  // Only apply middleware logic in production
+  // Only apply middleware logic in production environment
   if (process.env.NODE_ENV === 'production') {
     const sessionCookie = request.cookies.get('session');
     const { pathname } = request.nextUrl;
