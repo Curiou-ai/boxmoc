@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import NProgress from 'nprogress';
 
-export function PageLoader() {
+function NProgressDone() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -13,6 +13,11 @@ export function PageLoader() {
     NProgress.done();
   }, [pathname, searchParams]);
 
+  return null;
+}
+
+
+export function PageLoader() {
   useEffect(() => {
     NProgress.configure({ showSpinner: false });
 
@@ -49,5 +54,10 @@ export function PageLoader() {
     };
   }, []);
 
-  return null;
+  return (
+    <Suspense fallback={null}>
+      <NProgressDone />
+    </Suspense>
+  );
 }
+
