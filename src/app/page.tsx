@@ -178,7 +178,7 @@ export default function LandingPage() {
       </header>
 
       <main className="flex-1 pt-4">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card">
+        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center text-center space-y-6">
               <div className="space-y-2">
@@ -216,7 +216,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32">
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center space-y-8 text-center">
               <div className="space-y-2">
@@ -232,7 +232,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section className="w-full py-12 md:py-24 lg:py-32 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="p-1 rounded-2xl bg-gradient-to-br from-primary to-accent">
               <div className="bg-card text-card-foreground rounded-xl p-8 md:p-12 lg:p-16">
@@ -266,7 +266,7 @@ export default function LandingPage() {
 
         <WorkflowSteps />
 
-        <section id="services" className="w-full py-12 md:py-24 min-[896px]:py-32">
+        <section id="services" className="w-full py-12 md:py-24 min-[896px]:py-32 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col min-[896px]:flex-row gap-10 min-[896px]:gap-16 items-center">
               <div className="space-y-6 min-[896px]:w-1/2">
@@ -289,7 +289,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="clients" className="w-full py-12 md:py-24 lg:py-32">
+        <section id="clients" className="w-full py-12 md:py-24 lg:py-32 flex items-center justify-center">
             <div className="container px-4 md:px-6 max-w-7xl">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 md:mb-16">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">
@@ -348,7 +348,7 @@ export default function LandingPage() {
 
         <Testimonials />
 
-        <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card">
+        <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card flex items-center justify-center">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
@@ -386,3 +386,5 @@ export default function LandingPage() {
     </div>
   )
 }
+
+    
