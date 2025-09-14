@@ -8,17 +8,17 @@ export function AnnouncementBar() {
     <div className="bg-accent text-accent-foreground">
       <div className="container mx-auto flex h-12 max-w-7xl items-center justify-center gap-4 px-4 sm:px-6">
         <Sparkles className="h-5 w-5 shrink-0" />
-        <p className="text-sm font-medium text-center">
+        <p className="sm:text-sm text-xs font-medium text-center">
           Boxmoc's biggest event of the year, hosted by Curiou is coming{" "}
           <span className="font-bold">October 21st, 2026</span> - Sign up to stay in the loop.
         </p>
-        <Button
+        {/* <Button
           asChild
           size="sm"
           className="shrink-0 bg-foreground text-background hover:bg-foreground/80 hidden sm:flex"
         >
           <Link href="#">Save the date</Link>
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
