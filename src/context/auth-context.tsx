@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Loading } from '@/components/loading';
 
 interface AuthContextType {
   user: User | null;
@@ -73,17 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Show loading skeleton while checking auth status
+  // Show loading component while checking auth status
   if (loading) {
-    return (
-        <div className="flex flex-col space-y-3 p-4">
-          <Skeleton className="h-[125px] w-full rounded-xl" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px]" />
-            <Skeleton className="h-4 w-[200px]" />
-          </div>
-        </div>
-    );
+    return <Loading />;
   }
 
   return (

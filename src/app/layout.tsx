@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 import { CookieBanner } from '@/components/cookie-banner';
 import { AuthProvider } from '@/context/auth-context';
+import { PageLoader } from '@/components/page-loader';
 
 export const metadata: Metadata = {
   title: 'Boxmoc',
@@ -23,6 +24,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
+        <PageLoader />
         <AuthProvider>
           {children}
           <Chatbot />
