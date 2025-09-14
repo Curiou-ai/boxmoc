@@ -1,0 +1,30 @@
+name: NPM Build and Lint Typescript
+
+on:
+  push:
+    branches: 
+      - master
+      - main
+  pull_request:
+    branches: 
+      - master 
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions/cache@v4
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install modules
+        run: npm install
+        working-directory: .
+
+      - name: Build all packages
+        run: npm run build
+        working-directory: .
