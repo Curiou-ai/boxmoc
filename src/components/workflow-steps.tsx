@@ -95,7 +95,7 @@ const WorkflowCard = ({ step }: { step: typeof workflowSteps[0] }) => (
 export function WorkflowSteps() {
   return (
     <section id="workflow" className="w-full py-12 md:py-24 lg:py-32 bg-card overflow-hidden">
-      <div className="container px-4 md:px-6 max-w-7xl">
+      <div className="container flex flex-col mx-auto px-4 md:px-6 max-w-7xl">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 lg:mb-20">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">
             From Idea to Delivery

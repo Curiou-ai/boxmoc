@@ -40,7 +40,7 @@ export default function LandingPage() {
     startTransition(async () => {
         const result = await translateHeadline(headline, selectedLanguage.name);
         if (result.translatedText) {
-            setHeadline(result.translatedText);
+          setHeadline(result.translatedText);
         }
     });
   };
