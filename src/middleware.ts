@@ -4,9 +4,28 @@ import { NextResponse, type NextRequest } from 'next/server';
 const protectedRoutes = ['/creator'];
 const authRoutes = ['/login', '/signup'];
 
+// In-memory store for rate limiting
+const ipRequestCounts = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW = 10 * 1000; // 10 seconds
+const MAX_REQUESTS_PER_WINDOW = 10;
+
 export function middleware(request: NextRequest) {
   // Only apply middleware logic in production environment
   if (process.env.NODE_ENV === 'production') {
+    // Rate Limiting Logic
+    const ip = request.ip ?? '127.0.0.1';
+    const now = Date.now();
+
+    const timestamps = ipRequestCounts.get(ip) ?? [];
+    const recentTimestamps = timestamps.filter((ts) => ts > now - RATE_LIMIT_WINDOW);
+    
+    if (recentTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
+      return new NextResponse('Too Many Requests', { status: 429 });
+    }
+
+    ipRequestCounts.set(ip, [...recentTimestamps, now]);
+
+    // Authentication Logic
     const sessionCookie = request.cookies.get('session');
     const { pathname } = request.nextUrl;
 
