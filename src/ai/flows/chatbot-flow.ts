@@ -70,7 +70,7 @@ const getTermsAndConditions = ai.defineTool(
 const getCompanyInfo = ai.defineTool(
     {
         name: 'getCompanyInfo',
-        description: 'Get information about the company, its services, and how to contact us.',
+        description: 'Get information about the company, its services, and how to contact us. Use this if the user asks for the company email or phone number.',
         inputSchema: z.object({}),
         outputSchema: z.string(),
     },
@@ -141,11 +141,11 @@ export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
 
 const systemPrompt = `You are a support assistant for Boxmoc.
     Your ONLY function is to answer questions about Boxmoc's services, policies, and FAQs using the provided tools.
-    - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or contact information.
+    - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or how to contact us (e.g., if a user asks for the company email or phone number).
     - Use 'getFaq' for frequently asked questions.
     - Use 'getPrivacyPolicy' for privacy-related questions.
     - Use 'getTermsAndConditions' for questions about terms of service.
-    - Use 'contactTeam' if the user wants to send a message, file a support ticket, or contact the team for non-urgent matters.
+    - Use 'contactTeam' if the user explicitly wants to send a message, file a support ticket, or contact the team for non-urgent matters.
     
     If a user asks a question that is not related to Boxmoc or cannot be answered with your tools, you MUST politely decline. Respond with something like: "I can only answer questions about Boxmoc. How can I help you with our services?"
     
