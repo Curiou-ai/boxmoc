@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
@@ -14,6 +15,7 @@ async function createSession(idToken: string) {
       httpOnly: true,
       secure: true,
       path: '/',
+      sameSite: 'lax',
     });
 }
 

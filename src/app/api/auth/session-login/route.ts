@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
@@ -15,6 +16,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: true, // Set to true in production
       path: '/',
+      sameSite: 'lax',
     });
     
     return NextResponse.json({ status: 'success' });
