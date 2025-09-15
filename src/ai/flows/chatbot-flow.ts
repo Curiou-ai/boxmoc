@@ -33,7 +33,7 @@ By using Boxmoc, you agree to our terms of service. You are responsible for the 
 const COMPANY_INFO = `
 About Boxmoc: We are a design platform that makes it easy to create stunning, custom designs for packaging, marketing materials, and events using AI.
 Services: We offer AI design generation, an intuitive design editor, 3D previews, and project management. We can create designs for custom packaging, flyers, cards, engravings, and event promotions.
-Contact: You can reach us at contact@boxmoc.com or call us at +1 (234) 567-890.
+Contact: You can reach us at info@boxmoc.com or call us at +1 (234) 567-890.
 `;
 
 // Tools definition
