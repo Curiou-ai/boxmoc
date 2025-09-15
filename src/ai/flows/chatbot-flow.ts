@@ -91,6 +91,20 @@ const transferToLiveAgent = ai.defineTool(
     }
 );
 
+const contactTeam = ai.defineTool(
+    {
+        name: 'contactTeam',
+        description: 'Use this when the user wants to contact the support team, file a support ticket, or send a message to the company for non-live-chat inquiries.',
+        inputSchema: z.object({}),
+        outputSchema: z.string(),
+    },
+    async () => {
+        // This response guides the user to provide the necessary information for the contact request.
+        // The AI will then process the user's next message containing these details.
+        return "I can help with that. To create a support ticket for you, please provide your full name, email address, and a brief message outlining your request. I'll make sure it gets to the right team.";
+    }
+);
+
 
 const ChatbotInputSchema = z.object({
   history: z.array(z.object({
@@ -111,6 +125,17 @@ export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
       return "I'm sorry, but it looks like you've exhausted your AI credits for the month. Please upgrade your plan to continue.";
   }
 
+  // Check if the user's query contains contact information, likely in response to the contactTeam tool.
+  const containsContactInfo = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/.test(input.query) && input.query.length > 30;
+  const lastBotMessage = input.history?.slice(-1).find(m => m.role === 'model')?.content;
+
+  if (containsContactInfo && lastBotMessage?.includes("create a support ticket")) {
+    console.log(`--- New Contact Request from Chatbot ---`);
+    console.log(`Query: ${input.query}`);
+    console.log(`------------------------------------`);
+    return "Thank you! I've forwarded your message to our team. They will get back to you at the email address you provided shortly.";
+  }
+
   return chatbotFlow(input);
 }
 
@@ -120,6 +145,7 @@ const systemPrompt = `You are a support assistant for Boxmoc.
     - Use 'getFaq' for frequently asked questions.
     - Use 'getPrivacyPolicy' for privacy-related questions.
     - Use 'getTermsAndConditions' for questions about terms of service.
+    - Use 'contactTeam' if the user wants to send a message, file a support ticket, or contact the team for non-urgent matters.
     
     If a user asks a question that is not related to Boxmoc or cannot be answered with your tools, you MUST politely decline. Respond with something like: "I can only answer questions about Boxmoc. How can I help you with our services?"
     
@@ -133,7 +159,7 @@ const chatbotPrompt = ai.definePrompt({
     name: 'chatbotPrompt',
     input: { schema: ChatbotInputSchema },
     output: { format: 'text' },
-    tools: [getFaq, getPrivacyPolicy, getTermsAndConditions, getCompanyInfo, transferToLiveAgent],
+    tools: [getFaq, getPrivacyPolicy, getTermsAndConditions, getCompanyInfo, transferToLiveAgent, contactTeam],
     system: `${systemPrompt}
     Here is the conversation history:
     {{#if history}}
