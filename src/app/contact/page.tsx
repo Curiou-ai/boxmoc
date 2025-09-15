@@ -1,4 +1,8 @@
 
+'use client';
+
+import { useActionState } from 'react';
+import { handleRequestHelp } from '@/app/actions';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -6,9 +10,24 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
 import Image from "next/image"
-import { Box, Phone, ArrowLeft, MapPin } from "lucide-react"
+import { Box, Phone, ArrowLeft, MapPin, Mail, Send } from "lucide-react"
+import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 
 export default function ContactPage() {
+    const { toast } = useToast();
+    const [state, formAction, isPending] = useActionState(handleRequestHelp, { message: '', success: false });
+
+    useEffect(() => {
+        if (state.message) {
+            toast({
+                title: state.success ? "Message Sent!" : "Error",
+                description: state.message,
+                variant: state.success ? "default" : "destructive",
+            });
+        }
+    }, [state, toast]);
+
   return (
     <div className="bg-background text-foreground min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center border-b">
@@ -29,54 +48,61 @@ export default function ContactPage() {
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-start">
             <div className="space-y-8">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">Talk to our product analytics expert</h1>
+                    <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">Talk to an expert</h1>
                     <p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed mt-4">
-                        Have questions about pricing, plans, or Boxmoc? Fill out the form and our product analytics expert will be in touch directly.
+                        Have questions about pricing, plans, or how Boxmoc can work for you? Fill out the form and a product specialist will be in touch.
                     </p>
                 </div>
                 
                 <div className="space-y-4">
-                    <h2 className="text-2xl font-bold font-headline">Our office</h2>
+                    <h2 className="text-2xl font-bold font-headline">Our Offices</h2>
+                     <div className="grid sm:grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">United Kingdom</h3>
+                            <address className="not-italic text-muted-foreground space-y-2">
+                                <p className="flex items-start gap-2">
+                                    <MapPin className="h-5 w-5 mt-1 shrink-0" />
+                                    <span>30 Eastbourne Terrace<br/>Paddington, London<br/>W2 6LA, UK</span>
+                                </p>
+                                 <p className="flex items-center gap-2">
+                                    <Phone className="h-5 w-5" />
+                                    <a href="tel:+441351351051" className="hover:underline">+44 13 5135 1051</a>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Mail className="h-5 w-5" />
+                                    <a href="mailto:sales@boxmoc.com" className="hover:underline">sales@boxmoc.com</a>
+                                </p>
+                            </address>
+                        </div>
+                         <div className="space-y-2">
+                            <h3 className="font-semibold">France</h3>
+                            <address className="not-italic text-muted-foreground space-y-2">
+                                <p className="flex items-start gap-2">
+                                    <MapPin className="h-5 w-5 mt-1 shrink-0" />
+                                    <span>266 Place Ernest Granier<br/>34000 Montpellier<br/>France</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Phone className="h-5 w-5" />
+                                    <a href="tel:+33512182188" className="hover:underline">+33 5 12 18 21 88</a>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Mail className="h-5 w-5" />
+                                    <a href="mailto:sales.fr@boxmoc.com" className="hover:underline">sales.fr@boxmoc.com</a>
+                                </p>
+                            </address>
+                        </div>
+                    </div>
+                </div>
+                 <div className="space-y-4">
+                     <h2 className="text-2xl font-bold font-headline">The Team</h2>
                     <Image 
-                        src="https://placehold.co/600x400.png"
+                        src="https://picsum.photos/seed/office/600/400"
                         alt="Our team working in the office"
                         width={600}
                         height={400}
                         className="rounded-lg object-cover"
                         data-ai-hint="office team collaboration"
                     />
-                    <p className="text-muted-foreground">
-                        Have questions about pricing, plans, or Boxmoc? Fill out the form and our product analytics expert will be in touch directly.
-                    </p>
-                </div>
-                
-                <div className="grid sm:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                        <h3 className="font-semibold">United Kingdom</h3>
-                        <address className="not-italic text-muted-foreground space-y-2">
-                            <p className="flex items-start gap-2">
-                                <MapPin className="h-5 w-5 mt-1 shrink-0" />
-                                <span>30 Eastbourne Terrace<br/>Paddington, London<br/>W2 6LA, UK</span>
-                            </p>
-                             <p className="flex items-center gap-2">
-                                <Phone className="h-5 w-5" />
-                                <a href="tel:+441351351051" className="hover:underline">+44 13 5135 1051</a>
-                            </p>
-                        </address>
-                    </div>
-                     <div className="space-y-2">
-                        <h3 className="font-semibold">France</h3>
-                        <address className="not-italic text-muted-foreground space-y-2">
-                            <p className="flex items-start gap-2">
-                                <MapPin className="h-5 w-5 mt-1 shrink-0" />
-                                <span>266 Place Ernest Granier<br/>34000 Montpellier<br/>France</span>
-                            </p>
-                            <p className="flex items-center gap-2">
-                                <Phone className="h-5 w-5" />
-                                <a href="tel:+33512182188" className="hover:underline">+33 5 12 18 21 88</a>
-                            </p>
-                        </address>
-                    </div>
                 </div>
             </div>
             
@@ -85,34 +111,35 @@ export default function ContactPage() {
                 <CardTitle className="font-headline text-2xl">Send us a message</CardTitle>
               </CardHeader>
               <CardContent>
-                <form className="space-y-4">
+                <form action={formAction} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="first-name">First Name</Label>
-                      <Input id="first-name" placeholder="First Name" />
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" name="name" placeholder="Your Name" required />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name</Label>
-                      <Input id="last-name" placeholder="Last Name" />
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input id="email" name="email" type="email" placeholder="you@example.com" required />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="Email Address" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company">Company Name</Label>
-                    <Input id="company" placeholder="Company Name" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" placeholder="Phone Number" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="company">Company Name</Label>
+                      <Input id="company" name="company" placeholder="Your Company, Inc." />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number (Optional)</Label>
+                      <Input id="phone" name="phone" type="tel" placeholder="+1 (555) 000-0000" />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="message">Message</Label>
-                    <Textarea id="message" placeholder="Leave us a message..." rows={5} />
+                    <Textarea id="message" name="prompt" placeholder="Leave us a message..." rows={5} required minLength={10} />
                   </div>
-                  <Button type="submit" className="w-full">Send Message</Button>
+                  <Button type="submit" className="w-full" disabled={isPending}>
+                    <Send className="mr-2 h-4 w-4" />
+                    {isPending ? 'Sending...' : 'Send Message'}
+                  </Button>
                 </form>
               </CardContent>
             </Card>

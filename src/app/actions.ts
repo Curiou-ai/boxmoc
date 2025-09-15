@@ -3,6 +3,9 @@
 import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
 import { askChatbot, ChatbotInput } from '@/ai/flows/chatbot-flow';
 import { translateText, TranslateTextInput, TranslateTextOutput } from '@/ai/flows/translate-flow';
+import { sendEmail } from '@/lib/email-service';
+import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
+import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
 
 export interface FormState {
   message: string;
@@ -62,6 +65,27 @@ export async function handleChatbotQuery(
     };
   }
 
+  // Check if this looks like a contact info submission from the chatbot
+  const containsContactInfo = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/.test(query) && query.length > 30;
+  const lastBotMessage = history?.slice(-1).find((m: any) => m.role === 'model')?.content;
+
+  if (containsContactInfo && lastBotMessage?.includes("create a support ticket")) {
+    const fakeForm = new FormData();
+    // Simple parsing, assumes "Name, email, message" format. A more robust solution might use regex.
+    const parts = query.split(',');
+    fakeForm.append('name', parts[0]?.trim() || 'N/A');
+    fakeForm.append('email', parts[1]?.trim() || 'N/A');
+    fakeForm.append('prompt', 'Chatbot Inquiry');
+    fakeForm.append('notes', parts.slice(2)?.join(',').trim() || query);
+    
+    const result = await handleRequestHelp({ message: '' }, fakeForm);
+    if(result.success) {
+      return { response: result.message };
+    } else {
+      return { response: `I couldn't submit your request. ${result.message}` };
+    }
+  }
+
   try {
     const input: ChatbotInput = { query, history };
     const result = await askChatbot(input);
@@ -118,55 +142,67 @@ export async function handleRequestHelp(
 ): Promise<HelpFormState> {
   const name = formData.get('name');
   const email = formData.get('email');
-  const prompt = formData.get('prompt');
-  const notes = formData.get('notes');
+  const company = formData.get('company');
+  const phone = formData.get('phone');
+  const prompt = formData.get('prompt'); // This is the 'message' field from contact form
+  const notes = formData.get('notes'); // This is from the 'request help' dialog
 
   const fields = {
     name: name?.toString() || '',
     email: email?.toString() || '',
+    company: company?.toString() || '',
+    phone: phone?.toString() || '',
     prompt: prompt?.toString() || '',
     notes: notes?.toString() || '',
   }
 
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
-    return {
-      message: 'Please enter a valid name.',
-      fields,
-    };
+    return { message: 'Please enter a valid name.', fields };
   }
-
   if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return {
-      message: 'Please enter a valid email address.',
-      fields,
-    };
+    return { message: 'Please enter a valid email address.', fields };
   }
-
-  if (!prompt || typeof prompt !== 'string' || prompt.trim().length < 10) {
-    return {
-      message: 'Please provide a more detailed design prompt (at least 10 characters).',
-      fields,
-    };
+  
+  const messageContent = prompt || notes;
+  if (!messageContent || typeof messageContent !== 'string' || messageContent.trim().length < 10) {
+    return { message: 'Please provide a message with at least 10 characters.', fields };
+  }
+  
+  const companyEmail = process.env.COMPANY_EMAIL;
+  if (!companyEmail) {
+    console.error("COMPANY_EMAIL environment variable is not set.");
+    return { message: 'An unexpected error occurred. The server is not configured for sending emails.', fields };
   }
 
   try {
-    // In a real application, you would send this data to a CRM, email service, or a database.
-    // For this prototype, we'll just log it to the server console.
-    console.log('--- New Design Help Request ---');
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Prompt:', prompt);
-    console.log('Notes:', notes);
-    console.log('-----------------------------');
+    // 1. Send confirmation email to the user
+    await sendEmail({
+      to: fields.email,
+      subject: "We've received your message!",
+      react: ContactUserConfirmation({ name: fields.name, message: messageContent, companyName: "Boxmoc" }),
+    });
+
+    // 2. Send notification email to the company
+    await sendEmail({
+      to: companyEmail,
+      subject: `New Contact Form Submission from ${fields.name}`,
+      react: ContactCompanyNotification({ 
+        name: fields.name, 
+        email: fields.email, 
+        company: fields.company,
+        phone: fields.phone,
+        message: messageContent,
+      }),
+    });
 
     return {
-      message: "Your request has been sent! Our design team will contact you shortly.",
+      message: "Your request has been sent! We'll get back to you shortly.",
       success: true,
     };
   } catch (error) {
-    console.error('Help Request Error:', error);
+    console.error('Email Sending Error:', error);
     return {
-      message: 'An unexpected error occurred. Please try again later.',
+      message: 'An unexpected error occurred while sending your message. Please try again later.',
       fields,
     };
   }

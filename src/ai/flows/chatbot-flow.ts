@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { handleRequestHelp } from '@/app/actions';
 
 // Static data for tools
 const FAQ_DATA = `
@@ -99,8 +100,6 @@ const contactTeam = ai.defineTool(
         outputSchema: z.string(),
     },
     async () => {
-        // This response guides the user to provide the necessary information for the contact request.
-        // The AI will then process the user's next message containing these details.
         return "I can help with that. To create a support ticket for you, please provide your full name, email address, and a brief message outlining your request. I'll make sure it gets to the right team.";
     }
 );
@@ -119,21 +118,9 @@ const ChatbotOutputSchema = z.string();
 export type ChatbotOutput = z.infer<typeof ChatbotOutputSchema>;
 
 export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
-  // A simple mechanism to simulate exhausted credits. In a real app, this would be a database check.
   const isCreditExhausted = input.query.toLowerCase().includes('credit check fail');
   if (isCreditExhausted) {
       return "I'm sorry, but it looks like you've exhausted your AI credits for the month. Please upgrade your plan to continue.";
-  }
-
-  // Check if the user's query contains contact information, likely in response to the contactTeam tool.
-  const containsContactInfo = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/.test(input.query) && input.query.length > 30;
-  const lastBotMessage = input.history?.slice(-1).find(m => m.role === 'model')?.content;
-
-  if (containsContactInfo && lastBotMessage?.includes("create a support ticket")) {
-    console.log(`--- New Contact Request from Chatbot ---`);
-    console.log(`Query: ${input.query}`);
-    console.log(`------------------------------------`);
-    return "Thank you! I've forwarded your message to our team. They will get back to you at the email address you provided shortly.";
   }
 
   return chatbotFlow(input);
@@ -179,7 +166,6 @@ const chatbotFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-        // Use the ai object to access the configured model and generate content
         const { output } = await chatbotPrompt(input);
         return output as string;
     } catch (error) {
@@ -207,9 +193,6 @@ const chatbotFlow = ai.defineFlow(
                 body: JSON.stringify({
                     model: 'gpt-4o-mini',
                     messages: messages,
-                    // Note: Tools are defined for Genkit and won't work here directly.
-                    // The prompt instructs the model on how to behave, but it can't call the Genkit tools.
-                    // For a true fallback, you might need a separate prompt or logic here.
                 }),
             });
 
