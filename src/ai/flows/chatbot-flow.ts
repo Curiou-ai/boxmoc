@@ -100,7 +100,7 @@ const contactTeam = ai.defineTool(
         outputSchema: z.string(),
     },
     async () => {
-        return "I can help with that. To create a support ticket for you, please provide your full name, email address, and a brief message outlining your request. I'll make sure it gets to the right team.";
+        return "I can help with that. To create a support ticket for you, please provide the following details:\n\n*   Your full name\n*   Your email address\n*   A brief message outlining your request.\n\nI'll make sure it gets to the right team.";
     }
 );
 
