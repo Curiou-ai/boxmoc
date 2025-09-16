@@ -110,3 +110,10 @@ This guide will walk you through the process of deploying a Next.js project to V
 2.  **Deploy**:
     *   Vercel will automatically detect the Next.js project and begin deployment.                
     *   Once deployed, you can visit your app at the provided Vercel URL.
+
+
+## Security Measures for Your Platform
+1. XSS - Prevent injection of javascript code from user input
+2. SQL injection - Prevent SQL Injections into databases or api requests
+3. CORS - Ensure secruity measures for CORS
+4. CSRF (Cross-Site Request Forgery) Establish mitigation strategies for CSRF (Cross-Site Request Forgery)
