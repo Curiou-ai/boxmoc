@@ -59,7 +59,6 @@ Admin
     *   Implementation: Your application is ready for integration with monitoring services. You could add a service like Sentry or LogRocket by:
         1. Adding their SDK package to your project
         2. Initializing the service in a root file like src/app/layout.tsx.
-
     *   This would provide you with error tracking and session replay to monitor for suspicious activity.
     *   Location: Potentially in /home/user/studio/src/app/layout.tsx
 
