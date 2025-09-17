@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import admin from '@/lib/firebase-admin';
+import { z } from 'zod';
 
 
 async function createSession(idToken: string) {
@@ -18,6 +19,13 @@ async function createSession(idToken: string) {
       sameSite: 'lax',
     });
 }
+
+const passwordSchema = z.string()
+  .min(8, { message: "Password must be at least 8 characters long." })
+  .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
+  .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter." })
+  .regex(/[0-9]/, { message: "Password must contain at least one number." })
+  .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character." });
 
 export async function POST(request: NextRequest, { params }: { params: { route: string[] }}) {
     const route = params.route.join('/');
@@ -36,6 +44,15 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
             const email = body.get('email') as string;
             const password = body.get('password') as string;
             const displayName = body.get('displayName') as string;
+
+            const passwordValidation = passwordSchema.safeParse(password);
+            if (!passwordValidation.success) {
+                const errorMessage = passwordValidation.error.errors[0].message;
+                const url = request.nextUrl.clone()
+                url.pathname = '/signup';
+                url.searchParams.set('error', errorMessage);
+                return NextResponse.redirect(url);
+            }
 
             const userRecord = await admin.auth().createUser({
                 email,
