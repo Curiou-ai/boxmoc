@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Menu, Home, Settings, CreditCard, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -63,6 +63,9 @@ export default function CreatorLayout({
                 </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-60 p-0 overflow-y-auto bg-card border-r text-foreground">
+                <SheetHeader>
+                    <SheetTitle className="sr-only">Main Menu</SheetTitle>
+                </SheetHeader>
                 <nav className="flex flex-col gap-4 p-4">
                     {sidebarNavItems.map(item => (
                          <Link key={item.href} href={item.href}>
