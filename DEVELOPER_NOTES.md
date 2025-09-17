@@ -62,6 +62,8 @@ Admin
     *   This would provide you with error tracking and session replay to monitor for suspicious activity.
     *   Location: Potentially in /home/user/studio/src/app/layout.tsx
 
+## Package Dependencies
+
 
 # BREAKDOWN:
 
