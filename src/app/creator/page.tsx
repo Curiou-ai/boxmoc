@@ -6,7 +6,7 @@ import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Type, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Settings, Home, CreditCardIcon } from 'lucide-react';
+import { Upload, Brush, Type, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,7 +19,6 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import RequestHelpDialog from '@/components/request-help-dialog';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
@@ -36,7 +35,7 @@ const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { ima
         <DialogTrigger asChild>
            <Button variant="ghost" className="flex justify-start items-center gap-4 w-full h-12 px-3 text-base">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <span className="lg:inline hidden">Generate with AI</span>
+                <span className="lg:inline">Generate with AI</span>
             </Button>
         </DialogTrigger>
       </TooltipTrigger>
@@ -61,7 +60,7 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
     ];
 
     return (
-        <aside className={cn("hidden lg:flex lg:w-64 flex-col border-r bg-background", className)}>
+        <aside className={cn("flex w-full lg:w-64 flex-col border-b lg:border-r lg:border-b-0 bg-background", className)}>
              <div className="flex-1 p-2 lg:p-4 space-y-2 mt-4">
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
@@ -80,7 +79,7 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                           <TooltipTrigger asChild>
                               <Button variant="ghost" className="w-full justify-start gap-4 h-12 px-3 text-base">
                                   <tool.icon className="h-6 w-6" />
-                                  <span>{tool.label}</span>
+                                  <span className="lg:inline">{tool.label}</span>
                               </Button>
                           </TooltipTrigger>
                           <TooltipContent side="right" sideOffset={5} className="lg:hidden">
@@ -98,7 +97,7 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                                 <TooltipTrigger asChild>
                                     <Button variant="secondary" className="w-full justify-start gap-4 h-12 px-3 text-base">
                                         <Users className="h-6 w-6" />
-                                        <span>Request Help</span>
+                                        <span className="lg:inline">Request Help</span>
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side="right" sideOffset={5} className="lg:hidden">
@@ -122,12 +121,12 @@ export default function CreatorPage() {
   };
   
   return (
-    <div className="flex flex-1 h-[calc(100vh-60px)]">
+    <div className="flex flex-col lg:flex-row flex-1 h-full lg:h-[calc(100vh-60px)]">
       <EditorSidebar onDesignGenerated={handleDesignGenerated} />
       
-      <div className="flex-1 flex flex-col p-2 sm:p-4 lg:p-6 overflow-hidden">
+      <div className="flex-1 flex flex-col p-2 sm:p-4 lg:p-6 overflow-auto">
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-          <Card className="flex flex-col shadow-lg">
+          <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
             <CardHeader>
               <div className="flex justify-between items-start gap-4">
                 <div>
@@ -162,7 +161,7 @@ export default function CreatorPage() {
               <ThreePreview key={`${design.imageUrl}-${productType}`} imageUrl={design.imageUrl} productType={productType} />
             </CardContent>
           </Card>
-          <Card className="flex flex-col shadow-lg">
+          <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
             <CardHeader>
               <CardTitle className="font-headline">AI Generated Design</CardTitle>
               <CardDescription>The image and description from the AI.</CardDescription>
