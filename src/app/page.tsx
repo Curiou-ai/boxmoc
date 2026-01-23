@@ -242,7 +242,7 @@ export default function LandingPage() {
         <section className="w-full py-12 md:py-24 lg:py-32 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="p-1 rounded-2xl bg-gradient-to-br from-primary to-accent">
-              <div className="bg-card text-card-foreground rounded-xl p-8 md:p-12 lg:p-16">
+              <div className="bg-card text-card-foreground rounded-xl p-8 md:p-12 lg:p-16 flex justify-center">
                 <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
                   <div className="space-y-6">
                     <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">
@@ -255,7 +255,7 @@ export default function LandingPage() {
                       <Link href="/creator">Learn More</Link>
                     </Button>
                   </div>
-                  <div className='md:flex md:items-center md:justify-center items-center'>
+                  <div className='flex items-center justify-start md:justify-center'>
                     {/* <Image
                       src="https://placehold.co/600x450.png" 
                       width="600"
@@ -264,7 +264,7 @@ export default function LandingPage() {
                       data-ai-hint="AI design tool"
                       className="rounded-xl shadow-2xl"
                     /> */}
-                    <BoxmocAI className='shadow-2xl'/>
+                    <BoxmocAI className='shadow-2xl max-w-sm'/>
                   </div>
                 </div>
               </div>
@@ -359,11 +359,11 @@ export default function LandingPage() {
         <Testimonials />
 
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card flex items-center justify-center">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
+          {/* <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Start creating your custom designs today. It's free to get started.
+                Start creating your custom designs today. Create an account and get started.
               </p>
             </div>
             <div className="mx-auto w-full max-w-sm space-y-2">
@@ -373,6 +373,76 @@ export default function LandingPage() {
                 </Link>
               </Button>
             </div>
+          </div> */}
+          <div className="container grid grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-8 items-center justify-center px-4 md:px-6 max-w-7xl">
+            {/* LEFT CTA */}
+            <div className="space-y-6">
+            <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
+              <p className="max-w-md text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Start creating your custom designs today. Create an account and get started.
+              </p>
+
+              <div className="flex items-center gap-4">
+                {/* <Link
+                  href="/creator"
+                  className="inline-flex items-center rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition"
+                >
+                  Start now
+                  <span className="ml-2">›</span>
+                </Link> */}
+                <Button asChild size="sm" className="">
+                  <Link href="/creator" className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium text-white transition">
+                    Start Now
+                    <span className="ml-2">›</span>
+                  </Link>
+                </Button>
+
+                <Link
+                  href="/contact"
+                  className="text-sm font-medium hover:text-blue-400 transition"
+                >
+                  Contact sales ›
+                </Link>
+              </div>
+            </div>
+            {/* FEATURE 1 */}
+            <div className="relative space-y-4 md:pl-10">
+              <div className="hidden md:absolute md:left-0 md:top-0 md:h-full md:w-px md:bg-slate-200" />
+
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+                <BrainCircuit className="h-6 w-6" />
+              </div>
+
+              <h3 className="text-lg font-semibold tracking-tighter md:text-xl/tight font-headline">
+                Pricing For You
+              </h3>
+
+              <p className="text-sm text-muted-foreground">
+                Transparent, predictable pricing with no hidden fees — built for
+                creators and growing teams.
+              </p>
+
+              <Link
+                href="/pricing"
+                className="inline-flex items-center text-sm font-medium hover:text-blue-400 transition"
+              >
+                Pricing details ›
+              </Link>
+
+              {/* <Button asChild size="sm" className="">
+                <Link href="/pricing" className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium text-white transition">
+                  Pricing details
+                  <span className="ml-2">›</span>
+                </Link>
+              </Button> */}
+            </div>
+            {/* <div className="mx-auto w-full max-w-sm space-y-2">
+              <Button asChild size="lg" className="w-full">
+                <Link href="/creator">
+                  Start Now
+                </Link>
+              </Button>
+            </div> */}
           </div>
         </section>
       </main>
