@@ -99,10 +99,15 @@ export default {
         'dash-flow': {
           '0%': { strokeDashoffset: 0 },
           '100%': { strokeDashoffset: -24 },
-        }
+        },
+        rotate3d: {
+          '0%, 100%': { transform: 'rotateX(-20deg) rotateY(25deg)' },
+          '50%': { transform: 'rotateX(-25deg) rotateY(-15deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
+        'rotate-3d': 'rotate3d 8s ease-in-out infinite',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'marquee-left': 'marquee-left 60s linear infinite',
         'marquee-right': 'marquee-right 60s linear infinite',

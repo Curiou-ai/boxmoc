@@ -15,9 +15,11 @@ import { WorkflowSteps } from '@/components/workflow-steps'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { AnnouncementBar } from '@/components/announcement-bar'
 import { translateHeadline } from './actions';
+import DashboardHero from '@/components/ui/dashboard';
+import BoxmocAI from '@/components/ui/chatbot-svg';
 
 const languages = [
-    { code: 'en', name: 'English', original: 'Design Your Perfect Creation with AI' },
+    { code: 'en', name: 'English', original: 'Your Brand, Delivered' },
     { code: 'es', name: 'Spanish' },
     { code: 'fr', name: 'French' },
     { code: 'de', name: 'German' },
@@ -25,8 +27,10 @@ const languages = [
 ];
 
 export default function LandingPage() {
-  const [headline, setHeadline] = useState('Design Your Perfect Creation with AI');
+  const [headline, setHeadline] = useState('Your Brand, Delivered');
   const [isPending, startTransition] = useTransition();
+
+
 
   const handleLanguageChange = (languageCode: string) => {
     const selectedLanguage = languages.find(l => l.code === languageCode);
@@ -177,24 +181,24 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1 pt-4">
+      <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-card flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="flex flex-col items-center justify-center text-center space-y-6">
-              <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
+              <div className="space-y-4">
+                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline mb-4">
                   {headline}
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-                  Bring your creative ideas to life. Our intuitive tools and powerful AI make it easy to create stunning, custom designs for packaging, marketing materials, and events in minutes.
+                  Our intuitive tools and powerful AI make it easy to create custom designs for packaging and marketing materials in minutes. Delivered right to your doorstep.
                 </p>
               </div>
-              <div className="w-full max-w-xs space-y-4">
-                <form className="flex flex-col gap-4">
+              <div className="w-full max-w-xs space-y-8 mb-6">
+                <form className="flex flex-col gap-5">
                   <Input
                     type="email"
                     placeholder="Enter your email"
-                    className="h-11"
+                    className="h-12"
                     aria-label="Email"
                   />
                   <Button type="submit" asChild size="lg" className="w-full">
@@ -204,14 +208,17 @@ export default function LandingPage() {
                   </Button>
                 </form>
               </div>
-              <Image
-                src="https://placehold.co/800x450.png"
-                width="800"
-                height="450"
-                alt="Hero"
-                data-ai-hint="packaging product mockup"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-contain w-full max-w-4xl"
-              />
+              <div className="w-full mx-auto">
+                {/* <Image
+                  src="https://placehold.co/800x450.png"
+                  width="800"
+                  height="450"
+                  alt="Hero"
+                  data-ai-hint="packaging product mockup"
+                  className="mx-auto aspect-video overflow-hidden rounded-xl object-contain w-full max-w-4xl"
+                /> */}
+                <DashboardHero />
+              </div>
             </div>
           </div>
         </section>
@@ -236,27 +243,28 @@ export default function LandingPage() {
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="p-1 rounded-2xl bg-gradient-to-br from-primary to-accent">
               <div className="bg-card text-card-foreground rounded-xl p-8 md:p-12 lg:p-16">
-                <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
+                <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
                   <div className="space-y-6">
                     <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">
                       Supercharge Your Creativity with Boxmoc AI
                     </h2>
                     <p className="text-muted-foreground md:text-lg">
-                      Let our AI be your co-designer. Instantly generate unique concepts for packaging, flyers, cards, and more. Get smart suggestions and refine your ideas in seconds. Go from a simple prompt to a production-ready design faster than ever before.
+                      Let our AI be your co-designer. Instantly generate unique concepts for your branded products. Get smart suggestions and refine your ideas in seconds. Go from a simple prompt to a production-ready design faster than ever before.
                     </p>
                     <Button asChild size="lg" className="bg-foreground text-background hover:bg-foreground/90">
                       <Link href="/creator">Learn More</Link>
                     </Button>
                   </div>
-                  <div>
-                    <Image
-                      src="https://placehold.co/600x450.png"
+                  <div className='md:flex md:items-center md:justify-center items-center'>
+                    {/* <Image
+                      src="https://placehold.co/600x450.png" 
                       width="600"
                       height="450"
                       alt="AI Feature"
                       data-ai-hint="AI design tool"
                       className="rounded-xl shadow-2xl"
-                    />
+                    /> */}
+                    <BoxmocAI className='shadow-2xl'/>
                   </div>
                 </div>
               </div>
@@ -275,11 +283,12 @@ export default function LandingPage() {
                 </h2>
                 <ServicesAccordion />
               </div>
-              <div className="bg-accent/50 rounded-2xl p-4 md:p-6 min-[896px]:p-8 min-[896px]:w-1/2">
+              {/* bg-accent/50 rounded-2xl p-4 md:p-6 min-[896px]:p-8 min-[896px]:w-1/2 */}
+              <div className="bg-accent/50 rounded-2xl min-[896px]:w-1/2">
                   <Image
-                    src="https://placehold.co/600x500.png"
-                    width="600"
-                    height="500"
+                    src="https://images.unsplash.com/photo-1758691737217-77302c5f988f?q=80&w=2070&h=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
+                    width="2070"
+                    height="2070"
                     alt="Design team collaborating"
                     data-ai-hint="design team collaboration"
                     className="rounded-xl shadow-2xl w-full h-full object-cover"
@@ -325,8 +334,9 @@ export default function LandingPage() {
                 {/* Right Column: API / Customization */}
                 <div>
                     <div className="relative mb-8 overflow-hidden rounded-xl">
+                    {/*replace this still image with moving images like a gif or svg*/}
                     <Image
-                        src="https://placehold.co/600x450.png"
+                        src="https://images.unsplash.com/photo-1699140034822-011cc2de9917?q=80&w=2560&h=1440&auto=format&fit=crop&ixlib=rb-4.0.3" //photo-1699140034822-011cc2de9917
                         width={600}
                         height={450}
                         alt="Custom API integration example"
@@ -334,9 +344,9 @@ export default function LandingPage() {
                         className="w-full h-full object-cover"
                     />
                     </div>
-                    <h3 className="text-2xl font-bold font-headline">Powerful Customization</h3>
+                    <h3 className="text-2xl font-bold font-headline">Powerful Customization</h3> {/*rep*/}
                     <p className="mt-4 text-muted-foreground">
-                    Take full control with our easy-to-use design tools. Upload assets, create designs for cards, flyers, and packaging, and see your vision come to life in stunning 3D.
+                      Take full control with our easy-to-use design tools. Upload assets, create designs for cards, flyers, and packaging, and see your vision come to life in stunning 3D.
                     </p>
                     <Button asChild variant="secondary" className="mt-6">
                     <Link href="/creator">Explore the Tools</Link>
@@ -359,7 +369,7 @@ export default function LandingPage() {
             <div className="mx-auto w-full max-w-sm space-y-2">
               <Button asChild size="lg" className="w-full">
                 <Link href="/creator">
-                  Start Designing Now
+                  Start Now
                 </Link>
               </Button>
             </div>

@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
   :root {
     --background: 218 29% 95%;
     --foreground: 222 47% 11%;
@@ -73,17 +79,183 @@
     --sidebar-border: 217.2 32.6% 17.5%;
     --sidebar-ring: 227 36% 63%;
   }
+
+  .preview-box {
+      background: #0f1a2e;
+      border-radius: 12px;
+      padding: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      position: relative;
+      overflow: hidden;
+  }
+
+  .preview-box::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(96, 165, 250, 0.2) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+  }
+
+  .box-3d {
+      width: 280px;
+      height: 280px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(-20deg) rotateY(25deg);
+      animation: rotate3d 8s ease-in-out infinite;
+  }
+
+  @keyframes rotate3d {
+      0%, 100% { transform: rotateX(-20deg) rotateY(25deg); }
+      50% { transform: rotateX(-25deg) rotateY(-15deg); }
+  }
+
+  .box-face {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      opacity: 0.8;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .box-front { transform: translateZ(140px); }
+  .box-back { transform: translateZ(-140px) rotateY(180deg); background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+  .box-right { transform: rotateY(90deg) translateZ(140px); background: linear-gradient(135deg, #4f8cf5 0%, #3b82f6 100%); }
+  .box-left { transform: rotateY(-90deg) translateZ(140px); background: linear-gradient(135deg, #4f8cf5 0%, #3b82f6 100%); }
+  .box-top { transform: rotateX(90deg) translateZ(140px); background: linear-gradient(135deg, #7bb3f7 0%, #60a5fa 100%); }
+  .box-bottom { transform: rotateX(-90deg) translateZ(140px); background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); }
+
+  .ai-panel {
+      background: rgba(15, 26, 46, 0.3);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .ai-placeholder {
+      background: #0f1a2e;
+      border-radius: 12px;
+      padding: 3rem;
+      text-align: center;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .ai-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(96, 165, 250, 0.1);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      border: 2px dashed rgba(96, 165, 250, 0.3);
+  }
+
+  .ai-placeholder h3 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+  }
+
+  .ai-placeholder p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.875rem;
+  }
+
+  @media (max-width: 1200px) {
+      .content-grid {
+          grid-template-columns: 1fr;
+      }
+  }
 }
  
-@layer base {
-  * {
-    @apply border-border;
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .translate-z-\[100px\] {
+    transform: translateZ(100px);
+  }
+  
+  .translate-z-\[140px\] {
+    transform: translateZ(140px);
+  }
+  
+  .-translate-z-\[100px\] {
+    transform: translateZ(-100px);
+  }
+  
+  .-translate-z-\[140px\] {
+    transform: translateZ(-140px);
+  }
+  
+  .rotate-y-90 {
+    transform: rotateY(90deg) translateZ(100px);
+  }
+  
+  @media (min-width: 768px) {
+    .rotate-y-90 {
+      transform: rotateY(90deg) translateZ(140px);
+    }
+  }
+  
+  .-rotate-y-90 {
+    transform: rotateY(-90deg) translateZ(100px);
+  }
+  
+  @media (min-width: 768px) {
+    .-rotate-y-90 {
+      transform: rotateY(-90deg) translateZ(140px);
+    }
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+  
+  .rotate-x-90 {
+    transform: rotateX(90deg) translateZ(100px);
+  }
+  
+  @media (min-width: 768px) {
+    .rotate-x-90 {
+      transform: rotateX(90deg) translateZ(140px);
+    }
+  }
+  
+  .-rotate-x-90 {
+    transform: rotateX(-90deg) translateZ(100px);
+  }
+  
+  @media (min-width: 768px) {
+    .-rotate-x-90 {
+      transform: rotateX(-90deg) translateZ(140px);
+    }
   }
 }
-
 /* NProgress styles */
 #nprogress {
   pointer-events: none;
