@@ -87,6 +87,16 @@ export default function DashboardHero() {
               <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] -translate-x-1/2 -translate-y-1/2 bg-blue-400/20 rounded-full blur-3xl animate-pulse" />
               
               {/* 3D Box */}
+              <div className="preview-box">
+                <div className="box-3d">
+                  <div className="box-face box-front"></div>
+                  <div className="box-face box-back"></div>
+                  <div className="box-face box-right"></div>
+                  <div className="box-face box-left"></div>
+                  <div className="box-face box-top"></div>
+                  <div className="box-face box-bottom"></div>
+                </div>
+              </div>
               {/* <div className="relative perspective-1000"> */}
                 {/* <div className="w-[200px] h-[200px] md:w-[280px] md:h-[280px] animate-rotate-3d preserve-3d"> */}
                   {/* Front */}
@@ -103,16 +113,92 @@ export default function DashboardHero() {
                   {/* <div className="absolute w-full h-full bg-gradient-to-br from-blue-700 to-blue-800 opacity-80 border-2 border-white/20 -rotate-x-90 translate-z-[100px] md:translate-z-[140px]" /> */}
                 {/* </div> */}
               {/* </div> */}
-              <div className="preview-box">
-                  <div className="box-3d">
-                      <div className="box-face box-front"></div>
-                      <div className="box-face box-back"></div>
-                      <div className="box-face box-right"></div>
-                      <div className="box-face box-left"></div>
-                      <div className="box-face box-top"></div>
-                      <div className="box-face box-bottom"></div>
-                  </div>
-              </div>
+              
+              {/* 3D Box with Product Design */}
+                {/* 3D Product Box */}
+                {/* <div className="relative perspective-1000"> */}
+                  {/* <div className="w-[200px] h-[280px] md:w-[240px] md:h-[340px] animate-rotate-3d preserve-3d"> */}
+                    {/* Front Face */}
+                    {/* <div className="absolute w-full h-full bg-white border border-gray-200 shadow-xl translate-z-[80px] md:translate-z-[100px] flex flex-col items-center justify-between p-6">
+                      <div className="flex-1 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <Box className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                          </div>
+                          <h3 className="text-lg md:text-xl font-bold text-gray-800">BOXMOC</h3>
+                          <p className="text-xs text-gray-500 mt-1">Premium Package</p>
+                        </div>
+                      </div>
+                      <div className="w-full border-t border-gray-200 pt-3">
+                        <p className="text-[10px] text-gray-400 text-center">Design Studio Pro</p>
+                      </div>
+                    </div> */}
+                    
+                    {/* Back Face */}
+                    {/* <div className="absolute w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 shadow-xl -translate-z-[80px] md:-translate-z-[100px] rotate-y-180 flex items-center justify-center p-6">
+                      <div className="text-center">
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                          <div className="bg-white p-2 rounded shadow-sm">
+                            <p className="text-[8px] text-gray-400">Weight</p>
+                            <p className="text-xs font-semibold text-gray-700">2.5kg</p>
+                          </div>
+                          <div className="bg-white p-2 rounded shadow-sm">
+                            <p className="text-[8px] text-gray-400">Size</p>
+                            <p className="text-xs font-semibold text-gray-700">M</p>
+                          </div>
+                        </div>
+                        <div className="w-16 h-16 md:w-20 md:h-20 mx-auto bg-white p-2 rounded">
+                          <div className="w-full h-full bg-gray-900 flex items-center justify-center text-white text-[8px]">
+                            <div className="text-center leading-tight">
+                              <div>QR</div>
+                              <div>CODE</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div> */}
+                    
+                    {/* Right Face */}
+                    {/* <div className="absolute w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 border border-blue-400 shadow-xl rotate-y-90 translate-z-[80px] md:translate-z-[100px] flex items-center justify-center p-4">
+                      <div className="text-white text-center transform -rotate-90">
+                        <p className="text-xs md:text-sm font-bold tracking-widest">BOXMOC</p>
+                        <p className="text-[8px] md:text-[10px] mt-1 opacity-80">PREMIUM</p>
+                      </div>
+                    </div> */}
+                    
+                    {/* Left Face */}
+                    {/* <div className="absolute w-full h-full bg-gradient-to-br from-purple-500 to-purple-600 border border-purple-400 shadow-xl -rotate-y-90 translate-z-[80px] md:translate-z-[100px] flex items-center justify-center p-4">
+                      <div className="text-white text-center transform rotate-90">
+                        <p className="text-xs md:text-sm font-bold tracking-widest">EST. 2024</p>
+                        <div className="flex gap-1 mt-2 justify-center">
+                          <div className="w-1 h-1 bg-white rounded-full"></div>
+                          <div className="w-1 h-1 bg-white rounded-full"></div>
+                          <div className="w-1 h-1 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                    </div> */}
+                    
+                    {/* Top Face */}
+                    {/* <div className="absolute w-full h-full bg-white border border-gray-300 shadow-xl rotate-x-90 translate-z-[80px] md:translate-z-[100px] flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-[10px] md:text-xs font-bold text-gray-600 tracking-wide">HANDLE WITH CARE</p>
+                        <div className="flex gap-2 mt-2 justify-center">
+                          <div className="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center">
+                            <span className="text-[8px] text-gray-600">↑</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div> */}
+                    
+                    {/* Bottom Face */}
+                    {/* <div className="absolute w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300 shadow-xl -rotate-x-90 translate-z-[80px] md:translate-z-[100px] flex items-center justify-center p-4">
+                      <div className="grid grid-cols-3 gap-1">
+                        {[...Array(9)].map((_, i) => (
+                          <div key={i} className="w-3 h-3 md:w-4 md:h-4 bg-gray-300 rounded-sm"></div>
+                        ))}
+                      </div>
+                    </div> */}
+                  {/* </div> */}
             </div>
           </div>
 
