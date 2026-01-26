@@ -190,7 +190,7 @@ export default function LandingPage() {
                   {headline}
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-                  Our intuitive tools and powerful AI make it easy to create custom designs for packaging and marketing materials in minutes. Delivered right to your doorstep.
+                  Our intuitive tools and powerful AI make it easy to create custom branded packaging and marketing materials in minutes. Delivered right to your doorstep.
                 </p>
               </div>
               <div className="w-full max-w-xs space-y-8 mb-6">
@@ -242,13 +242,13 @@ export default function LandingPage() {
         <section className="w-full py-12 md:py-24 lg:py-32 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
             <div className="p-1 rounded-2xl bg-gradient-to-br from-primary to-accent">
-              <div className="bg-card text-card-foreground rounded-xl p-8 md:p-12 lg:p-16 flex justify-center">
-                <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center">
+              <div className="bg-card text-card-foreground rounded-xl p-6 md:p-12 lg:p-16 flex justify-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center">
                   <div className="space-y-6">
                     <h2 className="text-3xl md:text-4xl font-bold tracking-tight font-headline">
                       Supercharge Your Creativity with Boxmoc AI
                     </h2>
-                    <p className="text-muted-foreground md:text-lg">
+                    <p className="text-muted-foreground text-sm sm:text-base md:text-lg">
                       Let our AI be your co-designer. Instantly generate unique concepts for your branded products. Get smart suggestions and refine your ideas in seconds. Go from a simple prompt to a production-ready design faster than ever before.
                     </p>
                     <Button asChild size="lg" className="bg-foreground text-background hover:bg-foreground/90">

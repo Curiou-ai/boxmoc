@@ -185,6 +185,21 @@
           grid-template-columns: 1fr;
       }
   }
+  @media (max-width: 640px) {
+    .box-3d {
+      transform: rotateX(-20deg) rotateY(25deg);
+    }
+    .box-face {
+      width: 140px;
+      height: 140px;
+    }
+    .box-front { transform: translateZ(70px); }
+    .box-back { transform: translateZ(-70px) rotateY(180deg); }
+    .box-right { transform: rotateY(90deg) translateZ(70px); }
+    .box-left { transform: rotateY(-90deg) translateZ(70px); }
+    .box-top { transform: rotateX(90deg) translateZ(70px); }
+    .box-bottom { transform: rotateX(-90deg) translateZ(70px); }
+  }
 }
  
 @layer utilities {

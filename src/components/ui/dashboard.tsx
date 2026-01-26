@@ -4,7 +4,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Upload, Type, Shapes, Edit, Sparkles } from 'lucide-react';
+import { Box, Upload, Type, Shapes, Edit, Sparkles, Save, Share2 } from 'lucide-react';
 
 interface ToolItem {
   id: string;
@@ -18,6 +18,8 @@ const tools: ToolItem[] = [
   { id: 'text', icon: <Type className="w-5 h-5" />, label: 'Text' },
   { id: 'shapes', icon: <Shapes className="w-5 h-5" />, label: 'Shapes' },
   { id: 'edit', icon: <Edit className="w-5 h-5" />, label: 'Edit' },
+  { id: 'save', icon: <Save className="w-5 h-5" />, label: 'Save' },
+  { id: 'share', icon: <Share2 className="w-5 h-5" />, label: 'Share' },
 ];
 
 export default function DashboardHero() {
@@ -25,7 +27,7 @@ export default function DashboardHero() {
 
   return (
     // <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-[1400px] bg-gradient-to-br from-[#1a2742] to-[#0f1a2e] rounded-xl p-6 md:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      <div className="w-full max-w-[1400px] bg-gradient-to-br from-[#1a2742] to-[#0f1a2e] rounded-2xl p-6 md:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative overflow-hidden">
         {/* Top gradient line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
@@ -35,38 +37,42 @@ export default function DashboardHero() {
             <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
               <Box className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl md:text-2xl font-bold text-white">Boxmoc</span>
+            {/* <span className="text-xl md:text-2xl font-bold text-white">Boxmoc</span> */}
           </div>
-          <div className="flex gap-3">
+          {/* <div className="flex gap-3">
             <button className="px-4 md:px-6 py-2.5 md:py-3 rounded-lg bg-white/10 text-white font-semibold hover:bg-white/15 transition-all duration-300">
               Share
             </button>
             <button className="px-4 md:px-6 py-2.5 md:py-3 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 text-white font-semibold hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)] transition-all duration-300">
               Save
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_1fr] gap-6 md:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_2fr] gap-6 md:gap-8 w-full">
           {/* Sidebar */}
           <div className="bg-[#0f1a2e]/50 rounded-2xl p-6 border border-white/5">
-            <h3 className="text-xs md:text-sm text-white/50 mb-4 uppercase tracking-wider">
+            {/* <h3 className="text-xs md:text-sm text-white/50 mb-4 uppercase tracking-wider">
               Tools
-            </h3>
-            <div className="space-y-2">
+            </h3> */}
+            <div className="space-y-2 flex lg:flex-col flex-row mx-auto gap-2 overflow-y-auto">
               {tools.map((tool) => (
                 <button
                   key={tool.id}
+                  title={tool.id}
                   onClick={() => setActiveTool(tool.id)}
-                  className={`w-full p-4 rounded-lg flex items-center gap-3 transition-all duration-200 ${
+                  className={`group relative w-full p-3 lg:p-4 rounded-lg flex items-center justify-center lg:gap-3 lg:justify-start transition-all duration-200 ${
                     activeTool === tool.id
-                      ? 'bg-blue-400/15 border-l-4 border-blue-400 text-white'
+                      ? 'bg-blue-400/15 border-b-2 border-blue-400 text-white'
                       : 'text-white/70 hover:bg-blue-400/10 hover:text-white'
                   }`}
                 >
                   {tool.icon}
-                  <span className="font-medium">{tool.label}</span>
+                  <span className="font-medium hidden lg:flex">{tool.label}</span>
+                  {/* <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 lg:hidden">
+                    {tool.label}
+                  </span> */}
                 </button>
               ))}
             </div>
@@ -76,7 +82,7 @@ export default function DashboardHero() {
           <div className="bg-[#0f1a2e]/30 rounded-2xl p-6 md:p-8 border border-white/5">
             <div className="mb-6">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
-                3D Preview
+                Preview
               </h2>
               <p className="text-sm text-white/60">
                 A real-time preview of your design.
@@ -203,7 +209,7 @@ export default function DashboardHero() {
           </div>
 
           {/* AI Generated Design Panel */}
-          <div className="bg-[#0f1a2e]/30 rounded-2xl p-6 md:p-8 border border-white/5">
+          {/* <div className="bg-[#0f1a2e]/30 rounded-2xl p-6 md:p-8 border border-white/5">
             <div className="mb-6">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
                 AI Generated Design
@@ -223,7 +229,7 @@ export default function DashboardHero() {
                 The AI's description of the design will be shown here.
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     // </div>
