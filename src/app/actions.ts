@@ -1,3 +1,4 @@
+
 'use server';
 
 import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
@@ -7,7 +8,7 @@ import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, writeBatch } from "firebase/firestore";
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
@@ -88,6 +89,8 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
     await addDoc(waitlistCollection, {
       email: email,
       createdAt: new Date(),
+      status: 'waitlisted', // 'waitlisted', 'active', 'redeemed'
+      code: null,
     });
 
   } catch (error) {
@@ -104,22 +107,37 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
 
 export async function handleValidateAccessCode(prevState: AccessCodeState, formData: FormData): Promise<AccessCodeState> {
     const code = formData.get('code') as string;
-    const accessCode = process.env.WAITLIST_ACCESS_CODE;
 
     if (!code) {
         return { message: 'Please enter an access code.' };
     }
-
-    if (!accessCode) {
-        console.error("WAITLIST_ACCESS_CODE is not set in environment variables.");
+    
+    if (!db) {
+        console.error("Firestore is not initialized. Cannot validate access code.");
         return { message: 'The access code system is not configured. Please contact support.' };
     }
 
-    if (code.trim().toLowerCase() === accessCode.toLowerCase()) {
-        redirect('/signup');
-    } else {
-        return { message: 'Invalid access code. Please try again.' };
+    try {
+        const waitlistCollection = collection(db, 'waitlist');
+        const q = query(waitlistCollection, where("code", "==", code.trim()), where("status", "==", "active"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return { message: 'Invalid or already used access code. Please try again.' };
+        }
+
+        // Invalidate the code by updating its status to 'redeemed'
+        const batch = writeBatch(db);
+        const docToUpdate = querySnapshot.docs[0];
+        batch.update(docToUpdate.ref, { status: 'redeemed' });
+        await batch.commit();
+
+    } catch (error) {
+        console.error("Error validating access code: ", error);
+        return { message: "An unexpected error occurred. Please try again later." };
     }
+
+    redirect('/signup');
 }
 
 export async function translateHeadline(
