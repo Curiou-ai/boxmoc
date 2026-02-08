@@ -11,6 +11,9 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, writeBatch } from "firebase/firestore";
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
+import { randomBytes } from 'crypto';
+import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
+
 
 export interface FormState {
   message: string;
@@ -51,6 +54,11 @@ export interface WaitlistState {
 }
 
 export interface AccessCodeState {
+    message: string;
+}
+
+export interface ActivationState {
+    success: boolean;
     message: string;
 }
 
@@ -103,6 +111,50 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
   }
 
   redirect('/waitlist/congratulations');
+}
+
+export async function sendAccessCode(email: string): Promise<ActivationState> {
+  // This function would typically be called from a secure admin interface.
+  
+  if (!db) {
+    return { success: false, message: "Firestore is not initialized." };
+  }
+  if (!email) {
+    return { success: false, message: "Email is required." };
+  }
+
+  try {
+    const waitlistCollection = collection(db, 'waitlist');
+    const q = query(waitlistCollection, where("email", "==", email), where("status", "==", "waitlisted"));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return { success: false, message: "User not found on the waitlist or has already been activated." };
+    }
+
+    const userDoc = querySnapshot.docs[0];
+    const accessCode = randomBytes(4).toString('hex').toUpperCase(); // Generates an 8-character code
+
+    const batch = writeBatch(db);
+    batch.update(userDoc.ref, { 
+      code: accessCode,
+      status: 'active' 
+    });
+    await batch.commit();
+
+    // Send email to the user
+    await sendEmail({
+      to: email,
+      subject: "Your Early Access Code for Boxmoc is here!",
+      react: WaitlistAccessCodeEmail({ accessCode, companyName: "Boxmoc" }),
+    });
+
+    return { success: true, message: `Access code sent successfully to ${email}.` };
+
+  } catch (error) {
+    console.error("Error sending access code: ", error);
+    return { success: false, message: "An unexpected error occurred." };
+  }
 }
 
 export async function handleValidateAccessCode(prevState: AccessCodeState, formData: FormData): Promise<AccessCodeState> {
