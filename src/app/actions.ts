@@ -8,7 +8,7 @@ import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs, writeBatch } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, writeBatch, orderBy } from "firebase/firestore";
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
@@ -62,7 +62,41 @@ export interface ActivationState {
     message: string;
 }
 
+export interface WaitlistUser {
+    id: string;
+    email: string;
+    status: 'waitlisted' | 'active' | 'redeemed';
+    code: string | null;
+    createdAt: string;
+}
+
 const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
+
+export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
+    if (!db) {
+        console.warn("Firestore not configured. Returning empty waitlist.");
+        return [];
+    }
+    const waitlistCol = collection(db, 'waitlist');
+    const q = query(waitlistCol, orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.empty) {
+        return [];
+    }
+    
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            email: data.email,
+            status: data.status,
+            code: data.code,
+            createdAt: data.createdAt.toDate().toISOString(), // Serialize date
+        };
+    });
+}
+
 
 export async function handleJoinWaitlist(prevState: WaitlistState, formData: FormData): Promise<WaitlistState> {
   const email = formData.get('email') as string;
@@ -171,7 +205,7 @@ export async function handleValidateAccessCode(prevState: AccessCodeState, formD
 
     try {
         const waitlistCollection = collection(db, 'waitlist');
-        const q = query(waitlistCollection, where("code", "==", code.trim()), where("status", "==", "active"));
+        const q = query(waitlistCollection, where("code", "==", code.trim().toUpperCase()), where("status", "==", "active"));
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
@@ -264,7 +298,7 @@ export async function handleGenerateDesign(
   if (!prompt || typeof prompt !== 'string' || prompt.trim().length < 10) {
     return {
       message: 'Please provide a more detailed description for the design (at least 10 characters).',
-      fields: { prompt: prompt?.toString() || "" },
+      fields: { prompt: prompt.toString() || "" },
     };
   }
   

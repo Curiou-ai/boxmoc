@@ -1,7 +1,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 
-const protectedRoutes = ['/creator'];
+const protectedRoutes = ['/creator', '/admin'];
 const authRoutes = ['/login', '/signup'];
 
 // In-memory store for rate limiting
