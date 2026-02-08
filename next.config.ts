@@ -24,6 +24,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/waitlist',
+        destination: '/waitlist/page',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 export default nextConfig;

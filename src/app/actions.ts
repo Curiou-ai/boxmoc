@@ -6,6 +6,10 @@ import { translateText, TranslateTextInput, TranslateTextOutput } from '@/ai/flo
 import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { z } from 'zod';
+import { redirect } from 'next/navigation';
 
 export interface FormState {
   message: string;
@@ -35,6 +39,63 @@ export interface ChatbotState {
 export interface TranslationState {
     translatedText?: string;
     error?: string;
+}
+
+export interface WaitlistState {
+  message: string;
+  success?: boolean;
+  fields?: {
+    email?: string;
+  };
+}
+
+const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
+
+export async function handleJoinWaitlist(prevState: WaitlistState, formData: FormData): Promise<WaitlistState> {
+  const email = formData.get('email') as string;
+
+  const validation = EmailSchema.safeParse(email);
+  if (!validation.success) {
+    return {
+      message: validation.error.errors[0].message,
+      success: false,
+      fields: { email }
+    };
+  }
+
+  if (!db) {
+    console.error("Firestore is not initialized. Cannot add to waitlist.");
+    // For prototype purposes, redirect even if DB is not configured.
+    redirect('/waitlist/congratulations');
+  }
+
+  try {
+    const waitlistCollection = collection(db, 'waitlist');
+
+    // Check if email already exists
+    const q = query(waitlistCollection, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      // Email already exists, silently treat as success.
+      redirect('/waitlist/congratulations');
+    }
+
+    // Add a new document with a generated id.
+    await addDoc(waitlistCollection, {
+      email: email,
+      createdAt: new Date(),
+    });
+
+  } catch (error) {
+    console.error("Error adding document to waitlist: ", error);
+    return {
+      message: "An unexpected error occurred on our end. Please try again.",
+      success: false,
+      fields: { email }
+    };
+  }
+
+  redirect('/waitlist/congratulations');
 }
 
 export async function translateHeadline(

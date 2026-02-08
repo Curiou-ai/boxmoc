@@ -17,7 +17,7 @@ export function AnnouncementBar() {
           size="sm"
           className="shrink-0 bg-foreground text-background hover:bg-foreground/80 hidden sm:flex"
         >
-          <Link href="#">Join Waitlist</Link>
+          <Link href="/waitlist">Join Waitlist</Link>
         </Button>
       </div>
     </div>
