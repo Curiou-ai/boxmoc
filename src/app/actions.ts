@@ -49,6 +49,10 @@ export interface WaitlistState {
   };
 }
 
+export interface AccessCodeState {
+    message: string;
+}
+
 const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
 
 export async function handleJoinWaitlist(prevState: WaitlistState, formData: FormData): Promise<WaitlistState> {
@@ -96,6 +100,26 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
   }
 
   redirect('/waitlist/congratulations');
+}
+
+export async function handleValidateAccessCode(prevState: AccessCodeState, formData: FormData): Promise<AccessCodeState> {
+    const code = formData.get('code') as string;
+    const accessCode = process.env.WAITLIST_ACCESS_CODE;
+
+    if (!code) {
+        return { message: 'Please enter an access code.' };
+    }
+
+    if (!accessCode) {
+        console.error("WAITLIST_ACCESS_CODE is not set in environment variables.");
+        return { message: 'The access code system is not configured. Please contact support.' };
+    }
+
+    if (code.trim().toLowerCase() === accessCode.toLowerCase()) {
+        redirect('/signup');
+    } else {
+        return { message: 'Invalid access code. Please try again.' };
+    }
 }
 
 export async function translateHeadline(
