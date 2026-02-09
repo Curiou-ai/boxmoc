@@ -59,6 +59,15 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
                 password,
                 displayName,
             });
+
+            // Create user profile in Firestore
+            const db = admin.firestore();
+            await db.collection('users').doc(userRecord.uid).set({
+                email: userRecord.email,
+                displayName: userRecord.displayName || '',
+                createdAt: new Date().toISOString(),
+                role: 'user' // Default role
+            });
             
             // Login user to create session
             const clientAuth = getAuth(app);
