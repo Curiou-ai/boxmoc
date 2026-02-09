@@ -26,37 +26,40 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
 }
 
 export async function middleware(request: NextRequest) {
-  // Only apply production middleware logic in production environment
+  const sessionCookie = request.cookies.get('session');
+  const { pathname } = request.nextUrl;
+
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+
+  // --- Production-only Logic ---
   if (process.env.NODE_ENV === 'production') {
-    // Rate Limiting Logic
+    // Rate Limiting
     if (ratelimit) {
       const ip = request.ip ?? '127.0.0.1';
-      const { success, pending, limit, remaining, reset } = await ratelimit.limit(ip);
-      
+      const { success } = await ratelimit.limit(ip);
       if (!success) {
         return new NextResponse('Too Many Requests', { status: 429 });
       }
     }
 
-    // Authentication Logic
-    const sessionCookie = request.cookies.get('session');
-    const { pathname } = request.nextUrl;
-
-    const isProtectedRoute = protectedRoutes.some((route) =>
-      pathname.startsWith(route)
-    );
-
-    // If user is trying to access a protected route without a session, redirect to login
-    if (isProtectedRoute && !sessionCookie) {
-      const absoluteURL = new URL('/login', request.nextUrl.origin);
-      return NextResponse.redirect(absoluteURL.toString());
+    // Unauthenticated users trying to access login/signup are redirected to waitlist
+    if (isAuthRoute && !sessionCookie) {
+      return NextResponse.redirect(new URL('/waitlist', request.url));
     }
+  }
 
-    // If user is logged in and tries to access login/signup pages, redirect to creator dashboard
-    if (authRoutes.some((route) => pathname.startsWith(route)) && sessionCookie) {
-      const absoluteURL = new URL('/creator', request.nextUrl.origin);
-      return NextResponse.redirect(absoluteURL.toString());
-    }
+  // --- Authentication Logic (all environments) ---
+
+  // If user is logged in, redirect them from auth pages to the creator dashboard
+  if (isAuthRoute && sessionCookie) {
+    return NextResponse.redirect(new URL('/creator', request.url));
+  }
+
+  // If user is not logged in, redirect them from protected pages to the login page
+  // In production, this will trigger a second redirect to /waitlist
+  if (isProtectedRoute && !sessionCookie) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();

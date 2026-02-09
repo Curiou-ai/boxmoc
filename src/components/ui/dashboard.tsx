@@ -27,7 +27,7 @@ export default function DashboardHero() {
 
   return (
     // <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-[1400px] bg-gradient-to-br from-[#1a2742] to-[#0f1a2e] rounded-2xl p-3 sm:p-6 md:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      <div className="w-full max-w-[1400px] bg-gradient-to-br from-[#1a2742] to-[#0f1a2e] rounded-2xl p-4 sm:p-6 md:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative overflow-hidden">
         {/* Top gradient line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 

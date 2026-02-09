@@ -26,11 +26,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      {
-        source: '/waitlist',
-        destination: '/waitlist/page',
-        permanent: true,
-      },
+      // {
+      //   source: '/waitlist',
+      //   destination: '/waitlist',
+      //   permanent: true,
+      // },
     ]
   },
 };

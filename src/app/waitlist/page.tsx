@@ -4,10 +4,10 @@ import { useEffect, useActionState } from 'react';
 import { handleJoinWaitlist, WaitlistState, handleValidateAccessCode, AccessCodeState } from '@/app/actions';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { Box, Mail, ArrowRight, KeyRound } from "lucide-react"
+import { Mail, ArrowRight, KeyRound } from "lucide-react"
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import Navbar from '@/components/navigation';
 import { Separator } from '@/components/ui/separator';
 
 function AccessCodeForm() {
@@ -56,13 +56,8 @@ export default function WaitlistPage() {
 
     return (
         <div className="bg-background text-foreground min-h-screen flex flex-col items-center justify-center p-4">
-             <header className="absolute top-0 left-0 right-0 px-4 lg:px-6 h-14 flex items-center">
-                <Link href="/" className="flex items-center justify-center gap-2">
-                <Box className="h-6 w-6 text-primary" />
-                <span className="font-bold text-lg">Boxmoc</span>
-                </Link>
-            </header>
-            <main className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24">
+            <Navbar />
+            <main className="py-12 md:py-24 px-4 md:px-6 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24">
                 <div className="lg:w-1/2 text-center lg:text-left">
                     <div className="max-w-md mx-auto lg:mx-0">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline mb-4">
@@ -106,7 +101,7 @@ export default function WaitlistPage() {
                 </div>
                 <div className="lg:w-1/2 flex items-center justify-center">
                     <Image
-                        src="https://images.unsplash.com/photo-1620494218318-2e3d8847d7c6?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3"
+                        src="https://images.unsplash.com/photo-1729858444838-c0003f7cc02c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3" //photo-1574717024757-c1ec4d86ae82
                         width={600}
                         height={700}
                         alt="Abstract futuristic design"
