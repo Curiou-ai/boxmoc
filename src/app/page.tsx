@@ -336,7 +336,7 @@ export default function LandingPage() {
                     <div className="relative mb-8 overflow-hidden rounded-xl">
                     {/*replace this still image with moving images like a gif or svg*/}
                     <Image
-                        src="https://images.unsplash.com/photo-1699140034822-011cc2de9917?q=80&w=2560&h=1440&auto=format&fit=crop&ixlib=rb-4.0.3" //photo-1699140034822-011cc2de9917
+                        src="https://images.unsplash.com/photo-1759563874669-0b6f7337e66a?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3" //photo-1699140034822-011cc2de9917
                         width={600}
                         height={450}
                         alt="Custom API integration example"

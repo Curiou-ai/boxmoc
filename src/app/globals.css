@@ -187,7 +187,8 @@
   }
   @media (max-width: 640px) {
     .box-3d {
-      transform: rotateX(-20deg) rotateY(25deg);
+      transform: rotateX(-20deg) rotateY(0deg);
+      animation: none;
     }
     .box-face {
       width: 140px;
