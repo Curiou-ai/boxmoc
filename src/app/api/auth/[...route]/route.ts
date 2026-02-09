@@ -50,7 +50,7 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
               react: SignInNotificationEmail({
                 email: email,
                 signInTime: new Date(),
-                ipAddress: request.ip,
+                ipAddress: request.headers.get('x-forwarded-for') || undefined,
                 userAgent: request.headers.get('user-agent'),
                 appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'
               })

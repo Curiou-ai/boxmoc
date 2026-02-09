@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
     // Rate Limiting
     if (ratelimit) {
-      const ip = request.ip ?? '127.0.0.1';
+      const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
       const { success } = await ratelimit.limit(ip);
       if (!success) {
         return new NextResponse('Too Many Requests', { status: 429 });
