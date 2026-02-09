@@ -2,10 +2,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import admin from '@/lib/firebase-admin';
 import { z } from 'zod';
+import { sendEmail } from '@/lib/email-service';
+import WelcomeEmail from '@/emails/WelcomeEmail';
+import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
 
 
 async function createSession(idToken: string) {
@@ -39,6 +42,20 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
             const idToken = await userCredential.user.getIdToken();
             await createSession(idToken);
+            
+            // Send sign-in notification
+            await sendEmail({
+              to: email,
+              subject: `New Sign-In to Your ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'} Account`,
+              react: SignInNotificationEmail({
+                email: email,
+                signInTime: new Date(),
+                ipAddress: request.ip,
+                userAgent: request.headers.get('user-agent'),
+                appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'
+              })
+            });
+
             return NextResponse.redirect(new URL('/creator', request.url));
         } else if (route === 'signup') {
             const email = body.get('email') as string;
@@ -69,6 +86,13 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
                 role: 'user' // Default role
             });
             
+            // Send welcome email
+            await sendEmail({
+              to: email,
+              subject: `Welcome to ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'}!`,
+              react: WelcomeEmail({ name: displayName, appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc' })
+            });
+
             // Login user to create session
             const clientAuth = getAuth(app);
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
@@ -78,10 +102,6 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
             return NextResponse.redirect(new URL('/creator', request.url));
 
         } else if (route === 'google-signin') {
-             // This route is tricky because Google Sign-In is a client-side flow.
-             // This POST is a trigger. We redirect to a page that will handle it.
-             // Better would be a pure client-side implementation.
-             // For now, redirecting to a page that starts the popup flow.
             return NextResponse.redirect(new URL('/google-auth-handler', request.url));
 
         } else if (route === 'logout') {

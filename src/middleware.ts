@@ -1,29 +1,42 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 const protectedRoutes = ['/creator', '/admin'];
 const authRoutes = ['/login', '/signup'];
 
-// In-memory store for rate limiting
-const ipRequestCounts = new Map<string, number[]>();
-const RATE_LIMIT_WINDOW = 10 * 1000; // 10 seconds
-const MAX_REQUESTS_PER_WINDOW = 10;
+let redis: Redis | null = null;
+let ratelimit: Ratelimit | null = null;
 
-export function middleware(request: NextRequest) {
-  // Only apply middleware logic in production environment
+// Initialize Redis and Ratelimit only if the environment variables are set
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+
+  ratelimit = new Ratelimit({
+    redis: redis,
+    limiter: Ratelimit.slidingWindow(10, '10 s'), // 10 requests per 10 seconds
+    analytics: true,
+  });
+} else {
+  console.warn('Upstash Redis environment variables not set. Rate limiting will be disabled.');
+}
+
+export async function middleware(request: NextRequest) {
+  // Only apply production middleware logic in production environment
   if (process.env.NODE_ENV === 'production') {
     // Rate Limiting Logic
-    const ip = request.ip ?? '127.0.0.1';
-    const now = Date.now();
-
-    const timestamps = ipRequestCounts.get(ip) ?? [];
-    const recentTimestamps = timestamps.filter((ts) => ts > now - RATE_LIMIT_WINDOW);
-    
-    if (recentTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
-      return new NextResponse('Too Many Requests', { status: 429 });
+    if (ratelimit) {
+      const ip = request.ip ?? '127.0.0.1';
+      const { success, pending, limit, remaining, reset } = await ratelimit.limit(ip);
+      
+      if (!success) {
+        return new NextResponse('Too Many Requests', { status: 429 });
+      }
     }
-
-    ipRequestCounts.set(ip, [...recentTimestamps, now]);
 
     // Authentication Logic
     const sessionCookie = request.cookies.get('session');
