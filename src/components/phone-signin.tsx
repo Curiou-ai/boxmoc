@@ -154,7 +154,7 @@ export default function PhoneSignIn() {
           id="phone"
           type="tel"
           value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.g.target.value)}
+          onChange={(e) => setPhoneNumber(e.target.value)}
           placeholder="e.g. +14155552671"
           disabled={isSubmitting}
         />

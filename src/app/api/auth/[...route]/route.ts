@@ -12,18 +12,6 @@ import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
 import { stripe } from '@/lib/stripe';
 
 
-async function createSession(idToken: string) {
-    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
-    const sessionCookie = await auth().createSessionCookie(idToken, { expiresIn });
-    cookies().set('session', sessionCookie, {
-      maxAge: expiresIn,
-      httpOnly: true,
-      secure: true,
-      path: '/',
-      sameSite: 'lax',
-    });
-}
-
 const passwordSchema = z.string()
   .min(8, { message: "Password must be at least 8 characters long." })
   .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
@@ -34,6 +22,7 @@ const passwordSchema = z.string()
 export async function POST(request: NextRequest, { params }: { params: { route: string[] }}) {
     const route = params.route.join('/');
     const body = await request.formData();
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
     try {
         if (route === 'login') {
@@ -42,7 +31,16 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
             const clientAuth = getAuth(app);
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
             const idToken = await userCredential.user.getIdToken();
-            await createSession(idToken);
+            
+            const sessionCookie = await auth().createSessionCookie(idToken, { expiresIn });
+            const response = NextResponse.redirect(new URL('/creator', request.url));
+            response.cookies.set('session', sessionCookie, {
+              maxAge: expiresIn,
+              httpOnly: true,
+              secure: true,
+              path: '/',
+              sameSite: 'lax',
+            });
             
             // Send sign-in notification
             await sendEmail({
@@ -57,7 +55,7 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
               })
             });
 
-            return NextResponse.redirect(new URL('/creator', request.url));
+            return response;
         } else if (route === 'signup') {
             const email = body.get('email') as string;
             const password = body.get('password') as string;
@@ -104,16 +102,26 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
             const clientAuth = getAuth(app);
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
             const idToken = await userCredential.user.getIdToken();
-            await createSession(idToken);
             
-            return NextResponse.redirect(new URL('/creator', request.url));
+            const sessionCookie = await auth().createSessionCookie(idToken, { expiresIn });
+            const response = NextResponse.redirect(new URL('/creator', request.url));
+            response.cookies.set('session', sessionCookie, {
+              maxAge: expiresIn,
+              httpOnly: true,
+              secure: true,
+              path: '/',
+              sameSite: 'lax',
+            });
+            
+            return response;
 
         } else if (route === 'google-signin') {
             return NextResponse.redirect(new URL('/google-auth-handler', request.url));
 
         } else if (route === 'logout') {
-            cookies().delete('session');
-            return NextResponse.redirect(new URL('/login', request.url));
+            const response = NextResponse.redirect(new URL('/login', request.url));
+            response.cookies.delete('session');
+            return response;
         }
 
     } catch (error: any) {

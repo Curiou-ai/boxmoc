@@ -1,7 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
-import { cookies } from 'next/headers';
 import { sendEmail } from '@/lib/email-service';
 import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
 
@@ -22,7 +21,8 @@ export async function POST(request: NextRequest) {
     // Create the session cookie.
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 
-    cookies().set('session', sessionCookie, {
+    const response = NextResponse.json({ status: 'success' });
+    response.cookies.set('session', sessionCookie, {
       maxAge: expiresIn,
       httpOnly: true,
       secure: true, // Set to true in production
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    return NextResponse.json({ status: 'success' });
+    return response;
   } catch (error) {
     console.error('Error creating session cookie or sending email', error);
     return NextResponse.json({ status: 'error', message: 'Could not create session.' }, { status: 401 });

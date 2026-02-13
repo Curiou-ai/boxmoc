@@ -48,7 +48,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/waitlist', request.url));
     }
   }
-
+  // --- Development-only Logic ---
+  if (process.env.NODE_ENV === 'development') {
+    //bypass authentication for protected routes
+    if (isProtectedRoute) {
+      return NextResponse.next();
+    }
+  }
   // --- Authentication Logic (all environments) ---
 
   // If user is logged in, redirect them from auth pages to the creator dashboard
