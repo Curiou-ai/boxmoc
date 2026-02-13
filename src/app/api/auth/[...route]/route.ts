@@ -24,6 +24,14 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
     const body = await request.formData();
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
+    if (!app) {
+        console.error('Firebase is not initialized. Check your configuration.');
+        return NextResponse.json(
+            { error: 'Authentication service is not available.' },
+            { status: 503 }
+        );
+    }
+
     try {
         if (route === 'login') {
             const email = body.get('email') as string;
