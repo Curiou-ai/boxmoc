@@ -26,13 +26,13 @@ export default function PhoneSignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Only configure reCAPTCHA in production
-    if (process.env.NODE_ENV === 'production') {
+    // Only configure reCAPTCHA in production and if Firebase is available
+    if (process.env.NODE_ENV === 'production' && auth) {
         if (!window.recaptchaVerifier) {
             window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                 'size': 'invisible',
-                'callback': (response: any) => {
-                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                'callback': () => {
+                    // reCAPTCHA solved.
                 },
             });
         }
@@ -46,15 +46,24 @@ export default function PhoneSignIn() {
     }
     setIsSubmitting(true);
     
-    // In dev mode, we'll just simulate success and move to OTP step.
-    if (process.env.NODE_ENV !== 'production') {
-        console.log(`DEV MODE: Simulating OTP sent to ${phoneNumber}`);
-        toast({ title: 'DEV MODE', description: 'OTP sent! Use any 6 digits to proceed.' });
-        setStep('otp');
-        setIsSubmitting(false);
-        return;
+    if (!auth) {
+        // If firebase is not configured, handle based on environment
+        if (process.env.NODE_ENV === 'production') {
+            toast({ title: 'Error', description: 'Phone sign-in is currently unavailable.', variant: 'destructive' });
+            setIsSubmitting(false);
+            return;
+        } else {
+            // In development, simulate the OTP flow
+            console.warn("Firebase not configured. Simulating phone auth.");
+            console.log(`DEV MODE: Simulating OTP sent to ${phoneNumber}`);
+            toast({ title: 'DEV MODE', description: 'OTP sent! Use any 6 digits to proceed.' });
+            setStep('otp');
+            setIsSubmitting(false);
+            return;
+        }
     }
     
+    // This block runs only if auth is available.
     try {
       const appVerifier = window.recaptchaVerifier;
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
@@ -76,12 +85,21 @@ export default function PhoneSignIn() {
     }
     setIsSubmitting(true);
     
-    // In dev mode, simulate successful login
-    if (process.env.NODE_ENV !== 'production') {
-        console.log(`DEV MODE: Simulating OTP verification with ${otp}`);
-        toast({ title: 'DEV MODE', description: 'Login successful!' });
-        router.push('/creator');
-        return;
+    if (!auth) {
+        if (process.env.NODE_ENV === 'production') {
+             // This case should ideally not be reachable if sendOtp is handled correctly
+             toast({ title: 'Error', description: 'Phone sign-in is currently unavailable.', variant: 'destructive' });
+             setIsSubmitting(false);
+             return;
+        } else {
+            // In development, simulate successful login
+            console.warn("Firebase not configured. Simulating OTP verification.");
+            console.log(`DEV MODE: Simulating OTP verification with ${otp}`);
+            toast({ title: 'DEV MODE', description: 'Login successful!' });
+            router.push('/creator');
+            // No finally block needed here, as we return
+            return;
+        }
     }
 
     try {
@@ -98,9 +116,10 @@ export default function PhoneSignIn() {
         toast({ title: 'Success!', description: 'You are now signed in.' });
         router.push('/creator');
       } else {
-        throw new Error('Confirmation result not found.');
+        throw new Error('Confirmation result not found. Please try sending the code again.');
       }
-    } catch (error: any) {
+    } catch (error: any)
+    {
       console.error('Error verifying OTP:', error);
       toast({ title: 'Error', description: `Failed to verify OTP: ${error.message}`, variant: 'destructive' });
     } finally {
@@ -122,7 +141,7 @@ export default function PhoneSignIn() {
         <Button onClick={handleVerifyOtp} disabled={isSubmitting} className="w-full">
           {isSubmitting ? 'Verifying...' : 'Verify & Sign In'}
         </Button>
-        <Button variant="link" size="sm" onClick={() => setStep('phone')} className="w-full">
+        <Button variant="link" size="sm" onClick={() => { setStep('phone'); setOtp(''); }} className="w-full">
           Back to phone number
         </Button>
       </div>
@@ -135,7 +154,7 @@ export default function PhoneSignIn() {
           id="phone"
           type="tel"
           value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          onChange={(e) => setPhoneNumber(e.g.target.value)}
           placeholder="e.g. +14155552671"
           disabled={isSubmitting}
         />
