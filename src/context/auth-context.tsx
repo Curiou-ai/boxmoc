@@ -3,55 +3,82 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Loading } from '@/components/loading';
+import { doc, onSnapshot, DocumentData } from 'firebase/firestore';
+
+// Extend the User type to include our custom profile fields
+export interface AppUser extends User, DocumentData {
+  role?: 'user' | 'admin';
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  stripePriceId?: string;
+  stripeCurrentPeriodEnd?: number;
+  stripeSubscriptionStatus?: string;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
 
-const mockUser = {
+const mockUser: AppUser = {
   uid: 'dev-user-123',
   displayName: 'Dev User',
   email: 'dev@example.com',
   photoURL: 'https://placehold.co/48x48.png',
-} as User;
+  role: 'user',
+  stripeSubscriptionStatus: 'active',
+  stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+} as AppUser;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // In production, always use real Firebase auth
-    if (process.env.NODE_ENV === 'production' && auth) {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setUser(user);
-        setLoading(false);
-      });
-      return () => unsubscribe();
-    } 
-    // In development, check if auth is configured
-    else if (process.env.NODE_ENV === 'development') {
-      if (auth) { // Firebase is configured, use real auth
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          setUser(user);
+    let unsubscribeAuth: () => void;
+    let unsubscribeProfile: () => void;
+
+    if (auth && db) {
+      unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+        if (firebaseUser) {
+          // Listen for profile changes in Firestore
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
+            if (doc.exists()) {
+              const profileData = doc.data();
+              setUser({ ...firebaseUser, ...profileData });
+            } else {
+               // This can happen briefly if the user doc hasn't been created yet.
+               // We fallback to the firebase user, and Firestore will sync up shortly.
+               setUser(firebaseUser as AppUser);
+            }
+            setLoading(false);
+          }, (error) => {
+            console.error("Error fetching user profile:", error);
+            setUser(firebaseUser as AppUser); // Fallback to just firebase user
+            setLoading(false);
+          });
+        } else {
+          setUser(null);
           setLoading(false);
-        });
-        return () => unsubscribe();
-      } else { // Firebase is not configured, use mock user
-        setUser(mockUser);
-        setLoading(false);
-      }
-    } else {
-       // In any other case (or if auth is null), stop loading
+        }
+      });
+    } else { // Firebase is not configured, likely in dev offline mode
+      setUser(mockUser);
       setLoading(false);
     }
+    
+    return () => {
+      if (unsubscribeAuth) unsubscribeAuth();
+      if (unsubscribeProfile) unsubscribeProfile();
+    };
   }, []);
 
   const signOut = async () => {
@@ -62,7 +89,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     
-    // Otherwise, use real Firebase sign out
     try {
       if (auth) {
         await firebaseSignOut(auth);
@@ -73,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Show loading component while checking auth status
   if (loading) {
     return <Loading />;
   }

@@ -7,10 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Navbar from "@/components/navigation"
 import Link from "next/link"
-import { Box, Check, Rocket, Sparkles } from "lucide-react"
+import { Box, Check, Rocket, Sparkles, Loader2 } from "lucide-react"
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { AnnouncementBar } from '@/components/announcement-bar';
+import { useAuth } from '@/context/auth-context';
+import { useToast } from '@/hooks/use-toast';
+import { loadStripe } from '@stripe/stripe-js';
+import { useRouter } from 'next/navigation';
 
 const pricingPlans = [
     {
@@ -19,6 +23,8 @@ const pricingPlans = [
         description: 'Perfect for individuals and hobbyists starting out with AI-powered design.',
         monthlyPrice: 10.99,
         yearlyPrice: 9,
+        priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID_MONTHLY!,
+        priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID_YEARLY!,
         isTrial: true,
         discountInfo: {
             text: "Originally $29/mo - Save over 60%",
@@ -32,9 +38,7 @@ const pricingPlans = [
             'Community Support',
             'Export Watermarked Designs'
         ],
-        buttonText: 'Start Free Trial Now',
-        buttonLink: '/signup',
-        popular: false,
+        buttonText: 'Start Free Trial',
     },
     {
         name: 'Pro',
@@ -42,6 +46,8 @@ const pricingPlans = [
         description: 'For professionals and small teams who need advanced features and more creative power.',
         monthlyPrice: 35,
         yearlyPrice: 30,
+        priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_MONTHLY!,
+        priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_YEARLY!,
         features: [
             'Unlimited AI Design Generations',
             'High-Resolution 3D Previews',
@@ -51,7 +57,6 @@ const pricingPlans = [
             'Upload Custom Assets & Logos'
         ],
         buttonText: 'Get Pro',
-        buttonLink: '/signup',
         popular: true,
     },
     {
@@ -73,9 +78,52 @@ const pricingPlans = [
     }
 ];
 
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function PricingPage() {
     const [billingCycle, setBillingCycle] = useState('monthly');
+    const [isLoading, setIsLoading] = useState<string | null>(null);
+    const { user } = useAuth();
+    const router = useRouter();
+    const { toast } = useToast();
+
+    const handleSubscribe = async (plan: typeof pricingPlans[0]) => {
+        if (!user) {
+            router.push('/signup');
+            return;
+        }
+
+        if (plan.buttonLink) {
+            router.push(plan.buttonLink);
+            return;
+        }
+        
+        const priceId = billingCycle === 'yearly' ? plan.priceIdYearly : plan.priceIdMonthly;
+        setIsLoading(priceId);
+
+        try {
+            const res = await fetch('/api/stripe/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ priceId, redirectPath: '/pricing' }),
+            });
+
+            if (!res.ok) {
+                const { error } = await res.json();
+                throw new Error(error || 'Could not create checkout session.');
+            }
+
+            const { sessionId } = await res.json();
+            const stripe = await stripePromise;
+            const { error } = await stripe!.redirectToCheckout({ sessionId });
+            if (error) throw new Error(error.message);
+
+        } catch (error: any) {
+            toast({ title: 'Error', description: error.message, variant: 'destructive' });
+            setIsLoading(null);
+        }
+    };
+
 
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col">
@@ -94,7 +142,7 @@ export default function PricingPage() {
             <Tabs defaultValue="monthly" onValueChange={setBillingCycle} className="w-auto">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                <TabsTrigger value="yearly">Yearly</TabsTrigger>
+                <TabsTrigger value="yearly">Yearly (Save 20%)</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -104,6 +152,8 @@ export default function PricingPage() {
                 const isYearly = billingCycle === 'yearly';
                 const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
                 const isCustom = plan.priceText === 'Custom';
+                const priceId = isYearly ? plan.priceIdYearly : plan.priceIdMonthly;
+                const isCurrentPlan = user?.stripePriceId === priceId;
                 
                 return (
                   <div key={plan.name} className="relative pt-6 h-full">
@@ -156,15 +206,17 @@ export default function PricingPage() {
                       </CardContent>
                       <CardFooter>
                         <Button 
-                              asChild 
-                              variant={plan.popular ? 'default' : 'outline'} 
+                              onClick={() => handleSubscribe(plan)}
+                              disabled={isCurrentPlan || isLoading === priceId}
+                              variant={isCurrentPlan ? 'outline' : (plan.popular ? 'default' : 'outline')} 
                               className={cn('w-full', 
-                                  plan.popular && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
-                                  plan.isTrial && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
+                                  plan.popular && !isCurrentPlan && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
+                                  plan.isTrial && !isCurrentPlan && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
                                   plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
                               )}
                           >
-                              <Link href={plan.buttonLink}>{plan.buttonText}</Link>
+                              {isLoading === priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              {isCurrentPlan ? 'Current Plan' : plan.buttonText}
                         </Button>
                       </CardFooter>
                     </Card>
@@ -172,7 +224,6 @@ export default function PricingPage() {
                 );
             })}
           </div>
-
         </div>
       </main>
 

@@ -1,5 +1,8 @@
 
-import { Button } from "@/components/ui/button"
+'use client';
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,142 +10,166 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Check } from "lucide-react"
+} from "@/components/ui/card";
+import { Check, Loader2, CreditCard } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import { loadStripe } from '@stripe/stripe-js';
+import { format } from "date-fns";
 
 const plans = [
-    { name: "Starter", price: "$10/mo", description: "For individuals and hobbyists.", features: ["10 AI Credits", "Basic 3D Previews"] },
-    { name: "Pro", price: "$35/mo", description: "For professionals and small teams.", features: ["Unlimited AI Credits", "HD 3D Previews", "Team Collaboration (5 seats)"] },
-    { name: "Enterprise", price: "Custom", description: "For large organizations.", features: ["Everything in Pro", "Dedicated Support", "API Access"] },
-]
+    { 
+        name: "Starter", 
+        priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!, 
+        price: "$10/mo", 
+        description: "For individuals and hobbyists.", 
+        features: ["10 AI Credits", "Basic 3D Previews"],
+        buttonText: "Subscribe",
+    },
+    { 
+        name: "Pro", 
+        priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!, 
+        price: "$35/mo", 
+        description: "For professionals and small teams.", 
+        features: ["Unlimited AI Credits", "HD 3D Previews", "Team Collaboration (5 seats)"],
+        buttonText: "Subscribe",
+        isPopular: true,
+    },
+    { 
+        name: "Enterprise", 
+        priceId: '', // No direct checkout
+        price: "Custom", 
+        description: "For large organizations.", 
+        features: ["Everything in Pro", "Dedicated Support", "API Access"],
+        buttonText: "Contact Sales",
+    },
+];
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function BillingPage() {
-  return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
-       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold font-headline mb-2">Billing</h1>
-        <p className="text-muted-foreground">Manage your payment methods and subscription plan.</p>
-      </div>
-      
-      <div className="grid gap-8 max-w-4xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment Method</CardTitle>
-            <CardDescription>
-              Add a payment method to your account for subscriptions or one-time orders.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-6">
-            <form className="grid gap-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="name">Name on card</Label>
-                    <Input id="name" placeholder="John Doe" />
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="card-number">Card number</Label>
-                    <Input id="card-number" placeholder="•••• •••• •••• ••••" />
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="grid gap-2">
-                    <Label htmlFor="month">Expires</Label>
-                    <Select>
-                        <SelectTrigger id="month">
-                        <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="1">January</SelectItem>
-                        <SelectItem value="2">February</SelectItem>
-                        <SelectItem value="3">March</SelectItem>
-                        <SelectItem value="4">April</SelectItem>
-                        <SelectItem value="5">May</SelectItem>
-                        <SelectItem value="6">June</SelectItem>
-                        <SelectItem value="7">July</SelectItem>
-                        <SelectItem value="8">August</SelectItem>
-                        <SelectItem value="9">September</SelectItem>
-                        <SelectItem value="10">October</SelectItem>
-                        <SelectItem value="11">November</SelectItem>
-                        <SelectItem value="12">December</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="grid gap-2">
-                    <Label htmlFor="year" className="invisible">Year</Label>
-                    <Select>
-                        <SelectTrigger id="year">
-                        <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                        {Array.from({ length: 10 }, (_, i) => (
-                            <SelectItem key={i} value={`${new Date().getFullYear() + i}`}>
-                            {new Date().getFullYear() + i}
-                            </SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="cvc">CVC</Label>
-                        <Input id="cvc" placeholder="CVC" />
-                    </div>
-                </div>
-                <div className="flex items-center space-x-2 pt-2">
-                    <Checkbox id="save-card" defaultChecked />
-                    <Label htmlFor="save-card" className="text-sm font-normal">Save this card for future purchases</Label>
-                </div>
-            </form>
-          </CardContent>
-          <CardFooter className="border-t pt-6">
-            <Button>Save Payment Method</Button>
-          </CardFooter>
-        </Card>
+    const { user } = useAuth();
+    const [isLoading, setIsLoading] = useState<'checkout' | 'portal' | null>(null);
+    const { toast } = useToast();
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Subscription Plan</CardTitle>
-            <CardDescription>You are currently on the <span className="font-semibold text-primary">Pro</span> plan.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-             {plans.map(plan => (
-                <Card key={plan.name} className="flex flex-col">
+    const currentPriceId = user?.stripePriceId;
+    const currentPlan = plans.find(p => p.priceId === currentPriceId);
+    const subscriptionStatus = user?.stripeSubscriptionStatus;
+    const isSubscribed = subscriptionStatus === 'active' || subscriptionStatus === 'trialing';
+
+    const handleManageSubscription = async () => {
+        setIsLoading('portal');
+        try {
+            const res = await fetch('/api/stripe/create-portal-link', { method: 'POST' });
+            if (!res.ok) {
+                const { error } = await res.json();
+                throw new Error(error || 'Failed to create portal link.');
+            }
+            const { url } = await res.json();
+            window.location.href = url;
+        } catch (error: any) {
+            toast({ title: 'Error', description: error.message, variant: 'destructive' });
+            setIsLoading(null);
+        }
+    };
+    
+    const handleSubscribe = async (priceId: string) => {
+        if (!priceId) { // For "Contact Sales"
+            window.location.href = '/contact';
+            return;
+        }
+        setIsLoading('checkout');
+        try {
+            const res = await fetch('/api/stripe/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ priceId }),
+            });
+
+            if (!res.ok) {
+                const { error } = await res.json();
+                throw new Error(error || 'Could not create checkout session.');
+            }
+
+            const { sessionId } = await res.json();
+            const stripe = await stripePromise;
+            const { error } = await stripe!.redirectToCheckout({ sessionId });
+            if (error) throw new Error(error.message);
+
+        } catch (error: any) {
+            toast({
+                title: 'Error',
+                description: error.message,
+                variant: 'destructive',
+            });
+            setIsLoading(null);
+        }
+    };
+
+    return (
+        <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+            <div className="max-w-4xl mx-auto">
+                <h1 className="text-3xl font-bold font-headline mb-2">Billing</h1>
+                <p className="text-muted-foreground">Manage your payment methods and subscription plan.</p>
+            </div>
+            
+            <div className="grid gap-8 max-w-4xl mx-auto">
+                <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline">{plan.name}</CardTitle>
-                        <p className="text-2xl font-bold">{plan.price}</p>
-                        <CardDescription>{plan.description}</CardDescription>
+                        <CardTitle>Subscription Plan</CardTitle>
+                        <CardDescription>
+                            You are currently on the <span className="font-semibold text-primary">{currentPlan?.name || 'Free'}</span> plan.
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-1">
-                        <ul className="space-y-2 text-sm">
-                            {plan.features.map(feature => (
-                                <li key={feature} className="flex items-center gap-2">
-                                    <Check className="h-4 w-4 text-primary" />
-                                    <span className="text-muted-foreground">{feature}</span>
-                                </li>
-                            ))}
-                        </ul>
+                    <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {plans.map(plan => {
+                            const isCurrentPlan = plan.priceId === currentPriceId;
+                            return (
+                                <Card key={plan.name} className={`flex flex-col ${isCurrentPlan ? 'border-primary' : ''}`}>
+                                    <CardHeader>
+                                        <CardTitle className="font-headline">{plan.name}</CardTitle>
+                                        <p className="text-2xl font-bold">{plan.price}</p>
+                                        <CardDescription>{plan.description}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="flex-1">
+                                        <ul className="space-y-2 text-sm">
+                                            {plan.features.map(feature => (
+                                                <li key={feature} className="flex items-center gap-2">
+                                                    <Check className="h-4 w-4 text-primary" />
+                                                    <span className="text-muted-foreground">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </CardContent>
+                                    <CardFooter>
+                                        <Button 
+                                            variant={isCurrentPlan ? 'default' : 'outline'} 
+                                            className="w-full"
+                                            disabled={isCurrentPlan || isLoading === 'checkout'}
+                                            onClick={() => handleSubscribe(plan.priceId)}
+                                        >
+                                          {isCurrentPlan ? 'Current Plan' : plan.buttonText}
+                                          {isLoading === 'checkout' && !isCurrentPlan && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            );
+                        })}
                     </CardContent>
-                    <CardFooter>
-                        <Button variant={plan.name === 'Pro' ? 'default' : 'outline'} className="w-full">
-                           {plan.name === 'Pro' ? 'Current Plan' : 'Select Plan'}
-                        </Button>
-                    </CardFooter>
+                    {isSubscribed && user?.stripeCurrentPeriodEnd && (
+                         <CardFooter className="border-t pt-6 flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+                            <div>
+                                <p>Your plan renews on {format(new Date(user.stripeCurrentPeriodEnd * 1000), 'PPP')}.</p>
+                                <p>Status: <span className="font-semibold capitalize text-primary">{subscriptionStatus}</span></p>
+                            </div>
+                            <Button onClick={handleManageSubscription} disabled={isLoading === 'portal'}>
+                                {isLoading === 'portal' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CreditCard className="mr-2 h-4 w-4" />}
+                                Manage Billing & Invoices
+                            </Button>
+                        </CardFooter>
+                    )}
                 </Card>
-             ))}
-          </CardContent>
-           <CardFooter className="border-t pt-6 flex-col items-start gap-2 text-sm text-muted-foreground">
-                <p>Your subscription will renew on August 1, 2024.</p>
-                <Button variant="link" className="p-0 h-auto text-destructive">Cancel Subscription</Button>
-           </CardFooter>
-        </Card>
-      </div>
-    </div>
-  )
+            </div>
+        </div>
+    );
 }

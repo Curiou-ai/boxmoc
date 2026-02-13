@@ -2,15 +2,21 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import admin from './firebase-admin';
+import { stripe } from './stripe';
 
 const db = admin.firestore();
 
-// Define a shape for the user profile data stored in Firestore
 export interface UserProfile {
   role: 'user' | 'admin';
   email: string;
   displayName: string;
   createdAt: string;
+  // Stripe fields
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  stripePriceId?: string;
+  stripeCurrentPeriodEnd?: number; // Store as Unix timestamp
+  stripeSubscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete' | 'unpaid';
 }
 
 // The session object will include both Auth data and Firestore profile data
@@ -28,19 +34,26 @@ export async function getSession(): Promise<UserSession | null> {
     const userDocRef = db.collection('users').doc(decodedIdToken.uid);
     const userDoc = await userDocRef.get();
 
-    // If a user has a valid auth session but no profile in Firestore, create one.
-    // This handles users created via social login for the first time.
     if (!userDoc.exists) {
       const authUser = await admin.auth().getUser(decodedIdToken.uid);
+      
+      const stripeCustomer = await stripe.customers.create({
+        email: authUser.email,
+        name: authUser.displayName,
+        metadata: {
+          firebaseUID: decodedIdToken.uid,
+        },
+      });
+      
       const newUserProfile: UserProfile = {
         email: authUser.email || '',
         displayName: authUser.displayName || 'New User',
         createdAt: new Date().toISOString(),
-        role: 'user', // Default to 'user' role
+        role: 'user',
+        stripeCustomerId: stripeCustomer.id,
       };
       await userDocRef.set(newUserProfile);
       
-      // Return the newly created profile data combined with the token
       return { ...decodedIdToken, ...newUserProfile };
     }
 
@@ -50,7 +63,6 @@ export async function getSession(): Promise<UserSession | null> {
 
   } catch (error) {
     console.error('Error verifying session cookie or fetching user profile:', error);
-    // Invalidate cookie if it's invalid to prevent redirect loops
     cookies().delete('session');
     return null;
   }

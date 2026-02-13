@@ -27,30 +27,31 @@ export default function DashboardHero() {
 
   return (
     // <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-[1400px] bg-gradient-to-br from-[#1a2742] to-[#0f1a2e] rounded-2xl p-4 sm:p-6 md:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative overflow-hidden">
+      <div className="w-full max-w-[1400px] items-center mx-auto bg-gradient-to-br from-[#1a2742] to-[#0f1a2e] rounded-2xl p-4 sm:p-6 md:p-12 shadow-[0_40px_120px_rgba(0,0,0,0.5)] relative overflow-hidden">
         {/* Top gradient line */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
         {/* Top Bar */}
-        <div className="hidden sm:flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 md:mb-12 pb-6 border-b border-white/10">
+        {/* <div className="hidden sm:flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 md:mb-12 pb-6 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
               <Box className="w-5 h-5 text-white" />
             </div>
-            {/* <span className="text-xl md:text-2xl font-bold text-white">Boxmoc</span> */}
+            <span className="text-xl md:text-2xl font-bold text-white">Boxmoc</span>
           </div>
-          {/* <div className="flex gap-3">
+          <div className="flex gap-3">
             <button className="px-4 md:px-6 py-2.5 md:py-3 rounded-lg bg-white/10 text-white font-semibold hover:bg-white/15 transition-all duration-300">
               Share
             </button>
             <button className="px-4 md:px-6 py-2.5 md:py-3 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 text-white font-semibold hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(59,130,246,0.4)] transition-all duration-300">
               Save
             </button>
-          </div> */}
-        </div>
+          </div>
+        </div> */}
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_2fr] gap-6 md:gap-8 w-full">
+        {/* lg:grid-cols-[280px_2fr] */}
+        <div className="grid grid-cols-1 lg:grid-cols-[250px_minmax(500px,_1fr)] justify-self-center mx-auto gap-6 md:gap-8 w-full">
           {/* Sidebar */}
           <div className="bg-[#0f1a2e]/50 rounded-2xl p-6 border border-white/5 hidden sm:block">
             {/* <h3 className="text-xs md:text-sm text-white/50 mb-4 uppercase tracking-wider">
@@ -77,7 +78,7 @@ export default function DashboardHero() {
               ))}
             </div>
           </div>
-          
+          {/* 3D Preview Panel - mobile*/}
           <div className="block sm:hidden rounded-2xl">
             <div className="mb-6">
               <h2 className="text-xl md:text-2xl font-bold text-white mb-2">

@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { sendEmail } from '@/lib/email-service';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
+import { stripe } from '@/lib/stripe';
 
 
 async function createSession(idToken: string) {
@@ -77,23 +78,29 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
                 displayName,
             });
 
-            // Create user profile in Firestore
+            const stripeCustomer = await stripe.customers.create({
+                email,
+                name: displayName,
+                metadata: {
+                    firebaseUID: userRecord.uid,
+                },
+            });
+            
             const db = admin.firestore();
             await db.collection('users').doc(userRecord.uid).set({
                 email: userRecord.email,
                 displayName: userRecord.displayName || '',
                 createdAt: new Date().toISOString(),
-                role: 'user' // Default role
+                role: 'user',
+                stripeCustomerId: stripeCustomer.id,
             });
             
-            // Send welcome email
             await sendEmail({
               to: email,
               subject: `Welcome to ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'}!`,
               react: WelcomeEmail({ name: displayName, appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc' })
             });
 
-            // Login user to create session
             const clientAuth = getAuth(app);
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
             const idToken = await userCredential.user.getIdToken();
