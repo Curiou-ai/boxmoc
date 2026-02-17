@@ -6,7 +6,7 @@ import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Type, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -36,13 +36,13 @@ const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { ima
            <Button variant="ghost" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0 text-primary
                                               lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
                 <Sparkles className="h-5 w-5 lg:h-6 lg:w-6" />
-                <span className="text-xs lg:text-base">Generate with AI</span>
+                <span className="text-xs lg:text-base">Create</span>
             </Button>
         </DialogTrigger>
       </TooltipTrigger>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle className="font-headline text-xl">Generate with AI</DialogTitle>
+          <DialogTitle className="font-headline text-xl">Create</DialogTitle>
            <DialogDescription>Describe your idea and let AI create a design for you.</DialogDescription>
         </DialogHeader>
         <AiDesignForm onDesignGenerated={handleGenerated} />
@@ -56,8 +56,10 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
     const tools = [
         { icon: Upload, label: 'Upload', tooltip: 'Upload Image' },
         { icon: Type, label: 'Text', tooltip: 'Add Text' },
-        { icon: Shapes, label: 'Shapes', tooltip: 'Add Shape' },
+        // { icon: Shapes, label: 'Shapes', tooltip: 'Add Shape' },
         { icon: Brush, label: 'Edit', tooltip: 'Edit Design' },
+        { icon: Save, label: 'Save', tooltip: 'Save' },
+        { icon: Share2, label: 'Share', tooltip: 'Share' },
     ];
 
     return (
@@ -66,8 +68,8 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <AiToolDialog onDesignGenerated={onDesignGenerated} />
-                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Generate with AI</TooltipContent>
-                      <TooltipContent side="bottom" className="lg:hidden">Generate with AI</TooltipContent>
+                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Create</TooltipContent>
+                      <TooltipContent side="bottom" className="lg:hidden">Create</TooltipContent>
                   </Tooltip>
                   
                   <Separator orientation="vertical" className="h-8 lg:hidden" />
@@ -89,19 +91,19 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                 </TooltipProvider>
              </div>
 
-              <div className="lg:mt-auto lg:border-t lg:p-4">
+              <div className="lg:mt-auto lg:border-t lg:p-4 p-2">
                     <RequestHelpDialog>
                          <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="secondary" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0
+                                    <Button variant="secondary" className="flex flex-col items-center justify-center h-auto w-18 gap-1 p-2 flex-shrink-0
                                                                           lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
                                         <Users className="h-5 w-5 lg:h-6 lg:w-6" />
-                                        <span className="text-xs lg:text-base">Request Help</span>
+                                        <span className="text-xs lg:text-base">Assistance</span>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Get Expert Help</TooltipContent>
-                                <TooltipContent side="bottom" className="lg:hidden">Get Expert Help</TooltipContent>
+                                <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Request Help</TooltipContent>
+                                <TooltipContent side="bottom" className="lg:hidden">Request Help</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </RequestHelpDialog>
@@ -139,7 +141,7 @@ export default function CreatorPage() {
                   <SelectContent>
                     <SelectItem value="box">
                       <div className="flex items-center gap-2">
-                        <Box className="h-4 w-4" /> Promotional Box
+                        <Box className="h-4 w-4" /> Box
                       </div>
                     </SelectItem>
                     <SelectItem value="card">
@@ -162,8 +164,8 @@ export default function CreatorPage() {
           </Card>
           <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
             <CardHeader>
-              <CardTitle className="font-headline">AI Generated Design</CardTitle>
-              <CardDescription>The image and description from the AI.</CardDescription>
+              <CardTitle className="font-headline">Edit Design</CardTitle>
+              <CardDescription>The image and description.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
               <div className="w-full aspect-square bg-muted/50 rounded-lg flex items-center justify-center overflow-hidden border">

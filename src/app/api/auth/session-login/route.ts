@@ -18,6 +18,15 @@ export async function POST(request: NextRequest) {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const user = await admin.auth().getUser(decodedToken.uid);
 
+    // Sync user data to Firestore on login
+    const db = admin.firestore();
+    await db.collection('users').doc(user.uid).set({
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+    }, { merge: true });
+
+
     // Create the session cookie.
     const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
 

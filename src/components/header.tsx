@@ -1,7 +1,7 @@
 
 'use client'; 
 
-import { Package, Share2, Save, Box, LogOut } from 'lucide-react';
+import { Package, Share2, Save, Bell, Box, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -38,13 +38,13 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="outline" size="sm">
+        {/* <Button variant="outline" size="sm">
           <Share2 className="h-4 w-4 md:mr-2" />
           <span className="hidden md:inline">Share</span>
-        </Button>
+        </Button> */}
         <Button size="sm">
-          <Save className="h-4 w-4 md:mr-2" />
-          <span className="hidden md:inline">Save</span>
+          <Bell className="h-4 w-4" />
+          {/* <span className="hidden md:inline">Save</span> */}
         </Button>
         {user ? (
           <DropdownMenu>
@@ -57,6 +57,12 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>{user.displayName || 'My Account'}</DropdownMenuLabel>
               <DropdownMenuSeparator />
+               <DropdownMenuItem asChild>
+                <Link href="/creator/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/creator/billing">Billing</Link>
               </DropdownMenuItem>

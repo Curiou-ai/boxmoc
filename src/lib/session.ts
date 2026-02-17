@@ -1,3 +1,4 @@
+
 import 'server-only';
 import { cookies } from 'next/headers';
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -10,6 +11,7 @@ export interface UserProfile {
   role: 'user' | 'admin';
   email: string;
   displayName: string;
+  photoURL?: string | null;
   createdAt: string;
   // Stripe fields
   stripeCustomerId?: string;
@@ -48,6 +50,7 @@ export async function getSession(): Promise<UserSession | null> {
       const newUserProfile: UserProfile = {
         email: authUser.email || '',
         displayName: authUser.displayName || 'New User',
+        photoURL: authUser.photoURL || null,
         createdAt: new Date().toISOString(),
         role: 'user',
         stripeCustomerId: stripeCustomer.id,

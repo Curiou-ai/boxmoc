@@ -96,6 +96,7 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
             await db.collection('users').doc(userRecord.uid).set({
                 email: userRecord.email,
                 displayName: userRecord.displayName || '',
+                photoURL: userRecord.photoURL || null,
                 createdAt: new Date().toISOString(),
                 role: 'user',
                 stripeCustomerId: stripeCustomer.id,

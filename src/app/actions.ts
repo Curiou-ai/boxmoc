@@ -7,12 +7,14 @@ import { translateText, TranslateTextInput, TranslateTextOutput } from '@/ai/flo
 import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
+import admin from '@/lib/firebase-admin';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, writeBatch, orderBy } from "firebase/firestore";
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
+// import { getSession } from './lib/session';
 
 
 export interface FormState {
@@ -62,6 +64,17 @@ export interface ActivationState {
     message: string;
 }
 
+export interface ProfileFormState {
+  message: string;
+  success: boolean;
+}
+
+export interface ProfilePictureState {
+  message: string;
+  success: boolean;
+  newImageUrl?: string;
+}
+
 export interface WaitlistUser {
     id: string;
     email: string;
@@ -71,6 +84,54 @@ export interface WaitlistUser {
 }
 
 const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
+const NameSchema = z.string().min(2, { message: "Name must be at least 2 characters."});
+
+
+export async function handleUpdateProfile(prevState: ProfileFormState, formData: FormData): Promise<ProfileFormState> {
+    const session = await getSession();
+    if (!session) {
+        return { success: false, message: 'You must be logged in to update your profile.' };
+    }
+
+    const displayName = formData.get('displayName') as string;
+
+    const validation = NameSchema.safeParse(displayName);
+    if (!validation.success) {
+        return { success: false, message: validation.error.errors[0].message };
+    }
+
+    try {
+        await admin.auth().updateUser(session.uid, { displayName });
+        await admin.firestore().collection('users').doc(session.uid).update({ displayName });
+        
+        return { success: true, message: 'Profile updated successfully!' };
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        return { success: false, message: 'An unexpected error occurred.' };
+    }
+}
+
+export async function handleUpdateProfilePicture(prevState: ProfilePictureState, formData: FormData): Promise<ProfilePictureState> {
+    const session = await getSession();
+    if (!session) {
+        return { success: false, message: 'You must be logged in to update your profile picture.' };
+    }
+
+    // In a real app, you would handle file upload here to a service like Firebase Storage
+    // and get a public URL. For this prototype, we'll just generate a new placeholder image URL.
+    const newImageUrl = `https://picsum.photos/seed/${Math.random()}/200/200`;
+
+    try {
+        await admin.auth().updateUser(session.uid, { photoURL: newImageUrl });
+        await admin.firestore().collection('users').doc(session.uid).update({ photoURL: newImageUrl });
+
+        return { success: true, message: 'Profile picture updated!', newImageUrl };
+    } catch (error) {
+        console.error("Error updating profile picture:", error);
+        return { success: false, message: 'An unexpected error occurred.' };
+    }
+}
+
 
 export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
     if (!db) {
