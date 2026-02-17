@@ -33,9 +33,10 @@ const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { ima
     <Dialog open={open} onOpenChange={setOpen}>
       <TooltipTrigger asChild>
         <DialogTrigger asChild>
-           <Button variant="ghost" className="w-auto lg:w-full flex-shrink-0 justify-center lg:justify-start items-center gap-4 h-12 px-3 text-base">
-                <Sparkles className="h-6 w-6 text-primary" />
-                <span className="hidden lg:inline">Generate with AI</span>
+           <Button variant="ghost" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0 text-primary
+                                              lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
+                <Sparkles className="h-5 w-5 lg:h-6 lg:w-6" />
+                <span className="text-xs lg:text-base">Generate with AI</span>
             </Button>
         </DialogTrigger>
       </TooltipTrigger>
@@ -75,9 +76,10 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                   {tools.map(tool => (
                       <Tooltip key={tool.label}>
                           <TooltipTrigger asChild>
-                              <Button variant="ghost" className="w-auto lg:w-full flex-shrink-0 justify-center lg:justify-start gap-4 h-12 px-3 text-base">
-                                  <tool.icon className="h-6 w-6" />
-                                  <span className="hidden lg:inline">{tool.label}</span>
+                              <Button variant="ghost" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0
+                                                                  lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
+                                  <tool.icon className="h-5 w-5 lg:h-6 lg:w-6" />
+                                  <span className="text-xs lg:text-base">{tool.label}</span>
                               </Button>
                           </TooltipTrigger>
                           <TooltipContent side="right" sideOffset={5} className="hidden lg:block">{tool.tooltip}</TooltipContent>
@@ -92,9 +94,10 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                          <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="secondary" className="w-auto lg:w-full flex-shrink-0 justify-center lg:justify-start gap-4 h-12 px-3 text-base">
-                                        <Users className="h-6 w-6" />
-                                        <span className="hidden lg:inline">Request Help</span>
+                                    <Button variant="secondary" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0
+                                                                          lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
+                                        <Users className="h-5 w-5 lg:h-6 lg:w-6" />
+                                        <span className="text-xs lg:text-base">Request Help</span>
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Get Expert Help</TooltipContent>
