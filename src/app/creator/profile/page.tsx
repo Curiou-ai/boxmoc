@@ -85,30 +85,8 @@ export default function ProfilePage() {
             </div>
 
             <div className="grid gap-8 max-w-4xl mx-auto">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Profile Details</CardTitle>
-                        <CardDescription>Update your personal information.</CardDescription>
-                    </CardHeader>
-                    <form action={updateProfileAction}>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="displayName">Full Name</Label>
-                                <Input id="displayName" name="displayName" defaultValue={user?.displayName || ''} required />
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="email">Email Address</Label>
-                                <Input id="email" name="email" type="email" value={user?.email || ''} disabled />
-                                <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="border-t pt-6 justify-end">
-                           <ProfileSubmitButton />
-                        </CardFooter>
-                    </form>
-                </Card>
 
-                 <Card>
+            <Card>
                     <CardHeader>
                         <CardTitle>Profile Picture</CardTitle>
                         <CardDescription>Update your avatar.</CardDescription>
@@ -136,6 +114,31 @@ export default function ProfilePage() {
                         </CardContent>
                     </form>
                 </Card>
+                
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Profile Details</CardTitle>
+                        <CardDescription>Update your personal information.</CardDescription>
+                    </CardHeader>
+                    <form action={updateProfileAction}>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="displayName">Full Name</Label>
+                                <Input id="displayName" name="displayName" defaultValue={user?.displayName || ''} required />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="email">Email Address</Label>
+                                <Input id="email" name="email" type="email" value={user?.email || ''} disabled />
+                                <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
+                            </div>
+                        </CardContent>
+                        <CardFooter className="border-t pt-6 justify-end">
+                           <ProfileSubmitButton />
+                        </CardFooter>
+                    </form>
+                </Card>
+
+                
                 
                 <Card>
                     <CardHeader>

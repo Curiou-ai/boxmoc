@@ -99,7 +99,7 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                                     <Button variant="secondary" className="flex flex-col items-center justify-center h-auto w-18 gap-1 p-2 flex-shrink-0
                                                                           lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
                                         <Users className="h-5 w-5 lg:h-6 lg:w-6" />
-                                        <span className="text-xs lg:text-base">Assistance</span>
+                                        <span className="text-xs lg:text-base">Support</span>
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Request Help</TooltipContent>
