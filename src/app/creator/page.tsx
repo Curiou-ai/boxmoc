@@ -33,9 +33,9 @@ const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { ima
     <Dialog open={open} onOpenChange={setOpen}>
       <TooltipTrigger asChild>
         <DialogTrigger asChild>
-           <Button variant="ghost" className="flex justify-start items-center gap-4 w-full h-12 px-3 text-base">
+           <Button variant="ghost" className="w-auto lg:w-full flex-shrink-0 justify-center lg:justify-start items-center gap-4 h-12 px-3 text-base">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <span className="lg:inline">Generate with AI</span>
+                <span className="hidden lg:inline">Generate with AI</span>
             </Button>
         </DialogTrigger>
       </TooltipTrigger>
@@ -60,49 +60,45 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
     ];
 
     return (
-        <aside className={cn("flex w-full lg:w-64 flex-col border-b lg:border-r lg:border-b-0 bg-background", className)}>
-             <div className="flex-1 p-2 lg:p-4 space-y-2 mt-4">
+        <aside id="toolbar" className={cn("flex flex-row lg:flex-col w-full lg:w-64 justify-between items-center lg:items-stretch border-b lg:border-r lg:border-b-0 bg-background p-2 lg:p-0", className)}>
+             <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-2 lg:space-y-2 lg:p-4 lg:mt-4 overflow-x-auto">
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <AiToolDialog onDesignGenerated={onDesignGenerated} />
-                      <TooltipContent side="right" sideOffset={5} className="lg:hidden">
-                        Generate with AI
-                      </TooltipContent>
+                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Generate with AI</TooltipContent>
+                      <TooltipContent side="bottom" className="lg:hidden">Generate with AI</TooltipContent>
                   </Tooltip>
                   
-                  <Separator className="my-4" />
-                  
-                  <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tools</p>
+                  <Separator orientation="vertical" className="h-8 lg:hidden" />
+                  <Separator className="my-4 hidden lg:block" />
 
                   {tools.map(tool => (
                       <Tooltip key={tool.label}>
                           <TooltipTrigger asChild>
-                              <Button variant="ghost" className="w-full justify-start gap-4 h-12 px-3 text-base">
+                              <Button variant="ghost" className="w-auto lg:w-full flex-shrink-0 justify-center lg:justify-start gap-4 h-12 px-3 text-base">
                                   <tool.icon className="h-6 w-6" />
-                                  <span className="lg:inline">{tool.label}</span>
+                                  <span className="hidden lg:inline">{tool.label}</span>
                               </Button>
                           </TooltipTrigger>
-                          <TooltipContent side="right" sideOffset={5} className="lg:hidden">
-                              {tool.tooltip}
-                          </TooltipContent>
+                          <TooltipContent side="right" sideOffset={5} className="hidden lg:block">{tool.tooltip}</TooltipContent>
+                          <TooltipContent side="bottom" className="lg:hidden">{tool.tooltip}</TooltipContent>
                       </Tooltip>
                   ))}
                 </TooltipProvider>
              </div>
 
-              <div className="p-2 lg:p-4 mt-auto border-t">
+              <div className="lg:mt-auto lg:border-t lg:p-4">
                     <RequestHelpDialog>
                          <TooltipProvider delayDuration={0}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button variant="secondary" className="w-full justify-start gap-4 h-12 px-3 text-base">
+                                    <Button variant="secondary" className="w-auto lg:w-full flex-shrink-0 justify-center lg:justify-start gap-4 h-12 px-3 text-base">
                                         <Users className="h-6 w-6" />
-                                        <span className="lg:inline">Request Help</span>
+                                        <span className="hidden lg:inline">Request Help</span>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={5} className="lg:hidden">
-                                    Get Expert Help
-                                </TooltipContent>
+                                <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Get Expert Help</TooltipContent>
+                                <TooltipContent side="bottom" className="lg:hidden">Get Expert Help</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </RequestHelpDialog>
@@ -148,11 +144,11 @@ export default function CreatorPage() {
                         <CreditCard className="h-4 w-4" /> Card
                       </div>
                     </SelectItem>
-                    <SelectItem value="bag">
+                    {/* <SelectItem value="bag">
                       <div className="flex items-center gap-2">
                         <ShoppingBag className="h-4 w-4" /> Tote Bag
                       </div>
-                    </SelectItem>
+                    </SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>

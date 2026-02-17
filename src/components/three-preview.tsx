@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 interface ThreePreviewProps {
   imageUrl?: string;
-  productType?: 'box' | 'card' | 'bag';
+  productType?: 'box' | 'card' | 'bag' | string;
 }
 
 const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'box' }) => {
