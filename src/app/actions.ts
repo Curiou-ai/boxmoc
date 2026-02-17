@@ -14,9 +14,6 @@ import { randomBytes } from 'crypto';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
 import { getSession } from '@/lib/session';
 
-// Initialize the Admin SDK's Firestore instance
-const db = admin.firestore();
-
 export interface FormState {
   message: string;
   design?: {
@@ -101,6 +98,7 @@ export async function handleUpdateProfile(prevState: ProfileFormState, formData:
     }
 
     try {
+        const db = admin.firestore();
         await admin.auth().updateUser(session.uid, { displayName });
         await db.collection('users').doc(session.uid).update({ displayName });
         
@@ -122,6 +120,7 @@ export async function handleUpdateProfilePicture(prevState: ProfilePictureState,
     const newImageUrl = `https://picsum.photos/seed/${Math.random()}/200/200`;
 
     try {
+        const db = admin.firestore();
         await admin.auth().updateUser(session.uid, { photoURL: newImageUrl });
         await db.collection('users').doc(session.uid).update({ photoURL: newImageUrl });
 
@@ -134,6 +133,7 @@ export async function handleUpdateProfilePicture(prevState: ProfilePictureState,
 
 
 export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
+    const db = admin.firestore();
     const waitlistCol = db.collection('waitlist');
     const q = waitlistCol.orderBy('createdAt', 'desc');
     const snapshot = await q.get();
@@ -168,6 +168,7 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
   }
 
   try {
+    const db = admin.firestore();
     const waitlistCollection = db.collection('waitlist');
 
     // Check if email already exists
@@ -206,6 +207,7 @@ export async function sendAccessCode(email: string): Promise<ActivationState> {
   }
 
   try {
+    const db = admin.firestore();
     const waitlistCollection = db.collection('waitlist');
     const q = waitlistCollection.where("email", "==", email).where("status", "==", "waitlisted");
     const querySnapshot = await q.get();
@@ -247,6 +249,7 @@ export async function handleValidateAccessCode(prevState: AccessCodeState, formD
     }
     
     try {
+        const db = admin.firestore();
         const waitlistCollection = db.collection('waitlist');
         const q = waitlistCollection.where("code", "==", code.trim().toUpperCase()).where("status", "==", "active");
         const querySnapshot = await q.get();

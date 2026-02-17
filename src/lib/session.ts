@@ -5,8 +5,6 @@ import { DecodedIdToken } from 'firebase-admin/auth';
 import admin from './firebase-admin';
 import { stripe } from './stripe';
 
-const db = admin.firestore();
-
 export interface UserProfile {
   role: 'user' | 'admin';
   email: string;
@@ -33,6 +31,7 @@ export async function getSession(): Promise<UserSession | null> {
   try {
     const decodedIdToken = await admin.auth().verifySessionCookie(sessionCookie, true);
     
+    const db = admin.firestore();
     const userDocRef = db.collection('users').doc(decodedIdToken.uid);
     const userDoc = await userDocRef.get();
 

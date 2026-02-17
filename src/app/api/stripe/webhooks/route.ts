@@ -12,9 +12,8 @@ const relevantEvents = new Set([
   'customer.subscription.created',
 ]);
 
-const db = admin.firestore();
-
 async function manageSubscriptionStatusChange(subscriptionId: string, customerId: string) {
+    const db = admin.firestore();
     const userQuerySnapshot = await db.collection('users').where('stripeCustomerId', '==', customerId).limit(1).get();
 
     if (userQuerySnapshot.empty) {
