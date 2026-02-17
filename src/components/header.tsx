@@ -1,7 +1,7 @@
 
 'use client'; 
 
-import { Package, Share2, Save, Bell, Box, LogOut, User } from 'lucide-react';
+import { Package, Share2, Save, Bell, Box, LogOut, User, CreditCard, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -50,7 +50,7 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="h-9 w-9 cursor-pointer">
-                  <AvatarImage src={user.photoURL || "https://placehold.co/48x48.png"} alt="User Avatar" data-ai-hint="woman smiling" />
+                  <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
                   <AvatarFallback>{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
@@ -64,10 +64,14 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/creator/billing">Billing</Link>
+                <Link href="/creator/billing">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  <span>Billing</span>
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="#">Settings</Link>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut}>

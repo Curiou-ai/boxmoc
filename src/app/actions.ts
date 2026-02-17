@@ -8,14 +8,14 @@ import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
 import admin from '@/lib/firebase-admin';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs, writeBatch, orderBy } from "firebase/firestore";
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
-// import { getSession } from './lib/session';
+import { getSession } from '@/lib/session';
 
+// Initialize the Admin SDK's Firestore instance
+const db = admin.firestore();
 
 export interface FormState {
   message: string;
@@ -102,7 +102,7 @@ export async function handleUpdateProfile(prevState: ProfileFormState, formData:
 
     try {
         await admin.auth().updateUser(session.uid, { displayName });
-        await admin.firestore().collection('users').doc(session.uid).update({ displayName });
+        await db.collection('users').doc(session.uid).update({ displayName });
         
         return { success: true, message: 'Profile updated successfully!' };
     } catch (error) {
@@ -123,7 +123,7 @@ export async function handleUpdateProfilePicture(prevState: ProfilePictureState,
 
     try {
         await admin.auth().updateUser(session.uid, { photoURL: newImageUrl });
-        await admin.firestore().collection('users').doc(session.uid).update({ photoURL: newImageUrl });
+        await db.collection('users').doc(session.uid).update({ photoURL: newImageUrl });
 
         return { success: true, message: 'Profile picture updated!', newImageUrl };
     } catch (error) {
@@ -134,13 +134,9 @@ export async function handleUpdateProfilePicture(prevState: ProfilePictureState,
 
 
 export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
-    if (!db) {
-        console.warn("Firestore not configured. Returning empty waitlist.");
-        return [];
-    }
-    const waitlistCol = collection(db, 'waitlist');
-    const q = query(waitlistCol, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
+    const waitlistCol = db.collection('waitlist');
+    const q = waitlistCol.orderBy('createdAt', 'desc');
+    const snapshot = await q.get();
     
     if (snapshot.empty) {
         return [];
@@ -171,25 +167,19 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
     };
   }
 
-  if (!db) {
-    console.error("Firestore is not initialized. Cannot add to waitlist.");
-    // For prototype purposes, redirect even if DB is not configured.
-    redirect('/waitlist/congratulations');
-  }
-
   try {
-    const waitlistCollection = collection(db, 'waitlist');
+    const waitlistCollection = db.collection('waitlist');
 
     // Check if email already exists
-    const q = query(waitlistCollection, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
+    const q = waitlistCollection.where("email", "==", email);
+    const querySnapshot = await q.get();
     if (!querySnapshot.empty) {
       // Email already exists, silently treat as success.
       redirect('/waitlist/congratulations');
     }
 
     // Add a new document with a generated id.
-    await addDoc(waitlistCollection, {
+    await waitlistCollection.add({
       email: email,
       createdAt: new Date(),
       status: 'waitlisted', // 'waitlisted', 'active', 'redeemed'
@@ -211,17 +201,14 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
 export async function sendAccessCode(email: string): Promise<ActivationState> {
   // This function would typically be called from a secure admin interface.
   
-  if (!db) {
-    return { success: false, message: "Firestore is not initialized." };
-  }
   if (!email) {
     return { success: false, message: "Email is required." };
   }
 
   try {
-    const waitlistCollection = collection(db, 'waitlist');
-    const q = query(waitlistCollection, where("email", "==", email), where("status", "==", "waitlisted"));
-    const querySnapshot = await getDocs(q);
+    const waitlistCollection = db.collection('waitlist');
+    const q = waitlistCollection.where("email", "==", email).where("status", "==", "waitlisted");
+    const querySnapshot = await q.get();
 
     if (querySnapshot.empty) {
       return { success: false, message: "User not found on the waitlist or has already been activated." };
@@ -230,7 +217,7 @@ export async function sendAccessCode(email: string): Promise<ActivationState> {
     const userDoc = querySnapshot.docs[0];
     const accessCode = randomBytes(4).toString('hex').toUpperCase(); // Generates an 8-character code
 
-    const batch = writeBatch(db);
+    const batch = db.batch();
     batch.update(userDoc.ref, { 
       code: accessCode,
       status: 'active' 
@@ -259,22 +246,17 @@ export async function handleValidateAccessCode(prevState: AccessCodeState, formD
         return { message: 'Please enter an access code.' };
     }
     
-    if (!db) {
-        console.error("Firestore is not initialized. Cannot validate access code.");
-        return { message: 'The access code system is not configured. Please contact support.' };
-    }
-
     try {
-        const waitlistCollection = collection(db, 'waitlist');
-        const q = query(waitlistCollection, where("code", "==", code.trim().toUpperCase()), where("status", "==", "active"));
-        const querySnapshot = await getDocs(q);
+        const waitlistCollection = db.collection('waitlist');
+        const q = waitlistCollection.where("code", "==", code.trim().toUpperCase()).where("status", "==", "active");
+        const querySnapshot = await q.get();
 
         if (querySnapshot.empty) {
             return { message: 'Invalid or already used access code. Please try again.' };
         }
 
         // Invalidate the code by updating its status to 'redeemed'
-        const batch = writeBatch(db);
+        const batch = db.batch();
         const docToUpdate = querySnapshot.docs[0];
         batch.update(docToUpdate.ref, { status: 'redeemed' });
         await batch.commit();

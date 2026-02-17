@@ -30,8 +30,10 @@ const mockUser: AppUser = {
   email: 'dev@example.com',
   photoURL: 'https://placehold.co/48x48.png',
   role: 'user',
-  stripeSubscriptionStatus: 'active',
+  stripeCustomerId: 'cus_dev123',
   stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+  stripeSubscriptionStatus: 'active',
+  stripeCurrentPeriodEnd: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
 } as AppUser;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,18 +44,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    let unsubscribeAuth: () => void;
-    let unsubscribeProfile: () => void;
+    let unsubscribeAuth: () => void = () => {};
+    let unsubscribeProfile: () => void = () => {};
 
     if (auth && db) {
       unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+        if (unsubscribeProfile) unsubscribeProfile(); // Unsubscribe from previous profile listener
+
         if (firebaseUser) {
           // Listen for profile changes in Firestore
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
               const profileData = doc.data();
-              setUser({ ...firebaseUser, ...profileData });
+              setUser({ ...firebaseUser, ...profileData } as AppUser);
             } else {
                // This can happen briefly if the user doc hasn't been created yet.
                // We fallback to the firebase user, and Firestore will sync up shortly.
@@ -76,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     return () => {
-      if (unsubscribeAuth) unsubscribeAuth();
-      if (unsubscribeProfile) unsubscribeProfile();
+      unsubscribeAuth();
+      unsubscribeProfile();
     };
   }, []);
 
@@ -93,6 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (auth) {
         await firebaseSignOut(auth);
       }
+      // Session cookie is HTTP-only, needs to be cleared by server
+      await fetch('/api/auth/logout');
+      setUser(null); // Clear user state immediately
       router.push('/login');
     } catch (error) {
       console.error("Error signing out: ", error);
