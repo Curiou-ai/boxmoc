@@ -113,6 +113,30 @@ export async function handleCreateOrderSession(
     const origin = headers().get('origin') || 'http://localhost:3000';
 
     try {
+        // 1. Upload image to Firebase Storage to get a permanent URL
+        const bucket = admin.storage().bucket();
+        const mimeType = designImageUrl.match(/data:(.*);base64,/)?.[1] || 'image/png';
+        const extension = mimeType.split('/')[1] || 'png';
+        const base64Data = designImageUrl.replace(/^data:image\/\w+;base64,/, "");
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        
+        // Generate a unique file name for the design
+        const db = admin.firestore();
+        const fileId = db.collection('tmp').doc().id;
+        const filePath = `user-designs/${session.uid}/${fileId}.${extension}`;
+        const file = bucket.file(filePath);
+
+        await file.save(imageBuffer, {
+            metadata: {
+                contentType: mimeType,
+                cacheControl: 'public, max-age=31536000', // Cache for 1 year
+            },
+            public: true, // Make the file publicly accessible
+        });
+
+        const permanentImageUrl = file.publicUrl();
+
+        // 2. Create Stripe Checkout Session with the new permanent URL
         const checkoutSession = await stripe.checkout.sessions.create({
             customer: session.stripeCustomerId,
             payment_method_types: ['card'],
@@ -123,7 +147,7 @@ export async function handleCreateOrderSession(
                         product_data: {
                             name: 'Custom Design Print',
                             description: designDescription,
-                            images: [designImageUrl],
+                            images: [permanentImageUrl], // Use the permanent URL
                         },
                         unit_amount: 4999, // e.g., $49.99
                     },
@@ -136,7 +160,7 @@ export async function handleCreateOrderSession(
             },
             metadata: {
                 userId: session.uid,
-                designImageUrl: designImageUrl,
+                designImageUrl: permanentImageUrl, // Use the permanent URL
                 designDescription: designDescription.substring(0, 499), // Max 500 chars for metadata
             },
             success_url: `${origin}/creator/orders?success=true`,
@@ -301,13 +325,13 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
 
 export async function sendAccessCode(email: string): Promise<ActivationState> {
   // This function would typically be called from a secure admin interface.
+  const db = admin.firestore();
   
   if (!email) {
     return { success: false, message: "Email is required." };
   }
 
   try {
-    const db = admin.firestore();
     const waitlistCollection = db.collection('waitlist');
     const q = waitlistCollection.where("email", "==", email).where("status", "==", "waitlisted");
     const querySnapshot = await q.get();
@@ -343,13 +367,13 @@ export async function sendAccessCode(email: string): Promise<ActivationState> {
 
 export async function handleValidateAccessCode(prevState: AccessCodeState, formData: FormData): Promise<AccessCodeState> {
     const code = formData.get('code') as string;
+    const db = admin.firestore();
 
     if (!code) {
         return { message: 'Please enter an access code.' };
     }
     
     try {
-        const db = admin.firestore();
         const waitlistCollection = db.collection('waitlist');
         const q = waitlistCollection.where("code", "==", code.trim().toUpperCase()).where("status", "==", "active");
         const querySnapshot = await q.get();
