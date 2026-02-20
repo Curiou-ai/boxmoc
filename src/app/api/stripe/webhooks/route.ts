@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
@@ -17,7 +18,7 @@ async function manageSubscriptionStatusChange(subscriptionId: string, customerId
     const userQuerySnapshot = await db.collection('users').where('stripeCustomerId', '==', customerId).limit(1).get();
 
     if (userQuerySnapshot.empty) {
-        console.error(`User not found for stripeCustomerId: ${customerId}`);
+        console.error(`Webhook Error: User not found for stripeCustomerId: ${customerId}`);
         return;
     }
     const userDoc = userQuerySnapshot.docs[0];
@@ -35,6 +36,33 @@ async function manageSubscriptionStatusChange(subscriptionId: string, customerId
 
     await userDoc.ref.update(subscriptionData);
     console.log(`Updated subscription for user ${userDoc.id} in Firestore.`);
+}
+
+async function handleOrderFulfillment(session: Stripe.Checkout.Session) {
+    const { userId, designImageUrl, designDescription } = session.metadata || {};
+
+    if (!userId || !session.shipping_details) {
+        console.error(`Webhook Error: Missing userId or shipping_details for session ${session.id}.`);
+        return;
+    }
+    
+    const orderData = {
+        userId: userId,
+        amountTotal: session.amount_total,
+        designImageUrl: designImageUrl,
+        designDescription: designDescription,
+        shippingAddress: {
+            name: session.shipping_details.name,
+            address: session.shipping_details.address,
+        },
+        status: 'processing', // Initial status after payment
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    const db = admin.firestore();
+    // Use session.id as a unique ID to prevent duplicate orders on webhook retries
+    await db.collection('users').doc(userId).collection('orders').doc(session.id).set(orderData);
+    console.log(`Successfully created order ${session.id} for user ${userId}.`);
 }
 
 export async function POST(request: Request) {
@@ -60,6 +88,8 @@ export async function POST(request: Request) {
                             checkoutSession.subscription as string,
                             checkoutSession.customer as string
                         );
+                    } else if (checkoutSession.mode === 'payment') {
+                        await handleOrderFulfillment(checkoutSession);
                     }
                     break;
                 case 'customer.subscription.created':
@@ -72,7 +102,9 @@ export async function POST(request: Request) {
                     );
                     break;
                 default:
-                    throw new Error('Unhandled relevant event!');
+                    // This should not happen if `relevantEvents` is correct.
+                    // throw new Error('Unhandled relevant event!');
+                    console.warn(`Unhandled relevant event type: ${event.type}`);
             }
         } catch (error) {
             console.error('Stripe webhook handler error:', error);

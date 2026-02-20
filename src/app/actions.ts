@@ -13,6 +13,8 @@ import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
 import { getSession } from '@/lib/session';
+import { stripe } from '@/lib/stripe';
+import { headers } from 'next/headers';
 
 export interface FormState {
   message: string;
@@ -80,8 +82,106 @@ export interface WaitlistUser {
     createdAt: string;
 }
 
+export interface OrderSessionState {
+  sessionId?: string;
+  error?: string;
+}
+
+export interface Order {
+    id: string;
+    amount: number;
+    status: string;
+    createdAt: string;
+    designImageUrl: string;
+    designDescription: string;
+    shippingAddress: any;
+}
+
+
 const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
 const NameSchema = z.string().min(2, { message: "Name must be at least 2 characters."});
+
+
+export async function handleCreateOrderSession(
+    { designImageUrl, designDescription }: { designImageUrl: string; designDescription: string }
+): Promise<OrderSessionState> {
+    const session = await getSession();
+    if (!session || !session.stripeCustomerId) {
+        return { error: 'You must be logged in to place an order.' };
+    }
+
+    const origin = headers().get('origin') || 'http://localhost:3000';
+
+    try {
+        const checkoutSession = await stripe.checkout.sessions.create({
+            customer: session.stripeCustomerId,
+            payment_method_types: ['card'],
+            line_items: [
+                {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: 'Custom Design Print',
+                            description: designDescription,
+                            images: [designImageUrl],
+                        },
+                        unit_amount: 4999, // e.g., $49.99
+                    },
+                    quantity: 1,
+                },
+            ],
+            mode: 'payment',
+            shipping_address_collection: {
+                allowed_countries: ['US', 'CA', 'GB', 'FR', 'DE'], // Example countries
+            },
+            metadata: {
+                userId: session.uid,
+                designImageUrl: designImageUrl,
+                designDescription: designDescription.substring(0, 499), // Max 500 chars for metadata
+            },
+            success_url: `${origin}/creator/orders?success=true`,
+            cancel_url: `${origin}/creator`,
+        });
+
+        if (!checkoutSession.id) {
+            return { error: 'Could not create checkout session.' };
+        }
+
+        return { sessionId: checkoutSession.id };
+
+    } catch (error: any) {
+        console.error('Stripe Order Session Error:', error);
+        return { error: error.message };
+    }
+}
+
+export async function getUserOrders(): Promise<Order[]> {
+    const session = await getSession();
+    if (!session) {
+        return [];
+    }
+
+    const db = admin.firestore();
+    const ordersRef = db.collection('users').doc(session.uid).collection('orders').orderBy('createdAt', 'desc');
+    const snapshot = await ordersRef.get();
+
+    if (snapshot.empty) {
+        return [];
+    }
+
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            amount: data.amountTotal,
+            status: data.status,
+            createdAt: data.createdAt.toDate().toISOString(),
+            designImageUrl: data.designImageUrl,
+            designDescription: data.designDescription,
+            shippingAddress: data.shippingAddress,
+        };
+    });
+}
 
 
 export async function handleUpdateProfile(prevState: ProfileFormState, formData: FormData): Promise<ProfileFormState> {

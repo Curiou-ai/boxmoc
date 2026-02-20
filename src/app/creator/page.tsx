@@ -4,9 +4,9 @@
 import { useState } from 'react';
 import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,6 +20,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import RequestHelpDialog from '@/components/request-help-dialog';
 import { cn } from '@/lib/utils';
+import { loadStripe } from '@stripe/stripe-js';
+import { handleCreateOrderSession } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
 
 const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
   const [open, setOpen] = useState(false);
@@ -116,9 +119,46 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
   const [productType, setProductType] = useState('box');
+  const [isOrdering, setIsOrdering] = useState(false);
+  const { toast } = useToast();
 
   const handleDesignGenerated = (newDesign: { imageUrl: string; description:string }) => {
     setDesign(newDesign);
+  };
+  
+  const handleOrder = async () => {
+    if (!design.imageUrl || !design.description) {
+        toast({
+            title: 'No design to order',
+            description: 'Please generate a design first before ordering a print.',
+            variant: 'destructive'
+        });
+        return;
+    }
+    setIsOrdering(true);
+    try {
+        const { sessionId, error } = await handleCreateOrderSession({
+            designImageUrl: design.imageUrl,
+            designDescription: design.description,
+        });
+
+        if (error) {
+            toast({ title: 'Error', description: error, variant: 'destructive'});
+            setIsOrdering(false);
+            return;
+        }
+
+        if (sessionId) {
+            const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+            if (!stripe) {
+                throw new Error('Stripe.js not loaded');
+            }
+            await stripe.redirectToCheckout({ sessionId });
+        }
+    } catch (err: any) {
+        toast({ title: 'Error', description: err.message, variant: 'destructive'});
+        setIsOrdering(false);
+    }
   };
   
   return (
@@ -182,6 +222,16 @@ export default function CreatorPage() {
                   <p className="text-muted-foreground">{design.description || "The AI's description of the design will be shown here."}</p>
               </div>
             </CardContent>
+            <CardFooter>
+                <Button onClick={handleOrder} disabled={!design.imageUrl || isOrdering} className="w-full">
+                    {isOrdering ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <ShoppingBag className="mr-2 h-4 w-4" />
+                    )}
+                    {isOrdering ? 'Processing...' : 'Order Print ($49.99)'}
+                </Button>
+            </CardFooter>
           </Card>
         </div>
       </div>

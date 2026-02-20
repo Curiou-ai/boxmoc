@@ -8,12 +8,13 @@ import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Menu, Home, Settings, CreditCard, Users } from 'lucide-react';
+import { Menu, Home, Settings, CreditCard, Users, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import RequestHelpDialog from '@/components/request-help-dialog';
 
 const sidebarNavItems = [
     { href: '/creator', icon: Home, label: 'Editor' },
+    { href: '/creator/orders', icon: ShoppingBag, label: 'Orders' },
     { href: '/creator/billing', icon: CreditCard, label: 'Billing' },
     { href: '#', icon: Settings, label: 'Settings' },
 ];

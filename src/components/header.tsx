@@ -1,7 +1,7 @@
 
 'use client'; 
 
-import { Package, Share2, Save, Bell, Box, LogOut, User, CreditCard, Settings } from 'lucide-react';
+import { Package, Share2, Save, Bell, Box, LogOut, User, CreditCard, Settings, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -61,6 +61,12 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
                 <Link href="/creator/profile">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+               <DropdownMenuItem asChild>
+                <Link href="/creator/orders">
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  <span>My Orders</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
