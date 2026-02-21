@@ -52,6 +52,11 @@ Admin
     *   Status: Supported (Integration Required)
     *   Implementation: Your application is ready for integration with monitoring services like Sentry or LogRocket. This would involve adding their SDK and initializing it in a root file like src/app/layout.tsx to provide error tracking and session replay.
     *   Location: Potentially in /home/user/studio/src/app/layout.tsx
+*   **Environment Variable Management**:
+    *   Status: Active
+    *   Implementation: The application relies on environment variables for configuration, especially for third-party services like Firebase, Stripe, and your email provider. All required variables are templated in the `.env` file at the root of the project.
+    *   Security: A clear distinction is made between public (`NEXT_PUBLIC_`) and server-side (secret) variables. Public variables, like your Firebase client API key or Stripe publishable key, are designed to be exposed in the browser. Security for these services is enforced on the backend through mechanisms like Firebase Security Rules and Stripe's API permissions, not by hiding these public identifiers. All sensitive keys (e.g., `STRIPE_SECRET_KEY`, `FIREBASE_PRIVATE_KEY`) are kept on the server and are not prefixed with `NEXT_PUBLIC_`.
+    *   Location: /.env
 
 ## Package Dependencies
 
