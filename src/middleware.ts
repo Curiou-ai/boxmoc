@@ -9,20 +9,29 @@ const authRoutes = ['/login', '/signup'];
 let redis: Redis | null = null;
 let ratelimit: Ratelimit | null = null;
 
-// Initialize Redis and Ratelimit only if the environment variables are set
-if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-  redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
+const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  ratelimit = new Ratelimit({
-    redis: redis,
-    limiter: Ratelimit.slidingWindow(10, '10 s'), // 10 requests per 10 seconds
-    analytics: true,
-  });
+// Initialize Redis and Ratelimit only if the environment variables are set and not placeholders
+if (upstashUrl && upstashToken && !upstashUrl.includes('<') && !upstashToken.includes('<')) {
+  try {
+    redis = new Redis({
+      url: upstashUrl,
+      token: upstashToken,
+    });
+
+    ratelimit = new Ratelimit({
+      redis: redis,
+      limiter: Ratelimit.slidingWindow(10, '10 s'), // 10 requests per 10 seconds
+      analytics: true,
+    });
+  } catch (error: any) {
+    console.error('Failed to initialize Upstash Redis for rate limiting:', error.message);
+    redis = null;
+    ratelimit = null;
+  }
 } else {
-  console.warn('Upstash Redis environment variables not set. Rate limiting will be disabled.');
+  console.warn('Upstash Redis environment variables not set or are placeholders. Rate limiting will be disabled.');
 }
 
 export async function middleware(request: NextRequest) {
