@@ -51,12 +51,10 @@ export default function DashboardHero() {
 
         {/* Content Grid */}
         {/* lg:grid-cols-[280px_2fr] */}
-        <div className="grid grid-cols-1 lg:grid-cols-[250px_minmax(500px,_1fr)] justify-self-center mx-auto gap-6 md:gap-8 w-full">
+        {/* lg:grid-cols-[250px_minmax(500px,_1fr)] */}
+        <div className="grid grid-cols-1 justify-self-center mx-auto gap-6 md:gap-8 w-full">
           {/* Sidebar */}
-          <div className="bg-[#0f1a2e]/50 rounded-2xl p-6 border border-white/5 hidden sm:block">
-            {/* <h3 className="text-xs md:text-sm text-white/50 mb-4 uppercase tracking-wider">
-              Tools
-            </h3> */}
+          {/* <div className="bg-[#0f1a2e]/50 rounded-2xl p-6 border border-white/5 hidden sm:block">
             <div className="space-y-2 flex lg:flex-col flex-row mx-auto gap-2 overflow-y-auto">
               {tools.map((tool) => (
                 <button
@@ -71,13 +69,10 @@ export default function DashboardHero() {
                 >
                   {tool.icon}
                   <span className="font-medium hidden lg:flex">{tool.label}</span>
-                  {/* <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 lg:hidden">
-                    {tool.label}
-                  </span> */}
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
           {/* 3D Preview Panel - mobile*/}
           <div className="block sm:hidden rounded-2xl">
             <div className="mb-6">
@@ -100,7 +95,7 @@ export default function DashboardHero() {
                   <div className="box-face box-right"></div>
                   <div className="box-face box-left"></div>
                   <div className="box-face box-top flex items-center justify-center">
-                    <span className="font-sans text-5xl font-bold text-white/90">nouri.</span>
+                    <span className="font-sans text-5xl font-bold text-white/90">moura.</span>
                   </div>
                   <div className="box-face box-bottom"></div>
                 </div>
@@ -129,7 +124,7 @@ export default function DashboardHero() {
                   <div className="box-face box-right"></div>
                   <div className="box-face box-left"></div>
                   <div className="box-face box-top flex items-center justify-center">
-                    <span className="font-sans text-5xl font-bold text-white/90">nouri.</span>
+                    <span className="font-sans text-5xl font-bold text-white/90">moura.</span>
                   </div>
                   <div className="box-face box-bottom"></div>
                 </div>
