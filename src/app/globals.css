@@ -99,7 +99,7 @@
       left: 50%;
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, rgba(96, 165, 250, 0.2) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(185, 150, 120, 0.2) 0%, transparent 70%);
       transform: translate(-50%, -50%);
       animation: pulse 3s ease-in-out infinite;
   }
@@ -130,17 +130,17 @@
       position: absolute;
       width: 280px;
       height: 280px;
-      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-      opacity: 0.8;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, #c5a990 0%, #a88165 100%);
+      opacity: 1;
+      border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   .box-front { transform: translateZ(140px); }
-  .box-back { transform: translateZ(-140px) rotateY(180deg); background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-  .box-right { transform: rotateY(90deg) translateZ(140px); background: linear-gradient(135deg, #4f8cf5 0%, #3b82f6 100%); }
-  .box-left { transform: rotateY(-90deg) translateZ(140px); background: linear-gradient(135deg, #4f8cf5 0%, #3b82f6 100%); }
-  .box-top { transform: rotateX(90deg) translateZ(140px); background: linear-gradient(135deg, #7bb3f7 0%, #60a5fa 100%); }
-  .box-bottom { transform: rotateX(-90deg) translateZ(140px); background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); }
+  .box-back { transform: translateZ(-140px) rotateY(180deg); background: linear-gradient(135deg, #a88165 0%, #9a7357 100%); }
+  .box-right { transform: rotateY(90deg) translateZ(140px); background: linear-gradient(135deg, #b9967b 0%, #a88165 100%); }
+  .box-left { transform: rotateY(-90deg) translateZ(140px); background: linear-gradient(135deg, #b9967b 0%, #a88165 100%); }
+  .box-top { transform: rotateX(90deg) translateZ(140px); background: linear-gradient(135deg, #d0b8a4 0%, #c5a990 100%); }
+  .box-bottom { transform: rotateX(-90deg) translateZ(140px); background: linear-gradient(135deg, #9a7357 0%, #8c684d 100%); }
 
   .ai-panel {
       background: rgba(15, 26, 46, 0.3);

@@ -99,7 +99,9 @@ export default function DashboardHero() {
                   <div className="box-face box-back"></div>
                   <div className="box-face box-right"></div>
                   <div className="box-face box-left"></div>
-                  <div className="box-face box-top"></div>
+                  <div className="box-face box-top flex items-center justify-center">
+                    <span className="font-sans text-5xl font-bold text-white/90">nouri.</span>
+                  </div>
                   <div className="box-face box-bottom"></div>
                 </div>
               </div>
@@ -126,7 +128,9 @@ export default function DashboardHero() {
                   <div className="box-face box-back"></div>
                   <div className="box-face box-right"></div>
                   <div className="box-face box-left"></div>
-                  <div className="box-face box-top"></div>
+                  <div className="box-face box-top flex items-center justify-center">
+                    <span className="font-sans text-5xl font-bold text-white/90">nouri.</span>
+                  </div>
                   <div className="box-face box-bottom"></div>
                 </div>
               </div>
