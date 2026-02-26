@@ -39,7 +39,7 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'bo
             break;
     }
     
-    const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0x778BCA, metalness: 0.1, roughness: 0.5 });
+    const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0xD8CCBF, metalness: 0.1, roughness: 0.5 });
     let materials: THREE.Material[] = Array(6).fill(defaultMaterial);
     
     const mesh = new THREE.Mesh(geometry, materials);
