@@ -81,7 +81,7 @@
   }
 
   .preview-box {
-      background: #EBE1D6;
+      background: rgba(122, 139, 122, 0.05);
       border-radius: 12px;
       padding: 3rem;
       display: flex;
@@ -99,7 +99,7 @@
       left: 50%;
       width: 300px;
       height: 300px;
-      background: radial-gradient(circle, rgba(122, 139, 122, 0.2) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(132, 139, 122, 0.2) 0%, transparent 70%);
       transform: translate(-50%, -50%);
       animation: pulse 3s ease-in-out infinite;
   }
@@ -130,17 +130,17 @@
       position: absolute;
       width: 280px;
       height: 280px;
-      background: linear-gradient(135deg, #d8ccbf 0%, #b9a695 100%);
+      background: linear-gradient(135deg, #c3a683 0%, #a4845a 100%);
       opacity: 1;
       border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   .box-front { transform: translateZ(140px); }
-  .box-back { transform: translateZ(-140px) rotateY(180deg); background: linear-gradient(135deg, #b9a695 0%, #a08c7a 100%); }
-  .box-right { transform: rotateY(90deg) translateZ(140px); background: linear-gradient(135deg, #c9b9a8 0%, #b9a695 100%); }
-  .box-left { transform: rotateY(-90deg) translateZ(140px); background: linear-gradient(135deg, #c9b9a8 0%, #b9a695 100%); }
-  .box-top { transform: rotateX(90deg) translateZ(140px); background: linear-gradient(135deg, #e0d4c8 0%, #d8ccbf 100%); }
-  .box-bottom { transform: rotateX(-90deg) translateZ(140px); background: linear-gradient(135deg, #a08c7a 0%, #8c7a6b 100%); }
+  .box-back { transform: translateZ(-140px) rotateY(180deg); background: linear-gradient(135deg, #a4845a 0%, #8b6e4a 100%); }
+  .box-right { transform: rotateY(90deg) translateZ(140px); background: linear-gradient(135deg, #b39572 0%, #a4845a 100%); }
+  .box-left { transform: rotateY(-90deg) translateZ(140px); background: linear-gradient(135deg, #b39572 0%, #a4845a 100%); }
+  .box-top { transform: rotateX(90deg) translateZ(140px); background: linear-gradient(135deg, #d1b899 0%, #c3a683 100%); }
+  .box-bottom { transform: rotateX(-90deg) translateZ(140px); background: linear-gradient(135deg, #8b6e4a 0%, #725a3d 100%); }
 
   .ai-panel {
       background: rgba(122, 139, 122, 0.05);

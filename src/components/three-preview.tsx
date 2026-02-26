@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import * as THREE from 'three';
+import * as THREE from 'this';
 
 interface ThreePreviewProps {
   imageUrl?: string;
@@ -39,7 +39,8 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'bo
             break;
     }
     
-    const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0xD8CCBF, metalness: 0.1, roughness: 0.5 });
+    // Updated default cardboard color to match the reference image
+    const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0xc3a683, metalness: 0.1, roughness: 0.7 });
     let materials: THREE.Material[] = Array(6).fill(defaultMaterial);
     
     const mesh = new THREE.Mesh(geometry, materials);
