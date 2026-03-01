@@ -7,7 +7,8 @@ const protectedRoutes = ['/creator', '/admin'];
 const authRoutes = ['/login', '/signup'];
 
 let redis: Redis | null = null;
-let ratelimit: Ratelimit | null = null;
+let globalRatelimit: Ratelimit | null = null;
+let contactRatelimit: Ratelimit | null = null;
 
 const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -20,15 +21,26 @@ if (upstashUrl && upstashToken && !upstashUrl.includes('<') && !upstashToken.inc
       token: upstashToken,
     });
 
-    ratelimit = new Ratelimit({
+    // Global limit: 10 requests per 10 seconds
+    globalRatelimit = new Ratelimit({
       redis: redis,
-      limiter: Ratelimit.slidingWindow(10, '10 s'), // 10 requests per 10 seconds
+      limiter: Ratelimit.slidingWindow(10, '10 s'),
       analytics: true,
+      prefix: 'ratelimit_global',
+    });
+
+    // Stricter limit for contact submissions: 2 per minute
+    contactRatelimit = new Ratelimit({
+      redis: redis,
+      limiter: Ratelimit.slidingWindow(2, '1 m'),
+      analytics: true,
+      prefix: 'ratelimit_contact',
     });
   } catch (error: any) {
     console.error('Failed to initialize Upstash Redis for rate limiting:', error.message);
     redis = null;
-    ratelimit = null;
+    globalRatelimit = null;
+    contactRatelimit = null;
   }
 } else {
   console.warn('Upstash Redis environment variables not set or are placeholders. Rate limiting will be disabled.');
@@ -44,11 +56,27 @@ export async function middleware(request: NextRequest) {
   // --- Production-only Logic ---
   if (process.env.NODE_ENV === 'production') {
     // Rate Limiting
-    if (ratelimit) {
+    if (redis) {
       const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
-      const { success } = await ratelimit.limit(ip);
-      if (!success) {
-        return new NextResponse('Too Many Requests', { status: 429 });
+      
+      // 1. Specific Rate Limit for Contact Submissions
+      const isContactSubmission = 
+        pathname === '/api/contact' || 
+        (pathname === '/contact' && request.method === 'POST');
+
+      if (isContactSubmission && contactRatelimit) {
+        const { success } = await contactRatelimit.limit(`contact_${ip}`);
+        if (!success) {
+          return new NextResponse('Too many contact submissions. Please try again in a minute.', { status: 429 });
+        }
+      }
+
+      // 2. Global Rate Limit
+      if (globalRatelimit) {
+        const { success } = await globalRatelimit.limit(ip);
+        if (!success) {
+          return new NextResponse('Too Many Requests', { status: 429 });
+        }
       }
     }
 
@@ -57,13 +85,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/waitlist', request.url));
     }
   }
+
   // --- Development-only Logic ---
   if (process.env.NODE_ENV === 'development') {
-    //bypass authentication for protected routes
-    if (isProtectedRoute) {
-      return NextResponse.next();
+    // bypass authentication for protected routes in dev if needed, 
+    // but here we maintain the same logic for consistency unless explicitly changed.
+    if (isProtectedRoute && !sessionCookie) {
+        // In dev we might want to allow access, but let's stick to standard flow
+        // return NextResponse.next(); 
     }
   }
+
   // --- Authentication Logic (all environments) ---
 
   // If user is logged in, redirect them from auth pages to the creator dashboard
@@ -72,7 +104,6 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user is not logged in, redirect them from protected pages to the login page
-  // In production, this will trigger a second redirect to /waitlist
   if (isProtectedRoute && !sessionCookie) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
