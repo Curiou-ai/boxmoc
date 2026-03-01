@@ -1,18 +1,24 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import admin from '@/lib/firebase-admin';
 import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
+import { ContactFormSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, company, phone, message } = body;
+    const validation = ContactFormSchema.safeParse(body);
 
-    if (!name || !email || !message) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (!validation.success) {
+      return NextResponse.json({ 
+        error: 'Validation Failed', 
+        details: validation.error.errors[0].message 
+      }, { status: 400 });
     }
+
+    const { name, email, company, phone, prompt, notes } = validation.data;
+    const message = prompt || notes;
 
     const db = admin.firestore();
     const submissionData = {
@@ -34,7 +40,7 @@ export async function POST(request: NextRequest) {
       await sendEmail({
         to: email,
         subject: "We've received your message!",
-        react: ContactUserConfirmation({ name, message, companyName: "Boxmoc" }),
+        react: ContactUserConfirmation({ name, message: message!, companyName: "Boxmoc" }),
       });
 
       await sendEmail({
@@ -45,7 +51,7 @@ export async function POST(request: NextRequest) {
           email, 
           company,
           phone,
-          message,
+          message: message!,
         }),
       });
     }

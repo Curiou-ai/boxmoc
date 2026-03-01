@@ -1,4 +1,3 @@
-
 'use server';
 
 import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
@@ -8,13 +7,13 @@ import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
 import admin from '@/lib/firebase-admin';
-import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
 import { getSession } from '@/lib/session';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
+import { ContactFormSchema, EmailSchema, NameSchema } from '@/lib/validations';
 
 export interface FormState {
   message: string;
@@ -31,6 +30,8 @@ export interface HelpFormState {
   fields?: {
     name?: string;
     email?: string;
+    company?: string;
+    phone?: string;
     prompt?: string;
     notes?: string;
   };
@@ -97,11 +98,6 @@ export interface Order {
     shippingAddress: any;
 }
 
-
-const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
-const NameSchema = z.string().min(2, { message: "Name must be at least 2 characters."});
-
-
 export async function handleCreateOrderSession(
     { designImageUrl, designDescription }: { designImageUrl: string; designDescription: string }
 ): Promise<OrderSessionState> {
@@ -110,7 +106,7 @@ export async function handleCreateOrderSession(
         return { error: 'You must be logged in to place an order.' };
     }
 
-    const origin = headers().get('origin') || 'http://localhost:3000';
+    const origin = (await headers()).get('origin') || 'http://localhost:3000';
 
     try {
         const db = admin.firestore();
@@ -204,7 +200,6 @@ export async function getUserOrders(): Promise<Order[]> {
     });
 }
 
-
 export async function handleUpdateProfile(prevState: ProfileFormState, formData: FormData): Promise<ProfileFormState> {
     const session = await getSession();
     if (!session) {
@@ -250,7 +245,6 @@ export async function handleUpdateProfilePicture(prevState: ProfilePictureState,
     }
 }
 
-
 export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
     const db = admin.firestore();
     const waitlistCol = db.collection('waitlist');
@@ -272,7 +266,6 @@ export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
         };
     });
 }
-
 
 export async function handleJoinWaitlist(prevState: WaitlistState, formData: FormData): Promise<WaitlistState> {
   const email = formData.get('email') as string;
@@ -480,40 +473,32 @@ export async function handleGenerateDesign(
   }
 }
 
-
 export async function handleRequestHelp(
   prevState: HelpFormState,
   formData: FormData,
 ): Promise<HelpFormState> {
-  const name = formData.get('name');
-  const email = formData.get('email');
-  const company = formData.get('company');
-  const phone = formData.get('phone');
-  const prompt = formData.get('prompt');
-  const notes = formData.get('notes');
-
   const fields = {
-    name: name?.toString() || '',
-    email: email?.toString() || '',
-    company: company?.toString() || '',
-    phone: phone?.toString() || '',
-    prompt: prompt?.toString() || '',
-    notes: notes?.toString() || '',
+    name: formData.get('name')?.toString() || '',
+    email: formData.get('email')?.toString() || '',
+    company: formData.get('company')?.toString() || '',
+    phone: formData.get('phone')?.toString() || '',
+    prompt: formData.get('prompt')?.toString() || '',
+    notes: formData.get('notes')?.toString() || '',
   }
 
-  if (!name || typeof name !== 'string' || name.trim().length < 2) {
-    return { message: 'Please enter a valid name.', fields };
-  }
-  if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return { message: 'Please enter a valid email address.', fields };
-  }
+  const validation = ContactFormSchema.safeParse(fields);
   
-  const messageContent = prompt || notes;
-  if (!messageContent || typeof messageContent !== 'string' || messageContent.trim().length < 10) {
-    return { message: 'Please provide a message with at least 10 characters.', fields };
+  if (!validation.success) {
+    return {
+        message: validation.error.errors[0].message,
+        success: false,
+        fields,
+    };
   }
-  
+
+  const messageContent = fields.prompt || fields.notes;
   const companyEmail = process.env.COMPANY_EMAIL;
+  
   if (!companyEmail) {
     console.error("COMPANY_EMAIL environment variable is not set.");
     return { message: 'An unexpected error occurred. The server is not configured for sending emails.', fields };
