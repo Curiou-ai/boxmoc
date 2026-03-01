@@ -60,8 +60,11 @@ export default function LandingPage() {
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline mb-4">
                   {headline}
                 </h1>
-                <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
+                {/* <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
                   Our intuitive tools and powerful AI make it easy to create custom branded packaging and marketing materials in minutes. Delivered right to your doorstep.
+                </p> */}
+                <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
+                  Create custom branded packaging and marketing materials in minutes. Delivered right to your doorstep.
                 </p>
               </div>
               <div className="w-full max-w-xs space-y-8 mb-6">
@@ -72,7 +75,7 @@ export default function LandingPage() {
                     className="h-12"
                     aria-label="Email"
                   />
-                  <Button type="submit" asChild size="lg" className="w-full">
+                  <Button type="submit" asChild size="lg" className="w-full mb-8">
                     <Link href="/creator">
                       Get Started for Free
                     </Link>

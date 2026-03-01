@@ -14,6 +14,9 @@ export default {
         headline: ['Space Grotesk', 'sans-serif'],
         code: ['monospace'],
       },
+      screens: {
+        'xs': '428px',
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

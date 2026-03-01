@@ -113,15 +113,13 @@ export async function handleCreateOrderSession(
     const origin = headers().get('origin') || 'http://localhost:3000';
 
     try {
-        // 1. Upload image to Firebase Storage to get a permanent URL
+        const db = admin.firestore();
         const bucket = admin.storage().bucket();
         const mimeType = designImageUrl.match(/data:(.*);base64,/)?.[1] || 'image/png';
         const extension = mimeType.split('/')[1] || 'png';
         const base64Data = designImageUrl.replace(/^data:image\/\w+;base64,/, "");
         const imageBuffer = Buffer.from(base64Data, 'base64');
         
-        // Generate a unique file name for the design
-        const db = admin.firestore();
         const fileId = db.collection('tmp').doc().id;
         const filePath = `user-designs/${session.uid}/${fileId}.${extension}`;
         const file = bucket.file(filePath);
@@ -129,14 +127,13 @@ export async function handleCreateOrderSession(
         await file.save(imageBuffer, {
             metadata: {
                 contentType: mimeType,
-                cacheControl: 'public, max-age=31536000', // Cache for 1 year
+                cacheControl: 'public, max-age=31536000',
             },
-            public: true, // Make the file publicly accessible
+            public: true,
         });
 
         const permanentImageUrl = file.publicUrl();
 
-        // 2. Create Stripe Checkout Session with the new permanent URL
         const checkoutSession = await stripe.checkout.sessions.create({
             customer: session.stripeCustomerId,
             payment_method_types: ['card'],
@@ -147,21 +144,21 @@ export async function handleCreateOrderSession(
                         product_data: {
                             name: 'Custom Design Print',
                             description: designDescription,
-                            images: [permanentImageUrl], // Use the permanent URL
+                            images: [permanentImageUrl],
                         },
-                        unit_amount: 4999, // e.g., $49.99
+                        unit_amount: 4999,
                     },
                     quantity: 1,
                 },
             ],
             mode: 'payment',
             shipping_address_collection: {
-                allowed_countries: ['US', 'CA', 'GB', 'FR', 'DE'], // Example countries
+                allowed_countries: ['US', 'CA', 'GB', 'FR', 'DE'],
             },
             metadata: {
                 userId: session.uid,
-                designImageUrl: permanentImageUrl, // Use the permanent URL
-                designDescription: designDescription.substring(0, 499), // Max 500 chars for metadata
+                designImageUrl: permanentImageUrl,
+                designDescription: designDescription.substring(0, 499),
             },
             success_url: `${origin}/creator/orders?success=true`,
             cancel_url: `${origin}/creator`,
@@ -239,8 +236,6 @@ export async function handleUpdateProfilePicture(prevState: ProfilePictureState,
         return { success: false, message: 'You must be logged in to update your profile picture.' };
     }
 
-    // In a real app, you would handle file upload here to a service like Firebase Storage
-    // and get a public URL. For this prototype, we'll just generate a new placeholder image URL.
     const newImageUrl = `https://picsum.photos/seed/${Math.random()}/200/200`;
 
     try {
@@ -273,7 +268,7 @@ export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
             email: data.email,
             status: data.status,
             code: data.code,
-            createdAt: data.createdAt.toDate().toISOString(), // Serialize date
+            createdAt: data.createdAt.toDate().toISOString(),
         };
     });
 }
@@ -295,19 +290,16 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
     const db = admin.firestore();
     const waitlistCollection = db.collection('waitlist');
 
-    // Check if email already exists
     const q = waitlistCollection.where("email", "==", email);
     const querySnapshot = await q.get();
     if (!querySnapshot.empty) {
-      // Email already exists, silently treat as success.
       redirect('/waitlist/congratulations');
     }
 
-    // Add a new document with a generated id.
     await waitlistCollection.add({
       email: email,
-      createdAt: new Date(),
-      status: 'waitlisted', // 'waitlisted', 'active', 'redeemed'
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      status: 'waitlisted',
       code: null,
     });
 
@@ -324,7 +316,6 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
 }
 
 export async function sendAccessCode(email: string): Promise<ActivationState> {
-  // This function would typically be called from a secure admin interface.
   const db = admin.firestore();
   
   if (!email) {
@@ -341,7 +332,7 @@ export async function sendAccessCode(email: string): Promise<ActivationState> {
     }
 
     const userDoc = querySnapshot.docs[0];
-    const accessCode = randomBytes(4).toString('hex').toUpperCase(); // Generates an 8-character code
+    const accessCode = randomBytes(4).toString('hex').toUpperCase();
 
     const batch = db.batch();
     batch.update(userDoc.ref, { 
@@ -350,7 +341,6 @@ export async function sendAccessCode(email: string): Promise<ActivationState> {
     });
     await batch.commit();
 
-    // Send email to the user
     await sendEmail({
       to: email,
       subject: "Your Early Access Code for Boxmoc is here!",
@@ -382,7 +372,6 @@ export async function handleValidateAccessCode(prevState: AccessCodeState, formD
             return { message: 'Invalid or already used access code. Please try again.' };
         }
 
-        // Invalidate the code by updating its status to 'redeemed'
         const batch = db.batch();
         const docToUpdate = querySnapshot.docs[0];
         batch.update(docToUpdate.ref, { status: 'redeemed' });
@@ -424,13 +413,11 @@ export async function handleChatbotQuery(
     };
   }
 
-  // Check if this looks like a contact info submission from the chatbot
   const containsContactInfo = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/.test(query) && query.length > 30;
   const lastBotMessage = history?.slice(-1).find((m: any) => m.role === 'model')?.content;
 
   if (containsContactInfo && lastBotMessage?.includes("create a support ticket")) {
     const fakeForm = new FormData();
-    // Simple parsing, assumes "Name, email, message" format. A more robust solution might use regex.
     const parts = query.split(',');
     fakeForm.append('name', parts[0]?.trim() || 'N/A');
     fakeForm.append('email', parts[1]?.trim() || 'N/A');
@@ -450,8 +437,7 @@ export async function handleChatbotQuery(
     const result = await askChatbot(input);
     return { response: result };
   } catch (error) {
-    console.error(error); // Log the actual error for debugging
-    // To keep the UI clean, return a generic error message to the user.
+    console.error(error);
     return {
         response: '',
         error: 'Error: An error occurred. Please try again later.'
@@ -503,8 +489,8 @@ export async function handleRequestHelp(
   const email = formData.get('email');
   const company = formData.get('company');
   const phone = formData.get('phone');
-  const prompt = formData.get('prompt'); // This is the 'message' field from contact form
-  const notes = formData.get('notes'); // This is from the 'request help' dialog
+  const prompt = formData.get('prompt');
+  const notes = formData.get('notes');
 
   const fields = {
     name: name?.toString() || '',
@@ -534,14 +520,24 @@ export async function handleRequestHelp(
   }
 
   try {
-    // 1. Send confirmation email to the user
+    const db = admin.firestore();
+    
+    // 1. Save to Firestore
+    await db.collection('contact_submissions').add({
+      ...fields,
+      message: messageContent,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      source: 'web_form'
+    });
+
+    // 2. Send confirmation email to the user
     await sendEmail({
       to: fields.email,
       subject: "We've received your message!",
       react: ContactUserConfirmation({ name: fields.name, message: messageContent, companyName: "Boxmoc" }),
     });
 
-    // 2. Send notification email to the company
+    // 3. Send notification email to the company
     await sendEmail({
       to: companyEmail,
       subject: `New Contact Form Submission from ${fields.name}`,
@@ -559,7 +555,7 @@ export async function handleRequestHelp(
       success: true,
     };
   } catch (error) {
-    console.error('Email Sending Error:', error);
+    console.error('Help Request Error:', error);
     return {
       message: 'An unexpected error occurred while sending your message. Please try again later.',
       fields,

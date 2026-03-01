@@ -9,7 +9,8 @@ export function AnnouncementBar() {
       <div className="container mx-auto flex h-12 max-w-7xl items-center justify-center gap-4 p-4 sm:p-6">
         <Sparkles className="h-5 w-5 shrink-0" />
         <p className="sm:text-sm text-xs font-medium text-center">
-          Boxmoc's beta is coming soon. Click here to be added on the waitlist{" "}
+          {/* Boxmoc's beta is coming soon. Click here to be added on the waitlist{" "} */}
+          Beta is live. Click here to be added on the waitlist{" "}
           {/*<span className="font-bold">October 21st, 2026</span>*/}
         </p>
         <Button

@@ -21,9 +21,9 @@ export default function ContactPage() {
     useEffect(() => {
         if (state.message) {
             toast({
-                title: state.success ? "Message Sent!" : "Error",
-                description: state.message,
-                variant: state.success ? "default" : "destructive",
+              title: state.success ? "Message Sent!" : "Error",
+              description: state.message,
+              variant: state.success ? "default" : "destructive",
             });
         }
     }, [state, toast]);

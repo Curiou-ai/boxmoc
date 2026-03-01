@@ -23,7 +23,7 @@ async function sendWithResend(payload: EmailPayload) {
   const { to, subject, html, react, text } = payload;
   
   if (!react && !html && !text) {
-      throw new Error("Email content is missing. Provide 'react', 'html', or 'text'.");
+    throw new Error("Email content is missing. Provide 'react', 'html', or 'text'.");
   }
 
   const emailHtml = react ? render(react) : html;

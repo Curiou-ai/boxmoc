@@ -52,7 +52,7 @@ export default function DashboardHero() {
                 <div className="box-face box-right"></div>
                 <div className="box-face box-left"></div>
                 <div className="box-face box-top flex items-center justify-center">
-                  <span className="font-sans text-5xl font-bold text-foreground/80">moura.</span>
+                  <span className="font-sans font-extrabold text-xl xs:text-2xl sm:text-5xl font-bold text-foreground/80">moura.</span>
                 </div>
                 <div className="box-face box-bottom"></div>
               </div>
