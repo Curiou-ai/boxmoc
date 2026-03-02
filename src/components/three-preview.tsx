@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
-import * as THREE from 'this';
+import * as THREE from 'three';
 
 interface ThreePreviewProps {
   imageUrl?: string;

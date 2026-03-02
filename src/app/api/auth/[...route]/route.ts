@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
@@ -19,8 +18,9 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, { message: "Password must contain at least one number." })
   .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character." });
 
-export async function POST(request: NextRequest, { params }: { params: { route: string[] }}) {
-    const route = params.route.join('/');
+export async function POST(request: NextRequest, { params }: { params: Promise<{ route: string[] }> }) {
+    const { route: routeArray } = await params;
+    const route = routeArray.join('/');
     const body = await request.formData();
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
@@ -144,11 +144,12 @@ export async function POST(request: NextRequest, { params }: { params: { route: 
     return NextResponse.json({ error: 'Invalid route' }, { status: 404 });
 }
 
-export async function GET(request: NextRequest, { params }: { params: { route: string[] }}) {
-    const route = params.route.join('/');
+export async function GET(request: NextRequest, { params }: { params: Promise<{ route: string[] }> }) {
+    const { route: routeArray } = await params;
+    const route = routeArray.join('/');
 
     if(route === 'session') {
-        const sessionCookie = cookies().get('session')?.value;
+        const sessionCookie = (await cookies()).get('session')?.value;
         if(!sessionCookie) {
             return NextResponse.json({ session: null }, { status: 401 });
         }
@@ -159,4 +160,5 @@ export async function GET(request: NextRequest, { params }: { params: { route: s
             return NextResponse.json({ session: null }, { status: 401 });
         }
     }
+    return NextResponse.json({ error: 'Invalid route' }, { status: 404 });
 }

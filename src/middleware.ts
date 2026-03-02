@@ -1,4 +1,3 @@
-
 import { NextResponse, type NextRequest } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -43,7 +42,10 @@ if (upstashUrl && upstashToken && !upstashUrl.includes('<') && !upstashToken.inc
     contactRatelimit = null;
   }
 } else {
-  console.warn('Upstash Redis environment variables not set or are placeholders. Rate limiting will be disabled.');
+  // Silent in production if not configured, or subtle log in dev
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Upstash Redis not configured. Rate limiting is disabled.');
+  }
 }
 
 export async function middleware(request: NextRequest) {
@@ -83,16 +85,6 @@ export async function middleware(request: NextRequest) {
     // Unauthenticated users trying to access login/signup are redirected to waitlist
     if (isAuthRoute && !sessionCookie) {
       return NextResponse.redirect(new URL('/waitlist', request.url));
-    }
-  }
-
-  // --- Development-only Logic ---
-  if (process.env.NODE_ENV === 'development') {
-    // bypass authentication for protected routes in dev if needed, 
-    // but here we maintain the same logic for consistency unless explicitly changed.
-    if (isProtectedRoute && !sessionCookie) {
-        // In dev we might want to allow access, but let's stick to standard flow
-        // return NextResponse.next(); 
     }
   }
 
