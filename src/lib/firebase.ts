@@ -57,4 +57,20 @@ if (app) {
   db = getFirestore(app);
 }
 
+/**
+ * Safely gets the FCM messaging instance on the client side.
+ */
+export const getMessagingInstance = async () => {
+  if (typeof window === 'undefined' || !app) return null;
+  try {
+    const { getMessaging, isSupported } = await import('firebase/messaging');
+    if (await isSupported()) {
+      return getMessaging(app);
+    }
+  } catch (error) {
+    console.error('Messaging is not supported in this browser.', error);
+  }
+  return null;
+};
+
 export { app, auth, db };
