@@ -13,7 +13,7 @@ export default function Navbar(){
                 <div className="flex items-center gap-6">
                 <Link href="/" className="flex items-center gap-2">
                     <Box className="h-6 w-6 text-primary" />
-                    <span className="font-bold text-lg"></span>
+                    <span className="font-bold text-lg">Boxmoc</span>
                 </Link>
                 {/* Desktop Navigation */}
                 <nav className="hidden items-center gap-6 lg:flex">

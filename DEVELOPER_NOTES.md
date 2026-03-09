@@ -12,53 +12,40 @@ Admin
 # NOTES:
 
 ## Security Posture
+*   **DDoS Protection & Rate Limiting**:
+    *   Status: Active (Production-Ready)
+    *   Implementation: The application uses a multi-tiered rate-limiting strategy via Upstash (Redis) in `src/middleware.ts`.
+    *   **Global Limit**: Protects the site from general scraping and overwhelming traffic (30 req / 10s).
+    *   **Auth Limit**: Specifically protects login/signup from brute-force and dictionary attacks (5 req / 1m).
+    *   **Contact Limit**: Mitigates email spam and bot submissions via the contact form (2 req / 1m).
+    *   **Transaction Limit**: Protects payment creation endpoints from card testing and session abuse (3 req / 1m).
+    *   Location: /home/user/studio/src/middleware.ts
 *   **CAPTCHA/Bot Protection**:
     *   Status: Active
-    *   Implementation: Your application uses Firebase Phone Authentication, which has Google's reCAPTCHA verifier integrated by default. This is implemented in src/components/phone-signin.tsx. The reCAPTCHA is configured to be "invisible," meaning it works in the background to distinguish between human users and bots without requiring users to solve a puzzle, thus protecting the phone sign-up process from abuse.
+    *   Implementation: Firebase Phone Authentication integration provides invisible reCAPTCHA for phone sign-ins.
     *   Location: /home/user/studio/src/components/phone-signin.tsx
-*   **Rate Limiting & Throttling**:
-    *   Status: Active (Production-Ready)
-    *   Implementation: The application's middleware, located at src/middleware.ts, uses a robust rate-limiting mechanism backed by Upstash (Redis). It restricts each IP address to a maximum of 10 requests every 10 seconds. This is applied to all pages and API endpoints, providing a strong defense against brute-force login attempts and other request-based attacks in a scalable, serverless environment. You will need to sign up for a free Upstash account and add your credentials to the .env file.
-    *   Location: /home/user/studio/src/middleware.ts
 *   **Email Verification & Notifications**:
     *   Status: Active & Supported
-    *   Implementation: Firebase Authentication has built-in support for email verification links, which you can enable in the Firebase Console. Additionally, the application now automatically sends a welcome email to new users upon signup and a security notification for every new login, enhancing user engagement and security awareness.
-    *   Action: To enforce email verification, go to your Firebase Console -> Authentication -> Sign-in method, and toggle on the Email verification setting.
+    *   Implementation: Automated welcome emails and security login notifications are sent via Resend/Nodemailer.
 *   **Password Strength**:
     *   Status: Active
-    *   Implementation: The application enforces strong password policies during signup using a Zod schema on the server. Passwords must have a minimum length of 8 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character.
+    *   Implementation: Zod schema enforces complex passwords (min 8 chars, uppercase, lowercase, number, special char).
     *   Location: /home/user/studio/src/app/api/auth/[...route]/route.ts
-*   **Two-Factor Authentication 2FA (TOTP/SMS)**:
-    *   Status: Supported (Integration Required)
-    *   Implementation: Firebase Authentication supports Time-based One-Time Passwords (TOTP) and SMS-based 2FA. While not yet implemented, the secure foundation is in place to add this feature when needed.
-*   **OAuth & Secure Login**:
-    *   Status: Active
-    *   Implementation: The application uses Google Sign-In as a trusted OAuth provider. This is a highly secure method as it delegates authentication to Google, reducing password-related risks. The server verifies the token received from Google before creating a session.
-    *   Location: /home/user/studio/src/app/google-auth-handler/page.tsx, /home/user/studio/src/app/api/auth/session-login/route.ts
 *   **Session Management**:
     *   Status: Active
-    *   Implementation: The application uses secure, server-side session cookies managed by Firebase. In src/app/api/auth/[...route]/route.ts, cookies are created with the httpOnly, secure, and sameSite: 'lax' flags, providing protection against XSS and CSRF attacks.
-    *   Location: /home/user/studio/src/app/api/auth/[...route]/route.ts
-*   **Cloudflare Security Features**:
-    *   Status: Platform Dependent
-    *   Implementation: Features like Bot Management, WAF, and advanced Rate Limiting are not part of the application's code but are configured at the hosting/DNS level. If you deploy your application through Vercel and use Cloudflare as your DNS provider, you can enable these powerful features in your Cloudflare dashboard.
-*   **Input Validation and Sanitization**:
+    *   Implementation: Secure server-side session cookies (HttpOnly, Secure, SameSite: Lax).
+*   **Input Validation**:
     *   Status: Active
-    *   Implementation:
-        *   XSS Protection: As a Next.js/React application, all content rendered in JSX is automatically sanitized. For AI-generated Markdown, the react-markdown library is used, which safely renders the output.
-        *   Server-Side Validation: Server actions and API routes use Zod schemas to validate all user inputs before processing them.
-    *   Location: /home/user/studio/src/app/actions.ts, /home/user/studio/src/app/api/auth/[...route]/route.ts
-*   **Monitoring Service Integration**:
-    *   Status: Supported (Integration Required)
-    *   Implementation: Your application is ready for integration with monitoring services like Sentry or LogRocket. This would involve adding their SDK and initializing it in a root file like src/app/layout.tsx to provide error tracking and session replay.
-    *   Location: Potentially in /home/user/studio/src/app/layout.tsx
-*   **Environment Variable Management**:
+    *   Implementation: Zod schemas validate all server action and API inputs.
+*   **Environment Variables**:
     *   Status: Active
-    *   Implementation: The application relies on environment variables for configuration, especially for third-party services like Firebase, Stripe, and your email provider. All required variables are templated in the `.env` file at the root of the project.
-    *   Security: A clear distinction is made between public (`NEXT_PUBLIC_`) and server-side (secret) variables. Public variables, like your Firebase client API key or Stripe publishable key, are designed to be exposed in the browser. Security for these services is enforced on the backend through mechanisms like Firebase Security Rules and Stripe's API permissions, not by hiding these public identifiers. All sensitive keys (e.g., `STRIPE_SECRET_KEY`, `FIREBASE_PRIVATE_KEY`) are kept on the server and are not prefixed with `NEXT_PUBLIC_`.
-    *   Location: /.env
+    *   Implementation: Strict separation between public and private keys in `.env`.
 
 ## Package Dependencies
-
+*   @upstash/ratelimit: ^2.0.4
+*   @upstash/redis: ^1.34.3
 
 # BREAKDOWN:
+*   Granular rate limits added for Auth, Transactions, and Global traffic.
+*   Updated Middleware to handle targeted DDoS mitigation.
+*   Documented updated security posture in DEVELOPER_NOTES.md.
