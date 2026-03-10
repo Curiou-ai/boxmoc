@@ -42,11 +42,23 @@ Admin
     *   Status: Active
     *   Implementation: Strict separation between public and private keys in `.env`.
 
-## Data Management Architecture
-*   **NoSQL First**: Firestore is the primary database. Prisma and Supabase are not used in this project to maintain a focused, high-performance Firebase architecture.
-*   **Migrations**: Since Firestore is schema-less, structural changes are managed through application logic or one-off administrative scripts.
+## Data Management Architecture (Firestore NoSQL)
+*   **NoSQL First**: Firestore is the primary database.
+*   **Waitlist Collection**:
+    *   `email` (string): Unique identifier.
+    *   `status` (enum): 'waitlisted' | 'active' | 'redeemed'.
+    *   `code` (string | null): Unique 8-char hex code for early access.
+    *   `createdAt` (timestamp): Server-side timestamp.
+*   **Contact Submissions Collection**:
+    *   `name` (string): Sender name.
+    *   `email` (string): Sender contact.
+    *   `company` (string): Optional.
+    *   `phone` (string): Optional.
+    *   `message` (string): Concatenated from prompt/notes.
+    *   `source` (string): 'web_form' | 'api' | 'chatbot'.
+    *   `createdAt` (timestamp): Server-side timestamp.
+*   **Migrations**: Managed through application logic and Zod validation. Structural changes are handled by merging new fields during writes or via administrative scripts.
 *   **Validation**: Zod is the primary tool for enforcing data integrity at the edge (Server Actions and API routes).
-*   **API Endpoints**: RESTful endpoints (e.g., `/api/waitlist`) are available for external integrations, backed by Firestore.
 
 ## Package Dependencies
 *   @upstash/ratelimit: ^2.0.4
@@ -56,4 +68,5 @@ Admin
 *   Granular rate limits added for Auth, Transactions, and Global traffic.
 *   Updated Middleware to handle targeted DDoS mitigation.
 *   Added dedicated Waitlist API endpoint (`/api/waitlist`).
+*   Established formal NoSQL "schema" definitions for waitlist and contact collections.
 *   Documented updated security posture and data management strategy in DEVELOPER_NOTES.md.
