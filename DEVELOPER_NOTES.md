@@ -7,6 +7,7 @@ Admin
 
 # STATUS
 1. Security Posture ✅
+2. Data Management Architecture ✅
 
 
 # NOTES:
@@ -41,6 +42,11 @@ Admin
     *   Status: Active
     *   Implementation: Strict separation between public and private keys in `.env`.
 
+## Data Management Architecture
+*   **ORM/Migrations**: Prisma is not used. Since Firestore is a NoSQL database, the application follows a schema-less approach.
+*   **Data Evolution**: Any necessary data structural changes are managed through application-level logic or one-off migration scripts using the Firebase Admin SDK (`src/lib/firebase-admin.ts`).
+*   **Validation**: Zod is the primary tool for enforcing data integrity at the edge (Server Actions and API routes).
+
 ## Package Dependencies
 *   @upstash/ratelimit: ^2.0.4
 *   @upstash/redis: ^1.34.3
@@ -48,4 +54,4 @@ Admin
 # BREAKDOWN:
 *   Granular rate limits added for Auth, Transactions, and Global traffic.
 *   Updated Middleware to handle targeted DDoS mitigation.
-*   Documented updated security posture in DEVELOPER_NOTES.md.
+*   Documented updated security posture and data management strategy in DEVELOPER_NOTES.md.
