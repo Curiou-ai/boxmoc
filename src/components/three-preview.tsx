@@ -2,13 +2,23 @@
 
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 interface ThreePreviewProps {
   imageUrl?: string;
   productType?: 'box' | 'card' | 'bag' | string;
+  dimensions?: {
+      width: number;
+      height: number;
+      depth: number;
+  };
 }
 
-const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'box' }) => {
+const ThreePreview: React.FC<ThreePreviewProps> = ({ 
+    imageUrl, 
+    productType = 'box',
+    dimensions = { width: 4, height: 4, depth: 4 }
+}) => {
   const mountRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -16,78 +26,84 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'bo
 
     const currentMount = mountRef.current;
 
+    // Standard packaging dimensions often use inches. We scale them for visual representation.
+    // Base unit: 1 unit = 1 inch
+    const { width, height, depth } = dimensions;
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, currentMount.clientWidth / currentMount.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, currentMount.clientWidth / currentMount.clientHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     currentMount.appendChild(renderer.domElement);
     
-    let geometry: THREE.BufferGeometry;
+    // Controls for full 3D rotation
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.autoRotate = !imageUrl; // Auto-rotate only if no image yet
+    controls.autoRotateSpeed = 1.0;
 
-    switch(productType) {
-        case 'card':
-            geometry = new THREE.BoxGeometry(3.5, 2, 0.05);
-            break;
-        case 'bag':
-            // A simplified tote bag shape using a thin box
-            geometry = new THREE.BoxGeometry(3, 3.5, 0.1);
-            break;
-        case 'box':
-        default:
-            geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
-            break;
-    }
+    const geometry = new THREE.BoxGeometry(width, height, depth);
     
-    // Updated default cardboard color to match the reference image
-    const defaultMaterial = new THREE.MeshStandardMaterial({ color: 0xc3a683, metalness: 0.1, roughness: 0.7 });
-    let materials: THREE.Material[] = Array(6).fill(defaultMaterial);
+    // Cardboard base material
+    const baseColor = new THREE.Color(0xc3a683);
+    const baseMaterial = new THREE.MeshStandardMaterial({ 
+        color: baseColor, 
+        metalness: 0.05, 
+        roughness: 0.8 
+    });
+
+    let materials: THREE.Material[] = Array(6).fill(baseMaterial);
     
     const mesh = new THREE.Mesh(geometry, materials);
     scene.add(mesh);
 
+    // Apply texture if provided
     if (imageUrl) {
         const textureLoader = new THREE.TextureLoader();
         textureLoader.load(imageUrl, 
             (texture) => {
                 texture.colorSpace = THREE.SRGBColorSpace;
-                const imageMaterial = new THREE.MeshStandardMaterial({ map: texture, metalness: 0.1, roughness: 0.5 });
-                mesh.material = Array(6).fill(imageMaterial);
+                
+                // For a box, we usually apply the design to specific faces or all faces
+                // For this preview, we'll wrap the design across all faces for impact
+                const designMaterial = new THREE.MeshStandardMaterial({ 
+                    map: texture, 
+                    metalness: 0.1, 
+                    roughness: 0.5 
+                });
+                
+                mesh.material = Array(6).fill(designMaterial);
                 (mesh.material as THREE.Material[]).forEach(mat => mat.needsUpdate = true);
             },
             undefined,
             (error) => {
-                console.error('An error happened loading the texture.', error);
+                console.error('Texture loading failed:', error);
             }
         );
     }
 
-    camera.position.z = 5;
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    // Lighting setup
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
+    
+    const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    mainLight.position.set(10, 10, 10);
+    scene.add(mainLight);
 
-    let mouseX = 0;
-    let mouseY = 0;
-    const onMouseMove = (event: MouseEvent) => {
-        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-    }
-    window.addEventListener('mousemove', onMouseMove);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    fillLight.position.set(-10, 5, -10);
+    scene.add(fillLight);
+
+    // Position camera based on box size
+    const maxDim = Math.max(width, height, depth);
+    camera.position.set(maxDim * 1.5, maxDim * 1.2, maxDim * 2);
+    camera.lookAt(0, 0, 0);
 
     const animate = () => {
       requestAnimationFrame(animate);
-      mesh.rotation.y += 0.005;
-      mesh.rotation.x += 0.002;
-      
-      // subtle mouse follow
-      camera.position.x += (mouseX * 0.5 - camera.position.x) * .05;
-      camera.position.y += (mouseY * 0.5 - camera.position.y) * .05;
-      camera.lookAt(scene.position);
-
+      controls.update();
       renderer.render(scene, camera);
     };
     animate();
@@ -103,17 +119,17 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({ imageUrl, productType = 'bo
 
     return () => {
         window.removeEventListener('resize', handleResize);
-        window.removeEventListener('mousemove', onMouseMove);
-        if (currentMount) {
+        if (currentMount && renderer.domElement) {
             currentMount.removeChild(renderer.domElement);
         }
         geometry.dispose();
         (mesh.material as THREE.Material[]).forEach(material => material.dispose());
         renderer.dispose();
+        controls.dispose();
     };
-  }, [imageUrl, productType]);
+  }, [imageUrl, dimensions]);
 
-  return <div ref={mountRef} className="w-full h-full rounded-lg" />;
+  return <div ref={mountRef} className="w-full h-full rounded-lg cursor-grab active:cursor-grabbing" />;
 };
 
 export default ThreePreview;

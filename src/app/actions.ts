@@ -24,6 +24,12 @@ export interface FormState {
   fields?: Record<string, string>;
 }
 
+export interface UploadState {
+    success: boolean;
+    message: string;
+    imageUrl?: string;
+}
+
 export interface HelpFormState {
   message: string;
   success?: boolean;
@@ -98,6 +104,53 @@ export interface Order {
     shippingAddress: any;
 }
 
+export async function handleUploadDesignImage(formData: FormData): Promise<UploadState> {
+    const session = await getSession();
+    if (!session) {
+        return { success: false, message: 'You must be logged in to upload images.' };
+    }
+
+    const file = formData.get('image') as File;
+    if (!file) {
+        return { success: false, message: 'No image file provided.' };
+    }
+
+    // Validation: Size (10MB limit)
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_SIZE) {
+        return { success: false, message: 'File is too large. Maximum size is 10MB.' };
+    }
+
+    // Validation: Type
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        return { success: false, message: 'Invalid file format. Please upload JPEG, PNG, or WebP.' };
+    }
+
+    try {
+        const bucket = admin.storage().bucket();
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const extension = file.type.split('/')[1];
+        const fileName = `user-uploads/${session.uid}/${Date.now()}.${extension}`;
+        const fileRef = bucket.file(fileName);
+
+        await fileRef.save(buffer, {
+            metadata: {
+                contentType: file.type,
+                cacheControl: 'public, max-age=31536000',
+            },
+            public: true,
+        });
+
+        const publicUrl = fileRef.publicUrl();
+        return { success: true, message: 'Upload successful!', imageUrl: publicUrl };
+
+    } catch (error: any) {
+        console.error('Upload Error:', error);
+        return { success: false, message: 'An error occurred during upload. Please try again.' };
+    }
+}
+
 export async function handleCreateOrderSession(
     { designImageUrl, designDescription }: { designImageUrl: string; designDescription: string }
 ): Promise<OrderSessionState> {
@@ -111,24 +164,30 @@ export async function handleCreateOrderSession(
     try {
         const db = admin.firestore();
         const bucket = admin.storage().bucket();
-        const mimeType = designImageUrl.match(/data:(.*);base64,/)?.[1] || 'image/png';
-        const extension = mimeType.split('/')[1] || 'png';
-        const base64Data = designImageUrl.replace(/^data:image\/\w+;base64,/, "");
-        const imageBuffer = Buffer.from(base64Data, 'base64');
         
-        const fileId = db.collection('tmp').doc().id;
-        const filePath = `user-designs/${session.uid}/${fileId}.${extension}`;
-        const file = bucket.file(filePath);
+        let permanentImageUrl = designImageUrl;
 
-        await file.save(imageBuffer, {
-            metadata: {
-                contentType: mimeType,
-                cacheControl: 'public, max-age=31536000',
-            },
-            public: true,
-        });
+        // If it's a data URI (from AI generation), we save it to storage
+        if (designImageUrl.startsWith('data:')) {
+            const mimeType = designImageUrl.match(/data:(.*);base64,/)?.[1] || 'image/png';
+            const extension = mimeType.split('/')[1] || 'png';
+            const base64Data = designImageUrl.replace(/^data:image\/\w+;base64,/, "");
+            const imageBuffer = Buffer.from(base64Data, 'base64');
+            
+            const fileId = db.collection('tmp').doc().id;
+            const filePath = `user-designs/${session.uid}/${fileId}.${extension}`;
+            const file = bucket.file(filePath);
 
-        const permanentImageUrl = file.publicUrl();
+            await file.save(imageBuffer, {
+                metadata: {
+                    contentType: mimeType,
+                    cacheControl: 'public, max-age=31536000',
+                },
+                public: true,
+            });
+
+            permanentImageUrl = file.publicUrl();
+        }
 
         const checkoutSession = await stripe.checkout.sessions.create({
             customer: session.stripeCustomerId,

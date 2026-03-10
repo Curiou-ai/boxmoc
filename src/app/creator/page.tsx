@@ -1,12 +1,11 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2 } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -21,8 +20,17 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import RequestHelpDialog from '@/components/request-help-dialog';
 import { cn } from '@/lib/utils';
 import { loadStripe } from '@stripe/stripe-js';
-import { handleCreateOrderSession } from '@/app/actions';
+import { handleCreateOrderSession, handleUploadDesignImage } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+
+const BOX_SIZES = [
+    { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4 },
+    { id: 'medium-cube', label: 'Medium Cube (8"x8"x8")', width: 8, height: 8, depth: 8 },
+    { id: 'large-cube', label: 'Large Cube (12"x12"x12")', width: 12, height: 12, depth: 12 },
+    { id: 'small-mailer', label: 'Small Mailer (6"x6"x2")', width: 6, height: 2, depth: 6 },
+    { id: 'medium-mailer', label: 'Medium Mailer (10"x8"x2")', width: 10, height: 2, depth: 8 },
+    { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5 },
+];
 
 const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
   const [open, setOpen] = useState(false);
@@ -39,13 +47,13 @@ const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { ima
            <Button variant="ghost" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0 text-primary
                                               lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
                 <Sparkles className="h-5 w-5 lg:h-6 lg:w-6" />
-                <span className="text-xs lg:text-base">Create</span>
+                <span className="text-xs lg:text-base">AI Create</span>
             </Button>
         </DialogTrigger>
       </TooltipTrigger>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle className="font-headline text-xl">Create</DialogTitle>
+          <DialogTitle className="font-headline text-xl">AI Designer</DialogTitle>
            <DialogDescription>Describe your idea and let AI create a design for you.</DialogDescription>
         </DialogHeader>
         <AiDesignForm onDesignGenerated={handleGenerated} />
@@ -54,12 +62,35 @@ const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { ima
   )
 }
 
-const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; className?: string }) => {
+const EditorSidebar = ({ onDesignGenerated, onImageUploaded, isUploading, className }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; onImageUploaded: (url: string) => void; isUploading: boolean; className?: string }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+        onImageUploaded('UPLOAD_START'); // Signal start
+        
+        try {
+            const result = await handleUploadDesignImage(formData);
+            if (result.success && result.imageUrl) {
+                onImageUploaded(result.imageUrl);
+            } else {
+                onImageUploaded('UPLOAD_ERROR:' + result.message);
+            }
+        } catch (err) {
+            onImageUploaded('UPLOAD_ERROR:Unexpected error during upload.');
+        }
+    };
 
     const tools = [
-        { icon: Upload, label: 'Upload', tooltip: 'Upload Image' },
         { icon: Type, label: 'Text', tooltip: 'Add Text' },
-        // { icon: Shapes, label: 'Shapes', tooltip: 'Add Shape' },
         { icon: Brush, label: 'Edit', tooltip: 'Edit Design' },
         { icon: Save, label: 'Save', tooltip: 'Save' },
         { icon: Share2, label: 'Share', tooltip: 'Share' },
@@ -71,10 +102,27 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
                 <TooltipProvider delayDuration={0}>
                   <Tooltip>
                     <AiToolDialog onDesignGenerated={onDesignGenerated} />
-                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Create</TooltipContent>
-                      <TooltipContent side="bottom" className="lg:hidden">Create</TooltipContent>
+                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">AI Create</TooltipContent>
+                      <TooltipContent side="bottom" className="lg:hidden">AI Create</TooltipContent>
                   </Tooltip>
                   
+                  <Tooltip>
+                      <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            disabled={isUploading}
+                            onClick={handleUploadClick}
+                            className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0 lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3"
+                          >
+                              {isUploading ? <Loader2 className="h-5 w-5 lg:h-6 lg:w-6 animate-spin" /> : <Upload className="h-5 w-5 lg:h-6 lg:w-6" />}
+                              <span className="text-xs lg:text-base">Upload</span>
+                          </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Upload Image (Max 10MB)</TooltipContent>
+                      <TooltipContent side="bottom" className="lg:hidden">Upload Image</TooltipContent>
+                  </Tooltip>
+                  <input type="file" ref={fileInputRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} />
+
                   <Separator orientation="vertical" className="h-8 lg:hidden" />
                   <Separator className="my-4 hidden lg:block" />
 
@@ -119,18 +167,38 @@ const EditorSidebar = ({ onDesignGenerated, className }: { onDesignGenerated: (d
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
   const [productType, setProductType] = useState('box');
+  const [selectedSizeId, setSelectedSizeId] = useState('medium-cube');
+  const [isUploading, setIsUploading] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const { toast } = useToast();
 
+  const currentSize = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
+
   const handleDesignGenerated = (newDesign: { imageUrl: string; description:string }) => {
     setDesign(newDesign);
+  };
+
+  const handleImageUploaded = (result: string) => {
+      if (result === 'UPLOAD_START') {
+          setIsUploading(true);
+          return;
+      }
+      if (result.startsWith('UPLOAD_ERROR:')) {
+          toast({ title: 'Upload Failed', description: result.split('UPLOAD_ERROR:')[1], variant: 'destructive' });
+          setIsUploading(false);
+          return;
+      }
+      
+      setDesign({ imageUrl: result, description: 'Custom uploaded design' });
+      setIsUploading(false);
+      toast({ title: 'Success', description: 'Image uploaded and applied to design.' });
   };
   
   const handleOrder = async () => {
     if (!design.imageUrl || !design.description) {
         toast({
             title: 'No design to order',
-            description: 'Please generate a design first before ordering a print.',
+            description: 'Please generate or upload a design first before ordering a print.',
             variant: 'destructive'
         });
         return;
@@ -139,7 +207,7 @@ export default function CreatorPage() {
     try {
         const { sessionId, error } = await handleCreateOrderSession({
             designImageUrl: design.imageUrl,
-            designDescription: design.description,
+            designDescription: `${design.description} (Size: ${currentSize.label})`,
         });
 
         if (error) {
@@ -163,73 +231,84 @@ export default function CreatorPage() {
   
   return (
     <div className="flex flex-col lg:flex-row flex-1 h-full lg:h-[calc(100vh-60px)]">
-      <EditorSidebar onDesignGenerated={handleDesignGenerated} />
+      <EditorSidebar 
+        onDesignGenerated={handleDesignGenerated} 
+        onImageUploaded={handleImageUploaded}
+        isUploading={isUploading}
+      />
       
       <div className="flex-1 flex flex-col p-2 sm:p-4 lg:p-6 overflow-auto">
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
           <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
             <CardHeader>
-              <div className="flex justify-between items-start gap-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div>
-                  <CardTitle className="font-headline">3D Preview</CardTitle>
-                  <CardDescription>A real-time preview of your design.</CardDescription>
+                  <CardTitle className="font-headline">3D Real-time Preview</CardTitle>
+                  <CardDescription>Rotate with cursor to see all sides.</CardDescription>
                 </div>
-                <Select value={productType} onValueChange={setProductType}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a product" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="box">
-                      <div className="flex items-center gap-2">
-                        <Box className="h-4 w-4" /> Box
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="card">
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" /> Card
-                      </div>
-                    </SelectItem>
-                    {/* <SelectItem value="bag">
-                      <div className="flex items-center gap-2">
-                        <ShoppingBag className="h-4 w-4" /> Tote Bag
-                      </div>
-                    </SelectItem> */}
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-2 w-full sm:w-auto">
+                    <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
+                        <SelectTrigger className="w-full sm:w-[220px]">
+                            <SelectValue placeholder="Standard Dimensions" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {BOX_SIZES.map(size => (
+                                <SelectItem key={size.id} value={size.id}>{size.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="flex-1 min-h-0">
-              <ThreePreview key={`${design.imageUrl}-${productType}`} imageUrl={design.imageUrl} productType={productType} />
+            <CardContent className="flex-1 min-h-0 bg-muted/20 rounded-b-lg">
+              <ThreePreview 
+                key={`${design.imageUrl}-${selectedSizeId}`} 
+                imageUrl={design.imageUrl} 
+                productType="box" 
+                dimensions={{ width: currentSize.width, height: currentSize.height, depth: currentSize.depth }}
+              />
             </CardContent>
           </Card>
           <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
             <CardHeader>
-              <CardTitle className="font-headline">Edit Design</CardTitle>
-              <CardDescription>The image and description.</CardDescription>
+              <CardTitle className="font-headline">Design Assets</CardTitle>
+              <CardDescription>Manage your generated or uploaded imagery.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
-              <div className="w-full aspect-square bg-muted/50 rounded-lg flex items-center justify-center overflow-hidden border">
+              <div className="w-full aspect-square bg-muted/50 rounded-lg flex items-center justify-center overflow-hidden border group relative">
                   {design.imageUrl ? (
-                      <img src={design.imageUrl} alt="Generated box design" className="w-full h-full object-cover" />
+                      <img src={design.imageUrl} alt="Active design" className="w-full h-full object-contain" />
                   ) : (
                       <div className="text-center text-muted-foreground p-4">
-                          <Package2 size={48} className="mx-auto mb-2" />
-                          <p>Your generated design will appear here.</p>
+                          <Package2 size={48} className="mx-auto mb-2 opacity-50" />
+                          <p>Your design will appear here.</p>
+                      </div>
+                  )}
+                  {isUploading && (
+                      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center">
+                          <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
+                          <p className="text-sm font-medium">Processing upload...</p>
                       </div>
                   )}
               </div>
               <div className="p-4 bg-muted/50 rounded-lg text-sm flex-grow h-40 overflow-y-auto border">
-                  <p className="text-muted-foreground">{design.description || "The AI's description of the design will be shown here."}</p>
+                  <p className="text-muted-foreground italic">
+                    {design.description || "The description of the current design will be shown here. Use the sidebar tools to generate a new design or upload your own assets."}
+                  </p>
               </div>
             </CardContent>
-            <CardFooter>
-                <Button onClick={handleOrder} disabled={!design.imageUrl || isOrdering} className="w-full">
+            <CardFooter className="flex flex-col gap-3">
+                <div className="flex w-full items-center justify-between text-sm text-muted-foreground px-1">
+                    <span className="flex items-center gap-1"><Maximize2 className="h-3 w-3" /> Size: {currentSize.label}</span>
+                    <span>Format: High-Res Print Ready</span>
+                </div>
+                <Button onClick={handleOrder} disabled={!design.imageUrl || isOrdering || isUploading} className="w-full py-6 text-lg font-bold">
                     {isOrdering ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ) : (
-                        <ShoppingBag className="mr-2 h-4 w-4" />
+                        <ShoppingBag className="mr-2 h-5 w-5" />
                     )}
-                    {isOrdering ? 'Processing...' : 'Order Print ($49.99)'}
+                    {isOrdering ? 'Processing Order...' : 'Order Custom Print ($49.99)'}
                 </Button>
             </CardFooter>
           </Card>
