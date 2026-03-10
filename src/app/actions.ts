@@ -96,6 +96,17 @@ export interface WaitlistUser {
     createdAt: string;
 }
 
+export interface ContactSubmission {
+    id: string;
+    name: string;
+    email: string;
+    company?: string;
+    phone?: string;
+    message: string;
+    createdAt: string;
+    source: string;
+}
+
 export interface OrderSessionState {
   sessionId?: string;
   error?: string;
@@ -366,6 +377,31 @@ export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
             status: data.status,
             code: data.code,
             createdAt: data.createdAt.toDate().toISOString(),
+        };
+    });
+}
+
+export async function getContactSubmissions(): Promise<ContactSubmission[]> {
+    const db = admin.firestore();
+    const contactsCol = db.collection('contact_submissions');
+    const q = contactsCol.orderBy('createdAt', 'desc');
+    const snapshot = await q.get();
+    
+    if (snapshot.empty) {
+        return [];
+    }
+    
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            name: data.name,
+            email: data.email,
+            company: data.company,
+            phone: data.phone,
+            message: data.message,
+            createdAt: data.createdAt.toDate().toISOString(),
+            source: data.source || 'web_form',
         };
     });
 }
