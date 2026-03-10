@@ -10,10 +10,11 @@ import admin from '@/lib/firebase-admin';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
-import { getSession } from '@/lib/session';
+import { getSession, UserProfile } from '@/lib/session';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 import { ContactFormSchema, EmailSchema, NameSchema, WaitlistSchema } from '@/lib/validations';
+import { revalidatePath } from 'next/cache';
 
 export interface FormState {
   message: string;
@@ -106,6 +107,12 @@ export interface ContactSubmission {
     message: string;
     createdAt: string;
     source: string;
+    status?: 'new' | 'contacted' | 'closed';
+    notes?: Array<{ id: string; content: string; author: string; createdAt: string }>;
+}
+
+export interface CRMUser extends UserProfile {
+    uid: string;
 }
 
 export interface OrderSessionState {
@@ -274,6 +281,57 @@ export async function handleJoinWaitlist(prevState: WaitlistState, formData: For
   redirect('/waitlist/congratulations');
 }
 
+// --- CRM & Customer Management ---
+
+export async function getCRMUsers(): Promise<CRMUser[]> {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') return [];
+
+    const db = admin.firestore();
+    const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+    
+    return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            uid: doc.id,
+            ...data
+        } as CRMUser;
+    });
+}
+
+export async function updateCRMUserStatus(userId: string, status: string): Promise<{ success: boolean }> {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') return { success: false };
+
+    const db = admin.firestore();
+    await db.collection('users').doc(userId).update({ status });
+    revalidatePath('/admin');
+    return { success: true };
+}
+
+export async function addCRMNote(type: 'user' | 'contact', id: string, content: string): Promise<{ success: boolean }> {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') return { success: false };
+
+    const db = admin.firestore();
+    const collection = type === 'user' ? 'users' : 'contact_submissions';
+    const ref = db.collection(collection).doc(id);
+
+    const note = {
+        id: Math.random().toString(36).substr(2, 9),
+        content,
+        author: session.displayName || 'Admin',
+        createdAt: new Date().toISOString()
+    };
+
+    await ref.update({
+        notes: admin.firestore.FieldValue.arrayUnion(note)
+    });
+
+    revalidatePath('/admin');
+    return { success: true };
+}
+
 // --- Contact Submissions ---
 
 export async function getContactSubmissions(): Promise<ContactSubmission[]> {
@@ -295,10 +353,22 @@ export async function getContactSubmissions(): Promise<ContactSubmission[]> {
             company: data.company,
             phone: data.phone,
             message: data.message,
+            status: data.status || 'new',
+            notes: data.notes || [],
             createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
             source: data.source || 'web_form',
         };
     });
+}
+
+export async function updateContactStatus(contactId: string, status: string): Promise<{ success: boolean }> {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') return { success: false };
+
+    const db = admin.firestore();
+    await db.collection('contact_submissions').doc(contactId).update({ status });
+    revalidatePath('/admin');
+    return { success: true };
 }
 
 export async function handleRequestHelp(
@@ -334,7 +404,9 @@ export async function handleRequestHelp(
       ...fields,
       message: messageContent,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      source: 'web_form'
+      source: 'web_form',
+      status: 'new',
+      notes: []
     });
 
     if (companyEmail) {

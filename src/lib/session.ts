@@ -1,4 +1,3 @@
-
 import 'server-only';
 import { cookies } from 'next/headers';
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -11,6 +10,9 @@ export interface UserProfile {
   displayName: string;
   photoURL?: string | null;
   createdAt: string;
+  lastActiveAt?: string;
+  status?: 'active' | 'churned' | 'onboarding' | 'trialing';
+  notes?: Array<{ id: string; content: string; author: string; createdAt: string }>;
   // Stripe fields
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
@@ -23,7 +25,7 @@ export interface UserProfile {
 export type UserSession = DecodedIdToken & UserProfile;
 
 export async function getSession(): Promise<UserSession | null> {
-  const sessionCookie = cookies().get('session')?.value;
+  const sessionCookie = (await cookies()).get('session')?.value;
   if (!sessionCookie) {
     return null;
   }
@@ -34,6 +36,8 @@ export async function getSession(): Promise<UserSession | null> {
     const db = admin.firestore();
     const userDocRef = db.collection('users').doc(decodedIdToken.uid);
     const userDoc = await userDocRef.get();
+
+    const now = new Date().toISOString();
 
     if (!userDoc.exists) {
       const authUser = await admin.auth().getUser(decodedIdToken.uid);
@@ -50,8 +54,10 @@ export async function getSession(): Promise<UserSession | null> {
         email: authUser.email || '',
         displayName: authUser.displayName || 'New User',
         photoURL: authUser.photoURL || null,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
+        lastActiveAt: now,
         role: 'user',
+        status: 'onboarding',
         stripeCustomerId: stripeCustomer.id,
       };
       await userDocRef.set(newUserProfile);
@@ -61,11 +67,14 @@ export async function getSession(): Promise<UserSession | null> {
 
     const userProfile = userDoc.data() as UserProfile;
 
-    return { ...decodedIdToken, ...userProfile };
+    // Background update of lastActiveAt
+    await userDocRef.update({ lastActiveAt: now });
+
+    return { ...decodedIdToken, ...userProfile, lastActiveAt: now };
 
   } catch (error) {
     console.error('Error verifying session cookie or fetching user profile:', error);
-    cookies().delete('session');
+    (await cookies()).delete('session');
     return null;
   }
 }

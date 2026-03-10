@@ -1,31 +1,46 @@
-import { getWaitlistUsers, getContactSubmissions } from "@/app/actions";
+import { getWaitlistUsers, getContactSubmissions, getCRMUsers } from "@/app/actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserTable } from "@/components/admin/user-table";
+import { ContactSubmissionTable } from "@/components/admin/contact-submission-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
 import { SendAccessCodeButton } from "@/components/admin/send-access-code-button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ContactSubmissionTable } from "@/components/admin/contact-submission-table";
 
 export default async function AdminPage() {
     const waitlistUsers = await getWaitlistUsers();
     const contactSubmissions = await getContactSubmissions();
+    const crmUsers = await getCRMUsers();
 
     return (
         <div className="container mx-auto py-10 px-4">
-            <h1 className="text-3xl font-bold font-headline mb-8">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold font-headline mb-8">CRM Dashboard</h1>
             
-            <Tabs defaultValue="waitlist" className="space-y-6">
-                <TabsList>
-                    <TabsTrigger value="waitlist">Waitlist Management</TabsTrigger>
-                    <TabsTrigger value="contacts">Contact Inquiries</TabsTrigger>
+            <Tabs defaultValue="customers" className="space-y-6">
+                <TabsList className="grid grid-cols-3 w-full max-w-md">
+                    <TabsTrigger value="customers">Customers</TabsTrigger>
+                    <TabsTrigger value="waitlist">Waitlist</TabsTrigger>
+                    <TabsTrigger value="contacts">Inquiries</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="customers">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Customer Base</CardTitle>
+                            <CardDescription>Monitor product usage, subscription health, and interaction logs.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <UserTable users={crmUsers} />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
                 <TabsContent value="waitlist">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Waitlist Users</CardTitle>
-                            <CardDescription>Manage early access for your users.</CardDescription>
+                            <CardTitle>Early Access Pipeline</CardTitle>
+                            <CardDescription>Manage leads awaiting platform invitations.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -70,8 +85,8 @@ export default async function AdminPage() {
                 <TabsContent value="contacts">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Recent Inquiries</CardTitle>
-                            <CardDescription>View messages sent from the contact form and chatbot.</CardDescription>
+                            <CardTitle>Recent Interactions</CardTitle>
+                            <CardDescription>Support requests and feedback loops.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <ContactSubmissionTable submissions={contactSubmissions} />
