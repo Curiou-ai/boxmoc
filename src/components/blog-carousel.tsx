@@ -1,12 +1,11 @@
-
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Calendar, User } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Calendar, User } from 'lucide-react';
 import placeholderData from '@/app/lib/placeholder-images.json';
 
 const blogPosts = [
@@ -45,6 +44,22 @@ const blogPosts = [
 ];
 
 export function BlogCarousel() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, clientWidth } = scrollContainerRef.current;
+      const scrollTo = direction === 'left' 
+        ? scrollLeft - clientWidth 
+        : scrollLeft + clientWidth;
+      
+      scrollContainerRef.current.scrollTo({
+        left: scrollTo,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-background overflow-hidden">
       <div className="container px-4 md:px-6 mx-auto max-w-7xl">
@@ -55,13 +70,39 @@ export function BlogCarousel() {
               Stay updated with the latest trends in custom branding, design efficiency, and our company journey.
             </p>
           </div>
-          <Button variant="outline" asChild className="hidden md:flex">
-            <Link href="#">View All Articles <ChevronRight className="ml-2 h-4 w-4" /></Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex gap-2 mr-4">
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => scroll('left')}
+                    className="rounded-full"
+                    aria-label="Scroll left"
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => scroll('right')}
+                    className="rounded-full"
+                    aria-label="Scroll right"
+                >
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
+            </div>
+            <Button variant="outline" asChild className="hidden md:flex">
+                <Link href="#">View All Articles <ChevronRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </div>
         </div>
 
         <div className="relative">
-          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div 
+            ref={scrollContainerRef}
+            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar" 
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {blogPosts.map((post) => {
               const img = placeholderData.blog.find(i => i.id === post.imageId);
               return (
