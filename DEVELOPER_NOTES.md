@@ -43,9 +43,10 @@ Admin
     *   Implementation: Strict separation between public and private keys in `.env`.
 
 ## Data Management Architecture
-*   **ORM/Migrations**: Prisma is not used. Since Firestore is a NoSQL database, the application follows a schema-less approach.
-*   **Data Evolution**: Any necessary data structural changes are managed through application-level logic or one-off migration scripts using the Firebase Admin SDK (`src/lib/firebase-admin.ts`).
+*   **NoSQL First**: Firestore is the primary database. Prisma and Supabase are not used in this project to maintain a focused, high-performance Firebase architecture.
+*   **Migrations**: Since Firestore is schema-less, structural changes are managed through application logic or one-off administrative scripts.
 *   **Validation**: Zod is the primary tool for enforcing data integrity at the edge (Server Actions and API routes).
+*   **API Endpoints**: RESTful endpoints (e.g., `/api/waitlist`) are available for external integrations, backed by Firestore.
 
 ## Package Dependencies
 *   @upstash/ratelimit: ^2.0.4
@@ -54,4 +55,5 @@ Admin
 # BREAKDOWN:
 *   Granular rate limits added for Auth, Transactions, and Global traffic.
 *   Updated Middleware to handle targeted DDoS mitigation.
+*   Added dedicated Waitlist API endpoint (`/api/waitlist`).
 *   Documented updated security posture and data management strategy in DEVELOPER_NOTES.md.
