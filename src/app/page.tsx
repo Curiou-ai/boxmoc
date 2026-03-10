@@ -16,6 +16,7 @@ import { AnnouncementBar } from '@/components/announcement-bar'
 import { translateHeadline } from './actions';
 import DashboardHero from '@/components/ui/dashboard';
 import BoxmocAI from '@/components/ui/chatbot-svg';
+import { BlogCarousel } from '@/components/blog-carousel';
 
 const languages = [
     { code: 'en', name: 'English', original: 'Your Brand, Delivered' },
@@ -28,8 +29,6 @@ const languages = [
 export default function LandingPage() {
   const [headline, setHeadline] = useState('Your Brand, Delivered');
   const [isPending, startTransition] = useTransition();
-
-
 
   const handleLanguageChange = (languageCode: string) => {
     const selectedLanguage = languages.find(l => l.code === languageCode);
@@ -60,9 +59,6 @@ export default function LandingPage() {
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline mb-4">
                   {headline}
                 </h1>
-                {/* <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-                  Our intuitive tools and powerful AI make it easy to create custom branded packaging and marketing materials in minutes. Delivered right to your doorstep.
-                </p> */}
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
                   Create custom branded packaging and marketing materials in minutes. Delivered right to your doorstep.
                 </p>
@@ -83,14 +79,6 @@ export default function LandingPage() {
                 </form>
               </div>
               <div className="w-full mx-auto">
-                {/* <Image
-                  src="https://placehold.co/800x450.png"
-                  width="800"
-                  height="450"
-                  alt="Hero"
-                  data-ai-hint="packaging product mockup"
-                  className="mx-auto aspect-video overflow-hidden rounded-xl object-contain w-full max-w-4xl"
-                /> */}
                 <DashboardHero />
               </div>
             </div>
@@ -130,14 +118,6 @@ export default function LandingPage() {
                     </Button>
                   </div>
                   <div className='flex items-center justify-start md:justify-center'>
-                    {/* <Image
-                      src="https://placehold.co/600x450.png" 
-                      width="600"
-                      height="450"
-                      alt="AI Feature"
-                      data-ai-hint="AI design tool"
-                      className="rounded-xl shadow-2xl"
-                    /> */}
                     <BoxmocAI className='shadow-2xl max-w-sm'/>
                   </div>
                 </div>
@@ -157,7 +137,6 @@ export default function LandingPage() {
                 </h2>
                 <ServicesAccordion />
               </div>
-              {/* bg-accent/50 rounded-2xl p-4 md:p-6 min-[896px]:p-8 min-[896px]:w-1/2 */}
               <div className="bg-accent/50 rounded-2xl min-[896px]:w-1/2">
                   <Image
                     src="https://images.unsplash.com/photo-1758691737217-77302c5f988f?q=80&w=2070&h=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
@@ -184,7 +163,6 @@ export default function LandingPage() {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
-                {/* Left Column: Client types */}
                 <div>
                     <div className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-muted/30 mb-8">
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12.22 2h-4.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.44.25a2 2 0 0 1-2 1.73V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.29a2 2 0 0 0-1-1.73l-4.44-2.54a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><path d="M18 13.13V22"></path><path d="M6 13.13V22"></path><path d="M12 13.13V22"></path></svg></div>
@@ -205,12 +183,10 @@ export default function LandingPage() {
                     </Button>
                 </div>
 
-                {/* Right Column: API / Customization */}
                 <div>
                     <div className="relative mb-8 overflow-hidden rounded-xl">
-                    {/*replace this still image with moving images like a gif or svg*/}
                     <Image
-                        src="https://images.unsplash.com/photo-1759563874669-0b6f7337e66a?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3" //photo-1699140034822-011cc2de9917
+                        src="https://images.unsplash.com/photo-1759563874669-0b6f7337e66a?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3"
                         width={600}
                         height={450}
                         alt="Custom API integration example"
@@ -218,7 +194,7 @@ export default function LandingPage() {
                         className="w-full h-full object-cover"
                     />
                     </div>
-                    <h3 className="text-2xl font-bold font-headline">Powerful Customization</h3> {/*rep*/}
+                    <h3 className="text-2xl font-bold font-headline">Powerful Customization</h3>
                     <p className="mt-4 text-muted-foreground">
                       Take full control with our easy-to-use design tools. Upload assets, create designs for cards, flyers, and packaging, and see your vision come to life in stunning 3D.
                     </p>
@@ -232,24 +208,10 @@ export default function LandingPage() {
 
         <Testimonials />
 
+        <BlogCarousel />
+
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card flex items-center justify-center">
-          {/* <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 max-w-7xl">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Start creating your custom designs today. Create an account and get started.
-              </p>
-            </div>
-            <div className="mx-auto w-full max-w-sm space-y-2">
-              <Button asChild size="lg" className="w-full">
-                <Link href="/creator">
-                  Start Now
-                </Link>
-              </Button>
-            </div>
-          </div> */}
           <div className="container grid grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-8 items-center justify-center px-4 md:px-6 max-w-7xl">
-            {/* LEFT CTA */}
             <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
               <p className="max-w-md text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -257,13 +219,6 @@ export default function LandingPage() {
               </p>
 
               <div className="flex items-center gap-4">
-                {/* <Link
-                  href="/creator"
-                  className="inline-flex items-center rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition"
-                >
-                  Start now
-                  <span className="ml-2">›</span>
-                </Link> */}
                 <Button asChild size="sm" className="">
                   <Link href="/creator" className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium text-white transition">
                     Start Now
@@ -279,7 +234,6 @@ export default function LandingPage() {
                 </Link>
               </div>
             </div>
-            {/* FEATURE 1 */}
             <div className="relative space-y-4 md:pl-10">
               <div className="hidden md:absolute md:left-0 md:top-0 md:h-full md:w-px md:bg-slate-200" />
 
@@ -302,21 +256,7 @@ export default function LandingPage() {
               >
                 Pricing details ›
               </Link>
-
-              {/* <Button asChild size="sm" className="">
-                <Link href="/pricing" className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium text-white transition">
-                  Pricing details
-                  <span className="ml-2">›</span>
-                </Link>
-              </Button> */}
             </div>
-            {/* <div className="mx-auto w-full max-w-sm space-y-2">
-              <Button asChild size="lg" className="w-full">
-                <Link href="/creator">
-                  Start Now
-                </Link>
-              </Button>
-            </div> */}
           </div>
         </section>
       </main>
@@ -340,5 +280,3 @@ export default function LandingPage() {
     </div>
   )
 }
-
-    
