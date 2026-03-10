@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2, Maximize2 } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2, Maximize2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,7 +20,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import RequestHelpDialog from '@/components/request-help-dialog';
 import { cn } from '@/lib/utils';
 import { loadStripe } from '@stripe/stripe-js';
-import { handleCreateOrderSession, handleUploadDesignImage } from '@/app/actions';
+import { handleCreateOrderSession, handleUploadDesignImage, getUserAssets, type Asset } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 
 const BOX_SIZES = [
@@ -163,16 +163,54 @@ const EditorSidebar = ({ onDesignGenerated, onImageUploaded, isUploading, classN
     );
 };
 
+const AssetLibrary = ({ assets, onSelect, activeUrl }: { assets: Asset[], onSelect: (url: string) => void, activeUrl?: string }) => {
+    if (assets.length === 0) return null;
+
+    return (
+        <div className="space-y-2">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">My Assets</h4>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
+                {assets.map(asset => (
+                    <button
+                        key={asset.id}
+                        onClick={() => onSelect(asset.url)}
+                        className={cn(
+                            "aspect-square rounded-md overflow-hidden border-2 transition-all hover:scale-105 relative",
+                            activeUrl === asset.url ? "border-primary ring-2 ring-primary/20" : "border-muted"
+                        )}
+                    >
+                        <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
+                        {activeUrl === asset.url && (
+                            <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                                <Check className="text-primary h-4 w-4 bg-background rounded-full p-0.5" />
+                            </div>
+                        )}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
-  const [productType, setProductType] = useState('box');
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedSizeId, setSelectedSizeId] = useState('medium-cube');
   const [isUploading, setIsUploading] = useState(false);
   const [isOrdering, setIsOrdering] = useState(false);
   const { toast } = useToast();
 
   const currentSize = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
+
+  const fetchAssets = async () => {
+      const data = await getUserAssets();
+      setAssets(data);
+  };
+
+  useEffect(() => {
+      fetchAssets();
+  }, []);
 
   const handleDesignGenerated = (newDesign: { imageUrl: string; description:string }) => {
     setDesign(newDesign);
@@ -191,6 +229,7 @@ export default function CreatorPage() {
       
       setDesign({ imageUrl: result, description: 'Custom uploaded design' });
       setIsUploading(false);
+      fetchAssets(); // Refresh library
       toast({ title: 'Success', description: 'Image uploaded and applied to design.' });
   };
   
@@ -274,7 +313,7 @@ export default function CreatorPage() {
               <CardTitle className="font-headline">Design Assets</CardTitle>
               <CardDescription>Manage your generated or uploaded imagery.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-4">
+            <CardContent className="flex-1 flex flex-col gap-6">
               <div className="w-full aspect-square bg-muted/50 rounded-lg flex items-center justify-center overflow-hidden border group relative">
                   {design.imageUrl ? (
                       <img src={design.imageUrl} alt="Active design" className="w-full h-full object-contain" />
@@ -291,7 +330,14 @@ export default function CreatorPage() {
                       </div>
                   )}
               </div>
-              <div className="p-4 bg-muted/50 rounded-lg text-sm flex-grow h-40 overflow-y-auto border">
+
+              <AssetLibrary 
+                assets={assets} 
+                activeUrl={design.imageUrl} 
+                onSelect={(url) => setDesign({ imageUrl: url, description: 'Applied from library' })} 
+              />
+
+              <div className="p-4 bg-muted/50 rounded-lg text-sm h-24 overflow-y-auto border">
                   <p className="text-muted-foreground italic">
                     {design.description || "The description of the current design will be shown here. Use the sidebar tools to generate a new design or upload your own assets."}
                   </p>

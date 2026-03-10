@@ -30,6 +30,13 @@ export interface UploadState {
     imageUrl?: string;
 }
 
+export interface Asset {
+    id: string;
+    url: string;
+    name: string;
+    createdAt: string;
+}
+
 export interface HelpFormState {
   message: string;
   success?: boolean;
@@ -143,11 +150,48 @@ export async function handleUploadDesignImage(formData: FormData): Promise<Uploa
         });
 
         const publicUrl = fileRef.publicUrl();
+
+        // Robust Transaction: Save metadata to Firestore for the library
+        const db = admin.firestore();
+        await db.collection('users').doc(session.uid).collection('assets').add({
+            url: publicUrl,
+            name: file.name,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            type: file.type,
+            size: file.size
+        });
+
         return { success: true, message: 'Upload successful!', imageUrl: publicUrl };
 
     } catch (error: any) {
         console.error('Upload Error:', error);
         return { success: false, message: 'An error occurred during upload. Please try again.' };
+    }
+}
+
+export async function getUserAssets(): Promise<Asset[]> {
+    const session = await getSession();
+    if (!session) return [];
+
+    try {
+        const db = admin.firestore();
+        const assetsRef = db.collection('users').doc(session.uid).collection('assets').orderBy('createdAt', 'desc');
+        const snapshot = await assetsRef.get();
+
+        if (snapshot.empty) return [];
+
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                url: data.url,
+                name: data.name,
+                createdAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+            } as Asset;
+        });
+    } catch (error) {
+        console.error("Error fetching assets:", error);
+        return [];
     }
 }
 
