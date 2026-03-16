@@ -216,6 +216,9 @@ export async function getUserAssets(): Promise<Asset[]> {
 // --- Waitlist Management ---
 
 export async function getWaitlistUsers(): Promise<WaitlistUser[]> {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') return [];
+
     const db = admin.firestore();
     const waitlistCol = db.collection('waitlist');
     const q = waitlistCol.orderBy('createdAt', 'desc');
@@ -335,6 +338,9 @@ export async function addCRMNote(type: 'user' | 'contact', id: string, content: 
 // --- Contact Submissions ---
 
 export async function getContactSubmissions(): Promise<ContactSubmission[]> {
+    const session = await getSession();
+    if (!session || session.role !== 'admin') return [];
+
     const db = admin.firestore();
     const contactsCol = db.collection('contact_submissions');
     const q = contactsCol.orderBy('createdAt', 'desc');
