@@ -37,9 +37,16 @@ async function initializeCollections() {
     });
     console.log('✅ Contact Submissions collection initialized.');
 
-    // Cleanup placeholders (Optional)
-    // await waitlistRef.delete();
-    // await contactRef.delete();
+    // 3. Initialize Users Collection (Profile Placeholder)
+    const userRef = db.collection('users').doc('init-placeholder');
+    await userRef.set({
+      email: 'admin@boxmoc.com',
+      displayName: 'System Admin',
+      role: 'admin',
+      status: 'active',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    console.log('✅ Users collection initialized.');
 
     console.log('🎉 Database initialization complete!');
     process.exit(0);
