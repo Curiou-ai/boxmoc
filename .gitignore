@@ -46,3 +46,6 @@ firestore-debug.log
 
 #idx
 .idx/
+
+#scripts
+json/*
