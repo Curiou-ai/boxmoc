@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
 import { SendAccessCodeButton } from "@/components/admin/send-access-code-button";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPage() {
     const waitlistUsers = await getWaitlistUsers();
     const contactSubmissions = await getContactSubmissions();

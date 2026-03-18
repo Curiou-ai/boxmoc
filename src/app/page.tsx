@@ -186,7 +186,7 @@ export default function LandingPage() {
                 <div>
                     <div className="relative mb-8 overflow-hidden rounded-xl">
                     <Image
-                        src="https://images.unsplash.com/photo-1759563874669-0b6f7337e66a?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3"
+                        src="https://images.unsplash.com/photo-1686575131650-e02f84970212?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3"
                         width={600}
                         height={450}
                         alt="Custom API integration example"

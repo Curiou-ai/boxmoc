@@ -48,6 +48,36 @@ Admin
     *   Implementation: Strict separation between public and private keys in `.env`.
 
 ## Data Management Architecture (Firestore NoSQL)
+Firestore is the primary database. Collections are schema-less but follow these application-enforced structures:
+
+### 1. `waitlist` (Collection)
+*   `email` (string): Unique identifier.
+*   `status` (enum): 'waitlisted' | 'active' | 'redeemed'.
+*   `code` (string | null): 8-char hex code for early access.
+*   `createdAt` (timestamp).
+
+### 2. `contact_submissions` (Collection)
+*   `name`, `email`, `message`, `status` ('new', 'contacted', 'closed').
+*   `notes` (array): Internal admin comments.
+
+### 3. `users` (Collection)
+*   `email` (string).
+*   `displayName` (string).
+*   `role` (enum): 'user' | 'admin'.
+*   `stripeCustomerId` (string): For billing integration.
+*   `stripeSubscriptionStatus` (string): active, trialing, etc.
+
+#### 3a. `users/{uid}/assets` (Sub-collection)
+*   `url` (string): Public Firebase Storage URL.
+*   `name` (string): Filename.
+*   `type` (string): MIME type.
+
+#### 3b. `users/{uid}/orders` (Sub-collection)
+*   `amountTotal` (number): Price in cents.
+*   `designImageUrl` (string): URL of the design printed.
+*   `shippingAddress` (object): Verified Stripe shipping data.
+*   `status` (string): 'processing', 'shipped'.
+
 *   **NoSQL First**: Firestore is the primary database. Collections are created automatically on first write.
 *   **Waitlist Collection** (`waitlist`):
     *   `email` (string): Unique identifier.
