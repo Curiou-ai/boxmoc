@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
 import { SendAccessCodeButton } from "@/components/admin/send-access-code-button";
 
+// Ensure this page is always rendered dynamically to avoid build-time Firebase errors
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {

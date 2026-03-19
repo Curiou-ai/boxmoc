@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { AppHeader } from "@/components/header";
 
+// Force dynamic rendering to prevent prerendering errors during build
+// as this layout relies on server-side session cookies and Firebase Admin.
+export const dynamic = 'force-dynamic';
+
 export default async function AdminLayout({ children }: { children: ReactNode }) {
     const session = await getSession();
     

@@ -9,6 +9,7 @@ import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+// Force dynamic rendering to handle session-based data fetching
 export const dynamic = 'force-dynamic';
 
 function OrderRow({ order }: { order: Order }) {
