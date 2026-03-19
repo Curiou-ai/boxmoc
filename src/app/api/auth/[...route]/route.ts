@@ -58,7 +58,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
                 signInTime: new Date(),
                 ipAddress: request.headers.get('x-forwarded-for') || undefined,
                 userAgent: request.headers.get('user-agent'),
-                appName: 'Boxmoc'
+                appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'
               })
             });
 
@@ -106,8 +106,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             
             await sendEmail({
               to: email,
-              subject: `Welcome to Boxmoc!`,
-              react: WelcomeEmail({ name: displayName, appName: 'Boxmoc' })
+              subject: `Welcome to ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'}!`,
+              react: WelcomeEmail({ name: displayName, appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc' })
             });
 
             // Create session after successful signup
@@ -126,6 +126,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             });
             
             return response;
+        } else if (route === 'google-signin') {
+            return NextResponse.redirect(new URL('/google-auth-handler', request.url));
 
         } else if (route === 'logout') {
             const response = NextResponse.redirect(new URL('/login', request.url));

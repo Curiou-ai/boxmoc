@@ -52,13 +52,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubscribeAuth: () => void = () => {};
     let unsubscribeProfile: () => void = () => {};
 
-    if (auth && db) {
-      unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
-        if (unsubscribeProfile) unsubscribeProfile();
+    // Create stable local references to satisfy TypeScript refinement in callbacks
+    const currentAuth = auth;
+    const currentDb = db;
+
+    if (currentAuth && currentDb) {
+      unsubscribeAuth = onAuthStateChanged(currentAuth, (firebaseUser) => {
+        if (unsubscribeProfile) unsubscribeProfile(); // Unsubscribe from previous profile listener
 
         if (firebaseUser) {
           // Real-time listener to Firestore user document for roles and metadata
-          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDocRef = doc(currentDb, 'users', firebaseUser.uid);
           unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
               const profileData = doc.data();
@@ -69,8 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
             setLoading(false);
           }, (error) => {
-            console.error("Firestore Profile Sync Error:", error);
-            setUser(firebaseUser as AppUser);
+            console.error("Error fetching user profile:", error);
+            setUser(firebaseUser as AppUser); // Fallback to just firebase user
             setLoading(false);
           });
         } else {
@@ -78,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       });
-    } else {
+    } else { // Firebase is not configured, likely in dev offline mode
       // Development offline mode
       setUser(mockUser);
       setLoading(false);
@@ -91,20 +95,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    if (process.env.NODE_ENV === 'development' && !auth) {
+    const currentAuth = auth;
+    // If in dev and offline, just clear the mock user
+    if (process.env.NODE_ENV === 'development' && !currentAuth) {
       setUser(null);
       router.push('/login');
       return;
     }
     
     try {
-      if (auth) await firebaseSignOut(auth);
-      // Ensure server-side session cookie is also cleared
+      if (currentAuth) await firebaseSignOut(currentAuth);
+      // Session cookie is HTTP-only, needs to be cleared by server
       await fetch('/api/auth/logout');
       setUser(null);
       router.push('/login');
     } catch (error) {
-      console.error("Sign-out error:", error);
+      console.error("Error signing out: ", error);
     }
   };
 
