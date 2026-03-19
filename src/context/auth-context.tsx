@@ -1,4 +1,3 @@
-
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
@@ -8,7 +7,9 @@ import { useRouter } from 'next/navigation';
 import { Loading } from '@/components/loading';
 import { doc, onSnapshot, DocumentData } from 'firebase/firestore';
 
-// Extend the User type to include our custom profile fields
+/**
+ * Extended User interface that includes Firestore profile data and roles.
+ */
 export interface AppUser extends User, DocumentData {
   role?: 'user' | 'admin';
   stripeCustomerId?: string;
@@ -16,6 +17,7 @@ export interface AppUser extends User, DocumentData {
   stripePriceId?: string;
   stripeCurrentPeriodEnd?: number;
   stripeSubscriptionStatus?: string;
+  status?: string;
 }
 
 interface AuthContextType {
@@ -24,12 +26,15 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+/**
+ * Mock user used for offline development when Firebase is not configured.
+ */
 const mockUser: AppUser = {
   uid: 'dev-user-123',
   displayName: 'Dev User',
   email: 'dev@example.com',
   photoURL: 'https://placehold.co/48x48.png',
-  role: 'user',
+  role: 'user', // Default dev role
   stripeCustomerId: 'cus_dev123',
   stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
   stripeSubscriptionStatus: 'active',
@@ -49,24 +54,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (auth && db) {
       unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
-        if (unsubscribeProfile) unsubscribeProfile(); // Unsubscribe from previous profile listener
+        if (unsubscribeProfile) unsubscribeProfile();
 
         if (firebaseUser) {
-          // Listen for profile changes in Firestore
+          // Real-time listener to Firestore user document for roles and metadata
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
               const profileData = doc.data();
               setUser({ ...firebaseUser, ...profileData } as AppUser);
             } else {
-               // This can happen briefly if the user doc hasn't been created yet.
-               // We fallback to the firebase user, and Firestore will sync up shortly.
+               // Fallback if document is still being created
                setUser(firebaseUser as AppUser);
             }
             setLoading(false);
           }, (error) => {
-            console.error("Error fetching user profile:", error);
-            setUser(firebaseUser as AppUser); // Fallback to just firebase user
+            console.error("Firestore Profile Sync Error:", error);
+            setUser(firebaseUser as AppUser);
             setLoading(false);
           });
         } else {
@@ -74,7 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       });
-    } else { // Firebase is not configured, likely in dev offline mode
+    } else {
+      // Development offline mode
       setUser(mockUser);
       setLoading(false);
     }
@@ -86,7 +91,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    // If in dev and offline, just clear the mock user
     if (process.env.NODE_ENV === 'development' && !auth) {
       setUser(null);
       router.push('/login');
@@ -94,15 +98,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      if (auth) {
-        await firebaseSignOut(auth);
-      }
-      // Session cookie is HTTP-only, needs to be cleared by server
+      if (auth) await firebaseSignOut(auth);
+      // Ensure server-side session cookie is also cleared
       await fetch('/api/auth/logout');
-      setUser(null); // Clear user state immediately
+      setUser(null);
       router.push('/login');
     } catch (error) {
-      console.error("Error signing out: ", error);
+      console.error("Sign-out error:", error);
     }
   };
 

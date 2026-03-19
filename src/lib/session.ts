@@ -4,6 +4,9 @@ import { DecodedIdToken } from 'firebase-admin/auth';
 import admin from './firebase-admin';
 import { stripe } from './stripe';
 
+/**
+ * Defines the user profile structure stored in Firestore.
+ */
 export interface UserProfile {
   role: 'user' | 'admin';
   email: string;
@@ -13,17 +16,23 @@ export interface UserProfile {
   lastActiveAt?: string;
   status?: 'active' | 'churned' | 'onboarding' | 'trialing';
   notes?: Array<{ id: string; content: string; author: string; createdAt: string }>;
-  // Stripe fields
+  // Stripe integration fields
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
   stripePriceId?: string;
-  stripeCurrentPeriodEnd?: number; // Store as Unix timestamp
+  stripeCurrentPeriodEnd?: number; // Unix timestamp
   stripeSubscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete' | 'unpaid';
 }
 
-// The session object will include both Auth data and Firestore profile data
+/**
+ * Combined session object including Auth token data and Firestore profile data.
+ */
 export type UserSession = DecodedIdToken & UserProfile;
 
+/**
+ * Retrieves and validates the current user session from the request cookies.
+ * Also synchronizes/lazy-initializes the user profile in Firestore.
+ */
 export async function getSession(): Promise<UserSession | null> {
   const sessionCookie = (await cookies()).get('session')?.value;
   if (!sessionCookie) {
@@ -39,9 +48,11 @@ export async function getSession(): Promise<UserSession | null> {
 
     const now = new Date().toISOString();
 
+    // Lazy-initialize user document if it doesn't exist (e.g., first-time Google sign-in)
     if (!userDoc.exists) {
       const authUser = await admin.auth().getUser(decodedIdToken.uid);
       
+      // Initialize Stripe Customer
       const stripeCustomer = await stripe.customers.create({
         email: authUser.email,
         name: authUser.displayName,
@@ -56,24 +67,25 @@ export async function getSession(): Promise<UserSession | null> {
         photoURL: authUser.photoURL || null,
         createdAt: now,
         lastActiveAt: now,
-        role: 'user',
+        role: 'user', // Default role for all new signups
         status: 'onboarding',
         stripeCustomerId: stripeCustomer.id,
       };
-      await userDocRef.set(newUserProfile);
       
+      await userDocRef.set(newUserProfile);
       return { ...decodedIdToken, ...newUserProfile };
     }
 
     const userProfile = userDoc.data() as UserProfile;
 
-    // Background update of lastActiveAt
+    // Background update of lastActiveAt for usage velocity tracking
     await userDocRef.update({ lastActiveAt: now });
 
     return { ...decodedIdToken, ...userProfile, lastActiveAt: now };
 
   } catch (error) {
-    console.error('Error verifying session cookie or fetching user profile:', error);
+    console.error('Session validation error:', error);
+    // Delete invalid session cookie
     (await cookies()).delete('session');
     return null;
   }

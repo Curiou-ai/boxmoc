@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import admin from '@/lib/firebase-admin';
 import { z } from 'zod';
@@ -10,7 +10,9 @@ import WelcomeEmail from '@/emails/WelcomeEmail';
 import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
 import { stripe } from '@/lib/stripe';
 
-
+/**
+ * Password validation schema to ensure security best practices.
+ */
 const passwordSchema = z.string()
   .min(8, { message: "Password must be at least 8 characters long." })
   .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
@@ -25,17 +27,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
 
     if (!app) {
-        console.error('Firebase is not initialized. Check your configuration.');
-        return NextResponse.json(
-            { error: 'Authentication service is not available.' },
-            { status: 503 }
-        );
+        return NextResponse.json({ error: 'Authentication service unavailable.' }, { status: 503 });
     }
 
     try {
         if (route === 'login') {
             const email = body.get('email') as string;
             const password = body.get('password') as string;
+            
             const clientAuth = getAuth(app);
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
             const idToken = await userCredential.user.getIdToken();
@@ -50,20 +49,21 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
               sameSite: 'lax',
             });
             
-            // Send sign-in notification
+            // Security notification for new login
             await sendEmail({
               to: email,
-              subject: `New Sign-In to Your ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'} Account`,
+              subject: `New Sign-In to Your Boxmoc Account`,
               react: SignInNotificationEmail({
                 email: email,
                 signInTime: new Date(),
                 ipAddress: request.headers.get('x-forwarded-for') || undefined,
                 userAgent: request.headers.get('user-agent'),
-                appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'
+                appName: 'Boxmoc'
               })
             });
 
             return response;
+
         } else if (route === 'signup') {
             const email = body.get('email') as string;
             const password = body.get('password') as string;
@@ -72,42 +72,45 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             const passwordValidation = passwordSchema.safeParse(password);
             if (!passwordValidation.success) {
                 const errorMessage = passwordValidation.error.errors[0].message;
-                const url = request.nextUrl.clone()
+                const url = request.nextUrl.clone();
                 url.pathname = '/signup';
                 url.searchParams.set('error', errorMessage);
                 return NextResponse.redirect(url);
             }
 
+            // Create Firebase Auth user
             const userRecord = await admin.auth().createUser({
                 email,
                 password,
                 displayName,
             });
 
+            // Create Stripe Customer
             const stripeCustomer = await stripe.customers.create({
                 email,
                 name: displayName,
-                metadata: {
-                    firebaseUID: userRecord.uid,
-                },
+                metadata: { firebaseUID: userRecord.uid },
             });
             
+            // Create Firestore User Document
             const db = admin.firestore();
             await db.collection('users').doc(userRecord.uid).set({
                 email: userRecord.email,
                 displayName: userRecord.displayName || '',
                 photoURL: userRecord.photoURL || null,
                 createdAt: new Date().toISOString(),
-                role: 'user',
+                role: 'user', // Default role
                 stripeCustomerId: stripeCustomer.id,
+                status: 'active'
             });
             
             await sendEmail({
               to: email,
-              subject: `Welcome to ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'}!`,
-              react: WelcomeEmail({ name: displayName, appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc' })
+              subject: `Welcome to Boxmoc!`,
+              react: WelcomeEmail({ name: displayName, appName: 'Boxmoc' })
             });
 
+            // Create session after successful signup
             const clientAuth = getAuth(app);
             const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
             const idToken = await userCredential.user.getIdToken();
@@ -124,9 +127,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
             
             return response;
 
-        } else if (route === 'google-signin') {
-            return NextResponse.redirect(new URL('/google-auth-handler', request.url));
-
         } else if (route === 'logout') {
             const response = NextResponse.redirect(new URL('/login', request.url));
             response.cookies.delete('session');
@@ -134,11 +134,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }
 
     } catch (error: any) {
-        console.error(error);
-        const url = request.nextUrl.clone()
-        url.pathname = route === 'login' ? '/login' : '/signup'
-        url.searchParams.set('error', error.message)
-        return NextResponse.redirect(url)
+        console.error('Auth API Error:', error);
+        const url = request.nextUrl.clone();
+        url.pathname = route === 'login' ? '/login' : '/signup';
+        url.searchParams.set('error', error.message);
+        return NextResponse.redirect(url);
     }
 
     return NextResponse.json({ error: 'Invalid route' }, { status: 404 });
@@ -150,13 +150,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     if(route === 'session') {
         const sessionCookie = (await cookies()).get('session')?.value;
-        if(!sessionCookie) {
-            return NextResponse.json({ session: null }, { status: 401 });
-        }
+        if(!sessionCookie) return NextResponse.json({ session: null }, { status: 401 });
+        
         try {
             const decodedIdToken = await admin.auth().verifySessionCookie(sessionCookie, true);
             return NextResponse.json({ session: decodedIdToken });
-        } catch (error) {
+        } catch {
             return NextResponse.json({ session: null }, { status: 401 });
         }
     }
