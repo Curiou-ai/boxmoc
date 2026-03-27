@@ -44,7 +44,7 @@ export default function ContactPage() {
         </nav>
       </header>
       <main className="py-12 md:py-24">
-        <div className="container px-4 md:px-6">
+        <div className="container px-4 md:px-6 w-full mx-auto">
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 items-start">
             <div className="space-y-8">
                 <div>
@@ -106,13 +106,13 @@ export default function ContactPage() {
                 </div>
             </div>
             
-            <Card className="w-full">
+            <Card className="w-full h-full">
               <CardHeader>
                 <CardTitle className="font-headline text-2xl">Send us a message</CardTitle>
               </CardHeader>
               <CardContent>
                 <form action={formAction} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
                       <Input id="name" name="name" placeholder="Your Name" required />
@@ -123,6 +123,26 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="company">Company Name</Label>
+                      <Input id="company" name="company" placeholder="Your Company, Inc." />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number (Optional)</Label>
+                      <Input id="phone" name="phone" type="tel" placeholder="+1 (555) 000-0000" />
+                    </div>
+                  </div> */}
+                  <div className="flex flex-row sm:flex-col justify-between sm:justify-center gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" name="name" placeholder="Your Name" required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+                    </div>
+                  </div>
+                  <div className="flex flex-row sm:flex-col justify-between sm:justify-center gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="company">Company Name</Label>
                       <Input id="company" name="company" placeholder="Your Company, Inc." />
