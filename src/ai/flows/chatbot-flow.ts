@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A chatbot flow for handling user queries.
@@ -9,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { handleRequestHelp } from '@/app/actions';
 
 // Static data for tools
 const FAQ_DATA = `
@@ -128,17 +128,15 @@ export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
 
 const systemPrompt = `You are a support assistant for Boxmoc.
     Your ONLY function is to answer questions about Boxmoc's services, policies, and FAQs using the provided tools.
-    - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or how to contact us (e.g., if a user asks for the company email or phone number).
+    - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or how to contact us.
     - Use 'getFaq' for frequently asked questions.
     - Use 'getPrivacyPolicy' for privacy-related questions.
     - Use 'getTermsAndConditions' for questions about terms of service.
-    - Use 'contactTeam' if the user explicitly wants to send a message, file a support ticket, or contact the team for non-urgent matters.
+    - Use 'contactTeam' if the user explicitly wants to send a message or contact the team.
     
-    If a user asks a question that is not related to Boxmoc or cannot be answered with your tools, you MUST politely decline. Respond with something like: "I can only answer questions about Boxmoc. How can I help you with our services?"
+    If a user asks a question that is not related to Boxmoc or cannot be answered with your tools, you MUST politely decline. 
     
-    Do not invent information or answer general knowledge questions.
-
-    Format your responses using Markdown. Use paragraphs for longer blocks of text. For lists of items, use bullet points (e.g., using '*' or '-').
+    Format your responses using Markdown.
     
     If the user asks to speak to a person or agent, use the 'transferToLiveAgent' tool.`;
 
@@ -169,15 +167,16 @@ const chatbotFlow = ai.defineFlow(
         const { output } = await chatbotPrompt(input);
         return output as string;
     } catch (error) {
-        console.warn('Gemini model failed, switching to OpenAI fallback.', error);
-        try {
-            const openAiUrl = process.env.OPENAI_API_URL ?? '';
-            const openAiKey = process.env.OPENAI_API_KEY ?? '';
+        console.warn('Gemini model failed, checking fallback.', error);
+        
+        const openAiUrl = process.env.OPENAI_API_URL;
+        const openAiKey = process.env.OPENAI_API_KEY;
 
-            if (!openAiUrl && !openAiKey) {
-                throw new Error("OpenAI environment variables are not set.");
-            }
-            
+        if (!openAiUrl || !openAiKey) {
+            return 'I am having trouble connecting to my brain right now. Please try again in a moment.';
+        }
+        
+        try {
             const messages = [
                 { role: 'system', content: systemPrompt },
                 ...(input.history || []).map(h => ({ role: h.role === 'model' ? 'assistant' : 'user', content: h.content })),
@@ -197,15 +196,14 @@ const chatbotFlow = ai.defineFlow(
             });
 
             if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`OpenAI API request failed: ${response.status} ${response.statusText} - ${errorBody}`);
+                throw new Error(`OpenAI API request failed: ${response.status}`);
             }
 
             const data = await response.json();
-            return data.choices[0]?.message?.content || 'Sorry, the fallback model could not provide a response.';
+            return data.choices[0]?.message?.content || 'Sorry, I am having trouble responding right now.';
             
         } catch (fallbackError) {
-            console.error('OpenAI fallback model also failed.', fallbackError);
+            console.error('Fallback model also failed.', fallbackError);
             return 'Sorry, I am having trouble connecting to my knowledge base right now. Please try again later.';
         }
     }

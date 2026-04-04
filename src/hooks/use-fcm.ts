@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,8 +7,7 @@ import { getToken, onMessage, type Messaging } from 'firebase/messaging';
 import { useToast } from './use-toast';
 
 /**
- * Hook to manage Firebase Cloud Messaging permissions, tokens, and messages.
- * Requires NEXT_PUBLIC_FIREBASE_VAPID_KEY in .env.local
+ * Hook to manage Firebase Cloud Messaging permissions and real-time updates.
  */
 export function useFCM() {
   const [token, setToken] = useState<string | null>(null);
@@ -15,7 +15,6 @@ export function useFCM() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Messaging can only be initialized on the client
     getMessagingInstance().then(setMessaging);
   }, []);
 
@@ -26,31 +25,28 @@ export function useFCM() {
       try {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-          // vapidKey is required to generate the registration token
           const fcmToken = await getToken(messaging, {
             vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
           });
           
           if (fcmToken) {
             setToken(fcmToken);
-            // Note: You should save this token to your user's document in Firestore 
-            // to target notifications to them from the backend.
-            console.log('FCM Token Generated:', fcmToken);
+            // In a production app, you would save this token to the user document
+            // console.log('SaaS Registration Token:', fcmToken);
           }
         }
       } catch (error) {
-        console.error('Failed to setup FCM:', error);
+        console.error('FCM Setup Failed:', error);
       }
     };
 
     setupFCM();
 
-    // Listen for messages while the app is in the foreground
+    // Foreground listener for real-time order updates
     const unsubscribe = onMessage(messaging, (payload) => {
-      console.log('Foreground message received:', payload);
       toast({
-        title: payload.notification?.title || 'New Notification',
-        description: payload.notification?.body || '',
+        title: payload.notification?.title || 'Order Update',
+        description: payload.notification?.body || 'Your shipment status has changed.',
       });
     });
 

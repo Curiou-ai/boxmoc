@@ -1,9 +1,7 @@
-import { initializeApp, getApps } from "firebase/app";
-import type { FirebaseApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import type { Auth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import type { Firestore } from "firebase/firestore";
+
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const prodConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -27,30 +25,17 @@ const isConfigComplete = (config: any) => {
   return config && Object.values(config).every(value => value);
 };
 
-
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 
 if (process.env.NODE_ENV === 'production') {
   if (isConfigComplete(prodConfig)) {
-    if (!getApps().length) {
-      app = initializeApp(prodConfig);
-    } else {
-      app = getApps()[0];
-    }
-  } else {
-    console.error("Production Firebase config is incomplete. App will not function correctly.");
+    app = !getApps().length ? initializeApp(prodConfig) : getApps()[0];
   }
-} else { // Development environment
+} else {
   if (isConfigComplete(devConfig)) {
-    if (!getApps().length) {
-      app = initializeApp(devConfig);
-    } else {
-      app = getApps()[0];
-    }
-  } else {
-    console.warn("Development Firebase config is incomplete. Running in offline mode.");
+    app = !getApps().length ? initializeApp(devConfig) : getApps()[0];
   }
 }
 
@@ -59,9 +44,6 @@ if (app) {
   db = getFirestore(app);
 }
 
-/**
- * Safely gets the FCM messaging instance on the client side.
- */
 export const getMessagingInstance = async () => {
   if (typeof window === 'undefined' || !app) return null;
   try {
@@ -69,8 +51,8 @@ export const getMessagingInstance = async () => {
     if (await isSupported()) {
       return getMessaging(app);
     }
-  } catch (error) {
-    console.error('Messaging is not supported in this browser.', error);
+  } catch (e) {
+    return null;
   }
   return null;
 };
