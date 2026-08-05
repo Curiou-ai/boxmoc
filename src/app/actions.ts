@@ -5,13 +5,15 @@ import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-des
 import { askChatbot, ChatbotInput } from '@/ai/flows/chatbot-flow';
 import { translateText, TranslateTextInput, TranslateTextOutput } from '@/ai/flows/translate-flow';
 import { sendEmail } from '@/lib/email-service';
+import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
+import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
 import admin from '@/lib/firebase-admin';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
 import { getSession, UserProfile } from '@/lib/session';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
-import { ContactFormSchema, WaitlistSchema } from '@/lib/validations';
+import { ContactFormSchema, EmailSchema, NameSchema, WaitlistSchema } from '@/lib/validations';
 import { revalidatePath } from 'next/cache';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
 
@@ -21,7 +23,7 @@ export interface Order {
     id: string;
     userId: string;
     tenantId: string;
-    status: 'CREATED' | 'PRICED' | 'MATCHED' | 'IN_PRODUCTION' | 'SHIPPED' | 'DELIVERED';
+    status: 'CREATED' | 'PRICED' | 'MATCHED' | 'IN_PRODUCTION' | 'SHIPPED' | 'DELIVERED'; //string
     designId: string;
     supplierId?: string;
     logisticsId?: string;
@@ -32,7 +34,11 @@ export interface Order {
     createdAt: string;
     shippingAddress: any;
 }
-
+export interface UploadState {
+    success: boolean;
+    message: string;
+    imageUrl?: string;
+}
 export interface Supplier {
     id: string;
     name: string;
@@ -48,7 +54,31 @@ export interface Asset {
     name: string;
     createdAt: string;
 }
-
+  
+  export interface ChatbotState {
+    response: string;
+    error?: string;
+  }
+  
+  export interface TranslationState {
+      translatedText?: string;
+      error?: string;
+  }
+  
+  export interface ActivationState {
+      success: boolean;
+      message: string;
+  }
+  
+  
+  export interface WaitlistUser {
+      id: string;
+      email: string;
+      status: 'waitlisted' | 'active' | 'redeemed';
+      code: string | null;
+      createdAt: string;
+      source?: string;
+  }
 export interface CRMUser extends UserProfile {
     uid: string;
 }
@@ -60,11 +90,21 @@ export interface ContactSubmission {
     company?: string;
     phone?: string;
     message: string;
-    status: 'new' | 'contacted' | 'closed';
+    status?: 'new' | 'contacted' | 'closed';
     source: string;
     createdAt: string;
     notes?: Array<{ id: string; content: string; author: string; createdAt: string }>;
 }
+export interface CRMUser extends UserProfile {
+    uid: string;
+}
+
+export interface OrderSessionState {
+  sessionId?: string;
+  error?: string;
+}
+
+// --- Image Assets ---
 
 export type FormState = {
     message: string;
@@ -77,6 +117,14 @@ export type HelpFormState = {
     message: string;
     success?: boolean;
     fields?: Record<string, any>;
+    // fields?: {
+    //     name?: string;
+    //     email?: string;
+    //     company?: string;
+    //     phone?: string;
+    //     prompt?: string;
+    //     notes?: string;
+    //   };
 };
 
 export type WaitlistState = {
@@ -135,6 +183,7 @@ export async function matchSupplier(orderId: string): Promise<{ success: boolean
 
 // --- Order Lifecycle Management ---
 
+
 export async function createOrderPipeline(data: Partial<Order>): Promise<{ success: boolean; orderId?: string }> {
     const session = await getSession();
     if (!session) return { success: false };
@@ -163,9 +212,16 @@ export async function getWaitlistUsers() {
     if (!session || session.role !== 'admin') return [];
     const db = admin.firestore();
     const snapshot = await db.collection('waitlist').orderBy('createdAt', 'desc').get();
+    if (snapshot.empty){
+        return [];
+    }
     return snapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data(),
+        // email: doc.data().email,
+        // status: doc.data().status,
+        // code: doc.data().code,
+        // source: doc.data().source,
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
     } as any));
 }
@@ -182,14 +238,25 @@ export async function getCRMUsers() {
     } as CRMUser));
 }
 
-export async function getContactSubmissions() {
+export async function getContactSubmissions(): Promise<ContactSubmission[]> {
     const session = await getSession();
     if (!session || session.role !== 'admin') return [];
     const db = admin.firestore();
     const snapshot = await db.collection('contact_submissions').orderBy('createdAt', 'desc').get();
+    if (snapshot.empty){
+        return [];
+    }
     return snapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data(),
+        // name: doc.data().name,
+        // email: doc.data().email,
+        // company: doc.data().company,
+        // phone: doc.data().phone,
+        // message: doc.data().message,
+        // status: doc.data().status || 'new',
+        // notes: doc.data().notes || [],
+        // source: doc.data().source || 'web_form',
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
     } as ContactSubmission));
 }
@@ -218,7 +285,7 @@ export async function getUserOrders(): Promise<Order[]> {
     });
 }
 
-export async function updateCRMUserStatus(userId: string, status: string) {
+export async function updateCRMUserStatus(userId: string, status: string): Promise<{ success: boolean }> {
     const session = await getSession();
     if (!session || session.role !== 'admin') return { success: false };
     const db = admin.firestore();
@@ -236,13 +303,13 @@ export async function updateContactStatus(contactId: string, status: string) {
     return { success: true };
 }
 
-export async function addCRMNote(type: 'user' | 'contact', id: string, content: string) {
+export async function addCRMNote(type: 'user' | 'contact', id: string, content: string): Promise<{ success: boolean }> {
     const session = await getSession();
     if (!session || session.role !== 'admin') return { success: false };
     
     const db = admin.firestore();
     const note = {
-        id: randomBytes(8).toString('hex'),
+        id: randomBytes(8).toString('hex'), //id: Math.random().toString(36).substr(2, 9),
         content,
         author: session.displayName || 'Admin',
         createdAt: new Date().toISOString(),
@@ -260,28 +327,36 @@ export async function addCRMNote(type: 'user' | 'contact', id: string, content: 
 // --- Waitlist Orchestration ---
 
 export async function sendAccessCode(email: string) {
+  //session to bypass the need to waitlist admins and send Access code
   const session = await getSession();
   if (!session || session.role !== 'admin') return { success: false, message: 'Unauthorized' };
 
-  const accessCode = randomBytes(4).toString('hex').toUpperCase();
-  const db = admin.firestore();
   
-  const query = await db.collection('waitlist').where('email', '==', email).limit(1).get();
-  if (query.empty) return { success: false, message: 'User not found' };
+  const db = admin.firestore();
+  if (!email) return { success: false, message: "Email is required." };
+  try{
+    const query = await db.collection('waitlist').where('email', '==', email).limit(1).get();
+    // const query = await db.collection('waitlist').where('email', '==', email).where("status","==","waitlisted").get();
+    if (query.empty) return { success: false, message: 'User not found or already active' };
 
-  await query.docs[0].ref.update({ 
-    status: 'active', 
-    code: accessCode 
-  });
+    const accessCode = randomBytes(4).toString('hex').toUpperCase();
+    await query.docs[0].ref.update({ 
+        status: 'active', 
+        code: accessCode 
+    });
 
-  await sendEmail({
-    to: email,
-    subject: "Your Boxmoc Early Access Code",
-    react: WaitlistAccessCodeEmail({ accessCode, companyName: "Boxmoc" })
-  });
+    await sendEmail({
+        to: email,
+        subject: "Your Boxmoc Early Access Code",
+        react: WaitlistAccessCodeEmail({ accessCode, companyName: "Boxmoc" })
+    });
 
-  revalidatePath('/admin');
-  return { success: true, message: 'Access code sent successfully.' };
+    revalidatePath('/admin');
+    return { success: true, message: `Access code sent successfully to ${email}.` };
+  } catch (error){
+    console.error(error);
+    return {success: false, message:"Error sending access code."}
+  }
 }
 
 export async function handleValidateAccessCode(prevState: any, formData: FormData) {
@@ -309,34 +384,61 @@ export async function handleValidateAccessCode(prevState: any, formData: FormDat
 export async function getUserAssets(): Promise<Asset[]> {
     const session = await getSession();
     if (!session) return [];
+    try {
+        const db = admin.firestore();
+        const snapshot = await db.collection('users').doc(session.uid).collection('assets')
+            .orderBy('createdAt', 'desc')
+            .get();
 
-    const db = admin.firestore();
-    const snapshot = await db.collection('users').doc(session.uid).collection('assets')
-        .orderBy('createdAt', 'desc')
-        .get();
+        if (snapshot.empty) return [];
 
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-    } as Asset));
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            url: doc.data().url,
+            name: doc.data().name,
+            //...doc.data(), 
+            createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        } as Asset));
+    } catch(error){
+        console.error("Error fetching assets:", error);
+        return [];
+    }
 }
 
-export async function handleUploadDesignImage(formData: FormData) {
+export async function handleUploadDesignImage(formData: FormData): Promise<UploadState> {
     const session = await getSession();
-    if (!session) return { success: false, message: 'Unauthorized' };
+    if (!session) {
+        return { success: false, message: 'You must be logged in to upload images.' };
+    }
 
     const file = formData.get('image') as File;
-    if (!file) return { success: false, message: 'No file provided' };
+    if (!file) {
+        return { success: false, message: 'No image file provided.' };
+    }
+
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_SIZE) {
+        return { success: false, message: 'File is too large. Maximum size is 10MB.' };
+    }
+
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        return { success: false, message: 'Invalid file format. Please upload JPEG, PNG, or WebP.' };
+    }
 
     try {
         const buffer = Buffer.from(await file.arrayBuffer());
         const fileName = `assets/${session.uid}/${Date.now()}-${file.name}`;
+        const extension = file.type.split('/')[1];
         const bucket = admin.storage().bucket();
         const fileRef = bucket.file(fileName);
 
         await fileRef.save(buffer, {
-            metadata: { contentType: file.type },
+            metadata: {
+                contentType: file.type,
+                cacheControl: 'public, max-age=31536000',
+            },
+            public: true,
         });
 
         // Make file public for preview (or use signed URLs in production)
@@ -348,9 +450,10 @@ export async function handleUploadDesignImage(formData: FormData) {
             url: publicUrl,
             name: file.name,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            type: file.type,
+            size: file.size
         });
-
-        return { success: true, imageUrl: publicUrl };
+        return { success: true, message: 'Image uploaded successfully!', imageUrl: publicUrl };
     } catch (error: any) {
         console.error('Upload error:', error);
         return { success: false, message: error.message };
@@ -361,13 +464,15 @@ export async function handleUploadDesignImage(formData: FormData) {
 
 export async function handleGenerateDesign(prevState: any, formData: FormData) {
   const prompt = formData.get('prompt') as string;
-  if (!prompt || prompt.length < 10) return { message: 'Prompt too short.' };
+  if (!prompt || typeof prompt !== 'string' || prompt.trim().length < 10) return { message: 'Please provide a more detailed description (min 10 chars).',
+    fields: { prompt: prompt?.toString() || "" }, };
+  
   
   try {
     const result = await generateDesign({ prompt });
     return { message: 'Design generated!', design: result, success: true };
   } catch (error) {
-    console.error('Design generation error:', error);
+    console.error('Failed to generate design:', error);
     return { message: 'Generation failed. Please try again later.' };
   }
 }
@@ -382,20 +487,24 @@ export async function handleJoinWaitlist(prevState: any, formData: FormData) {
     const query = await db.collection('waitlist').where('email', '==', email).limit(1).get();
     
     if (!query.empty) {
-        return { message: 'You are already on the list!', success: true };
+        redirect('/waitlist/congratulations');
+        // return { message: 'You are already on the list!', success: true };
     }
 
     await db.collection('waitlist').add({
       email,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       status: 'waitlisted',
+      code: null,
       source: 'web_form'
     });
-    redirect('/waitlist/congratulations');
+    
   } catch (e) {
     if (e instanceof Error && e.message.includes('NEXT_REDIRECT')) throw e;
-    return { message: 'Error joining waitlist.', success: false };
+    console.error("Error joining waitlist:", e)
+    return { message: 'Error joining waitlist. Please try again', success: false, fields: {email} };
   }
+  redirect('/waitlist/congratulations');
 }
 
 export async function handleChatbotQuery(prevState: any, formData: FormData) {
@@ -410,42 +519,77 @@ export async function handleChatbotQuery(prevState: any, formData: FormData) {
   }
 }
 
-export async function handleRequestHelp(prevState: any, formData: FormData) {
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
-  const company = formData.get('company') as string;
-  const phone = formData.get('phone') as string;
-  const prompt = formData.get('prompt') as string;
-  const notes = formData.get('notes') as string;
+export async function handleRequestHelp(prevState: any, formData: FormData): Promise<HelpFormState> {
+//   const name = formData.get('name') as string;
+//   const email = formData.get('email') as string;
+//   const company = formData.get('company') as string;
+//   const phone = formData.get('phone') as string;
+//   const prompt = formData.get('prompt') as string;
+//   const notes = formData.get('notes') as string;
 
-  const validation = ContactFormSchema.safeParse({ name, email, company, phone, prompt, notes });
-  if (!validation.success) {
-      return { message: validation.error.errors[0].message, success: false, fields: { name, email, prompt, notes } };
-  }
+//   const validation = ContactFormSchema.safeParse({ name, email, company, phone, prompt, notes });
+    const fields = {
+        name: formData.get('name')?.toString() || '',
+        email: formData.get('email')?.toString() || '',
+        company: formData.get('company')?.toString() || '',
+        phone: formData.get('phone')?.toString() || '',
+        prompt: formData.get('prompt')?.toString() || '',
+        notes: formData.get('notes')?.toString() || '',
+    }
 
+    const validation = ContactFormSchema.safeParse(fields);
+
+    if (!validation.success) {
+        return { message: validation.error.errors[0].message, success: false, fields /*fields: { name, email, prompt, notes }*/ };
+    }
+    const companyEmail = process.env.COMPANY_EMAIL;
+    const messageContent = fields.prompt || fields.notes;
   try {
       const db = admin.firestore();
       await db.collection('contact_submissions').add({
-          name,
-          email,
-          company,
-          phone,
-          message: prompt || notes,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          status: 'new',
-          source: 'support_request'
+        //   name,
+        //   email,
+        //   company,
+        //   phone,
+        //   message: prompt || notes,
+        ...fields,
+        message: messageContent,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        status: 'new',
+        source: 'support_request'
       });
-      return { message: 'Your request has been sent to our design experts.', success: true };
+        if (companyEmail) {
+            await sendEmail({
+            to: fields.email,
+            subject: "We've received your message!",
+            react: ContactUserConfirmation({ name: fields.name, message: messageContent!, companyName: "Boxmoc" }),
+            });
+
+            await sendEmail({
+            to: companyEmail,
+            subject: `New Contact Form Submission from ${fields.name}`,
+            react: ContactCompanyNotification({ 
+                name: fields.name, 
+                email: fields.email, 
+                company: fields.company,
+                phone: fields.phone,
+                message: messageContent!,
+            }),
+            });
+        }
+      return { message: "Your request has been sent! We'll get back to you shortly.", success: true };
   } catch (error) {
-      return { message: 'Failed to send request.', success: false };
+      console.error('Error sending request:', error);
+      return { message: 'Failed to send request.', fields, success: false };
   }
 }
 
-export async function translateHeadline(currentText: string, targetLanguage: string) {
+export async function translateHeadline(currentText: string, targetLanguage: string): Promise<TranslationState> {
     try {
         const result = await translateText({ text: currentText, targetLanguage });
         return { translatedText: result.translatedText };
     } catch (error) {
+        console.error('Translation error:', error);
         return { error: 'Translation failed.' };
     }
 }

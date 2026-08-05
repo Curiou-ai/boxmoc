@@ -118,7 +118,7 @@ export default function LandingPage() {
                     </Button>
                   </div>
                   <div className='flex items-center justify-start md:justify-center'>
-                    <BoxmocAI className='shadow-2xl max-w-sm'/>
+                    <BoxmocAI className='rounded-lg shadow-2xl max-w-sm border border-primary'/>
                   </div>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function LandingPage() {
             <div className="relative space-y-4 md:pl-10">
               <div className="hidden md:absolute md:left-0 md:top-0 md:h-full md:w-px md:bg-slate-200" />
 
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90">
                 <BrainCircuit className="h-6 w-6" />
               </div>
 

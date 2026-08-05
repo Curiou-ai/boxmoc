@@ -18,16 +18,35 @@ import { useRouter } from 'next/navigation';
 
 const pricingPlans = [
     {
-        name: 'Starter',
+        name: 'Free',
         icon: Box,
         description: 'Perfect for individuals and hobbyists starting out with AI-powered design.',
-        monthlyPrice: 10.99,
-        yearlyPrice: 9,
+        monthlyPrice: 0,
+        yearlyPrice: 0,
+        priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID_MONTHLY!,
+        priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID_YEARLY!,
+        isTrial: false,
+        features: [
+            '10 AI Design Generations / month',
+            'Standard 3D Previews',
+            'Access to Basic Templates',
+            '1 User Seat',
+            'Community Support',
+            'Export Watermarked Designs'
+        ],
+        buttonText: 'Get Started',
+    },
+    {
+        name: 'Pro',
+        icon: Box,
+        description: 'Perfect for individuals and hobbyists starting out with AI-powered design.',
+        monthlyPrice: 12,
+        yearlyPrice: 10,
         priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID_MONTHLY!,
         priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID_YEARLY!,
         isTrial: true,
         discountInfo: {
-            text: "Originally $29/mo - Save over 60%",
+            text: "Originally $20/mo - Save over 60%",
             subtext: "No credit card required for trial"
         },
         features: [
@@ -41,13 +60,14 @@ const pricingPlans = [
         buttonText: 'Start Free Trial',
     },
     {
-        name: 'Pro',
+        name: 'Business',
         icon: Rocket,
         description: 'For professionals and small teams who need advanced features and more creative power.',
-        monthlyPrice: 35,
+        monthlyPrice: 36,
         yearlyPrice: 30,
         priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_MONTHLY!,
         priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID_YEARLY!,
+        isTrial: true,
         features: [
             'Unlimited AI Design Generations',
             'High-Resolution 3D Previews',
@@ -56,7 +76,7 @@ const pricingPlans = [
             'Priority Email Support',
             'Upload Custom Assets & Logos'
         ],
-        buttonText: 'Get Pro',
+        buttonText: 'Start Free Trial',
         popular: true,
     },
     {
@@ -158,67 +178,72 @@ export default function PricingPage() {
                 return (
                   <div key={plan.name} className="relative pt-6 h-full">
                     {plan.isTrial && (
-                      <Badge className="absolute top-0 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 hover:bg-amber-400/90 font-bold px-4 py-1 text-sm">
+                      <Badge className="absolute top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 hover:bg-amber-400/90 font-bold px-4 py-1 text-sm">
                         7-DAY FREE TRIAL
                       </Badge>
                     )}
-                    <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border-2 border-pink-500 shadow-xl' : 'border')}>
-                      <CardHeader className="items-start space-y-4">
-                          <div className="flex items-center gap-4 w-full">
-                              <div className="p-3 bg-muted rounded-lg">
-                                  <plan.icon className="h-6 w-6 text-primary" />
-                              </div>
-                              <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
-                              {plan.popular && <Badge className="ml-auto bg-pink-100 text-pink-600 border border-pink-300 hover:bg-pink-100">Most Popular</Badge>}
-                          </div>
-                        <CardDescription className="pt-2">{plan.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex-grow space-y-6">
-                          <div className="flex justify-between items-baseline">
-                              {isCustom ? (
-                                  <p className="text-4xl font-bold">{plan.priceText}</p>
-                              ) : (
-                                  <p>
-                                      <span className="text-4xl font-bold">${price}</span>
-                                      <span className="text-muted-foreground"> per month</span>
-                                  </p>
-                              )}
-                              {!isCustom && isYearly && (
-                                  <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
-                              )}
-                          </div>
-
-                          {plan.isTrial && plan.discountInfo && !isYearly && (
-                            <div className="bg-muted/50 text-center p-3 rounded-lg border">
-                              <p className="font-semibold text-sm text-foreground">{plan.discountInfo.text}</p>
-                              <p className="text-xs text-muted-foreground mt-1">{plan.discountInfo.subtext}</p>
+                    <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border border-transparent bg-origin-border bg-clip-content,padding-box,border-box bg-gradient-to-r from-accent to-primary shadow-xl' : 'border')}>
+                      <div className={`${plan.popular ? "border-2 border-transparent rounded-2xl bg-gradient-to-r from-accent to-primary [background-clip:padding-box,border-box] [background-origin:border-box] bg-[linear-gradient(to_right,hsl(var(--card)),hsl(var(--card)))] h-full" : ""}`}>
+                        <CardHeader className="items-start space-y-4">
+                            <div className="flex items-center gap-4 w-full">
+                                <div className="p-3 bg-muted rounded-lg">
+                                    <plan.icon className="h-6 w-6 text-primary" />
+                                </div>
+                                <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
+                                {plan.popular && <Badge className="ml-auto bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90 border border-primary">Most Popular</Badge>}
                             </div>
-                          )}
-                       
-                        <ul className="space-y-3 text-sm">
-                          {plan.features.map((feature, i) => (
-                            <li key={i} className="flex items-center gap-3">
-                              <Check className="h-5 w-5 text-primary" />
-                              <span className="text-muted-foreground">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                      <CardFooter>
-                        <Button 
-                              onClick={() => handleSubscribe(plan)}
-                              disabled={isCurrentPlan || isLoading === priceId}
-                              variant={isCurrentPlan ? 'outline' : (plan.popular ? 'default' : 'outline')} 
-                              className={cn('w-full', 
-                                  plan.popular && !isCurrentPlan && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
-                                  plan.isTrial && !isCurrentPlan && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
-                                  plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
-                              )}
-                          >
-                              {isLoading === priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                              {isCurrentPlan ? 'Current Plan' : plan.buttonText}
-                        </Button>
-                      </CardFooter>
+                          <CardDescription className="pt-2">{plan.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex-grow space-y-6">
+                            <div className="flex justify-between items-baseline">
+                                {isCustom ? (
+                                    <p className="text-4xl font-bold">{plan.priceText}</p>
+                                ) : (
+                                    <p>
+                                        <span className="text-4xl font-bold">${price}</span>
+                                        <span className="text-muted-foreground"> per month</span>
+                                    </p>
+                                )}
+                                {!isCustom && isYearly && (
+                                    <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
+                                )}
+                            </div>
+
+                            {/* {plan.isTrial && plan.discountInfo && !isYearly && (
+                              <div className="bg-muted/50 text-center p-3 rounded-lg border">
+                                <p className="font-semibold text-sm text-foreground">{plan.discountInfo.text}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{plan.discountInfo.subtext}</p>
+                              </div>
+                            )} */}
+                        
+                          <ul className="space-y-3 text-sm">
+                            {plan.features.map((feature, i) => (
+                              <li key={i} className="flex items-center gap-3">
+                                <Check className="h-5 w-5 text-primary" />
+                                <span className="text-muted-foreground">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                        <CardFooter>
+                          <Button 
+                                onClick={() => handleSubscribe(plan)}
+                                // disabled={isCurrentPlan || isLoading === priceId}
+                                variant={plan.popular ? 'default' : 'outline'} 
+                                className={cn('w-full', 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
+                                )}
+                                // className={cn('w-full', 
+                                //     plan.popular && !isCurrentPlan && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
+                                //     plan.isTrial && !isCurrentPlan && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
+                                //     plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
+                                // )}
+                            >
+                                {isLoading === priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                {/* {isCurrentPlan ? 'Current Plan' : plan.buttonText} */}
+                                {plan.buttonText}
+                          </Button>
+                        </CardFooter>
+                      </div>
                     </Card>
                   </div>
                 );
@@ -227,7 +252,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-       <footer className="w-full shrink-0 border-t mt-auto">
+      <footer className="w-full shrink-0 border-t mt-auto">
         <div className="container flex flex-col gap-2 sm:flex-row py-6 max-w-7xl items-center px-4 md:px-6">
             <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 Boxmoc. All rights reserved.</p>
             <nav className="sm:ml-auto flex gap-4 sm:gap-6">

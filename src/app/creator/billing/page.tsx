@@ -19,17 +19,25 @@ import { format } from "date-fns";
 
 const plans = [
     { 
-        name: "Starter", 
+        name: "Free", 
         priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!, 
-        price: "$10/mo", 
+        price: "$0/mo", 
         description: "For individuals and hobbyists.", 
         features: ["10 AI Credits", "Basic 3D Previews"],
         buttonText: "Subscribe",
     },
     { 
         name: "Pro", 
+        priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID!, 
+        price: "$12/mo", 
+        description: "For individuals and hobbyists.", 
+        features: ["1000 AI Credits", "HD 3D Previews"],
+        buttonText: "Subscribe",
+    },
+    { 
+        name: "Business", 
         priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID!, 
-        price: "$35/mo", 
+        price: "$20/mo", 
         description: "For professionals and small teams.", 
         features: ["Unlimited AI Credits", "HD 3D Previews", "Team Collaboration (5 seats)"],
         buttonText: "Subscribe",

@@ -23,8 +23,8 @@ export default function ChatbotSVG({
     >
       <defs>
         <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0f172a" />
-          <stop offset="100%" stopColor="#020617" />
+          <stop offset="0%" stopColor="#2a2622" />
+          <stop offset="100%" stopColor="#2a2622" />
         </linearGradient>
       </defs>
 
@@ -32,8 +32,8 @@ export default function ChatbotSVG({
       <rect width="380" height="640" rx="20" fill="url(#bg)" />
 
       {/* Header */}
-      <rect x="16" y="16" width="348" height="56" rx="14" fill="#020617" />
-      <circle cx="44" cy="44" r="14" fill="#1e293b" />
+      {/* <rect x="16" y="16" width="348" height="56" rx="14" fill="#020617" /> */}
+      <circle cx="44" cy="44" r="14" style={{ fill: "hsl(var(--muted))" }} />
       <rect x="36" y="38" width="16" height="12" rx="2" fill="#e5e7eb" />
       <rect x="40" y="34" width="8" height="6" rx="2" fill="#e5e7eb" />
 
@@ -49,7 +49,7 @@ export default function ChatbotSVG({
       </text>
 
       {/* Message Bubble */}
-      <rect x="24" y="96" width="300" height="72" rx="16" fill="#020617" />
+      <rect x="24" y="96" width="300" height="72" rx="16" style={{ fill: "hsl(var(--muted))" }} />
       <text
         x="40"
         y="124"
@@ -70,7 +70,7 @@ export default function ChatbotSVG({
       </text>
 
       {/* Action Buttons */}
-      <rect x="230" y="200" width="120" height="34" rx="17" fill="#020617" />
+      <rect x="230" y="200" width="120" height="34" rx="17" style={{ fill: "hsl(var(--background))" }} />
       <text
         x="290"
         y="222"
@@ -82,7 +82,7 @@ export default function ChatbotSVG({
         Services
       </text>
 
-      <rect x="230" y="244" width="120" height="34" rx="17" fill="#020617" />
+      <rect x="230" y="244" width="120" height="34" rx="17" style={{ fill: "hsl(var(--background))" }} />
       <text
         x="290"
         y="266"
@@ -94,7 +94,7 @@ export default function ChatbotSVG({
         FAQs
       </text>
 
-      <rect x="230" y="288" width="120" height="34" rx="17" fill="#1e293b" />
+      <rect x="230" y="288" width="120" height="34" rx="17" style={{ fill: "hsl(var(--background))" }} />
       <text
         x="290"
         y="310"
@@ -107,11 +107,11 @@ export default function ChatbotSVG({
       </text>
 
       {/* Input */}
-      <rect x="16" y="572" width="292" height="44" rx="22" fill="#020617" />
+      <rect x="16" y="572" width="292" height="44" rx="22" style={{ fill: "hsl(var(--background))" }}/>
       <text
         x="32"
         y="600"
-        fill="#64748b"
+        fill="#ffffff"
         fontSize="13"
         fontFamily="Inter, system-ui, -apple-system, sans-serif"
       >
@@ -119,7 +119,7 @@ export default function ChatbotSVG({
       </text>
 
       {/* Send Button */}
-      <rect x="316" y="572" width="44" height="44" rx="14" fill="#6366f1" />
+      <rect x="316" y="572" width="44" height="44" rx="14" style={{ fill: "hsl(var(--primary)" }} />
       <polygon points="332,586 350,594 332,602" fill="white" />
     </svg>
   );
