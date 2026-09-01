@@ -26,6 +26,11 @@ git commit --amend --reset-author
 ```
 <b><u>Configure Fine Grained Access Token</u></b>
 ```bash
+#remove remote origin
+git remote remove origin
+#change remote origin
+git remote set-url origin https://<github_key>@github.com/Curiou-ai/boxmoc
+#add remote origin
 git remote add origin https://<github_key>@github.com/Curiou-ai/boxmoc
 ```
 
