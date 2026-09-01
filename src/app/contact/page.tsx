@@ -53,56 +53,16 @@ export default function ContactPage() {
                         Have questions about pricing, plans, or how Boxmoc can work for you? Fill out the form and a product specialist will be in touch.
                     </p>
                 </div>
-                
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-bold font-headline">Our Offices</h2>
-                     <div className="grid sm:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <h3 className="font-semibold">United Kingdom</h3>
-                            <address className="not-italic text-muted-foreground space-y-2">
-                                <p className="flex items-start gap-2">
-                                    <MapPin className="h-5 w-5 mt-1 shrink-0" />
-                                    <span>30 Eastbourne Terrace<br/>Paddington, London<br/>W2 6LA, UK</span>
-                                </p>
-                                 <p className="flex items-center gap-2">
-                                    <Phone className="h-5 w-5" />
-                                    <a href="tel:+441351351051" className="hover:underline">+44 13 5135 1051</a>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <Mail className="h-5 w-5" />
-                                    <a href="mailto:sales@boxmoc.com" className="hover:underline">sales@boxmoc.com</a>
-                                </p>
-                            </address>
-                        </div>
-                         <div className="space-y-2">
-                            <h3 className="font-semibold">France</h3>
-                            <address className="not-italic text-muted-foreground space-y-2">
-                                <p className="flex items-start gap-2">
-                                    <MapPin className="h-5 w-5 mt-1 shrink-0" />
-                                    <span>266 Place Ernest Granier<br/>34000 Montpellier<br/>France</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <Phone className="h-5 w-5" />
-                                    <a href="tel:+33512182188" className="hover:underline">+33 5 12 18 21 88</a>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <Mail className="h-5 w-5" />
-                                    <a href="mailto:sales.fr@boxmoc.com" className="hover:underline">sales.fr@boxmoc.com</a>
-                                </p>
-                            </address>
-                        </div>
-                    </div>
-                </div>
                  <div className="space-y-4">
-                     <h2 className="text-2xl font-bold font-headline">The Team</h2>
-                    <Image 
-                        src="https://picsum.photos/seed/office/600/400"
-                        alt="Our team working in the office"
-                        width={600}
-                        height={400}
-                        className="rounded-lg object-cover"
-                        data-ai-hint="office team collaboration"
-                    />
+                  <h2 className="text-2xl font-bold font-headline">The Team</h2>
+                  <Image 
+                    src="https://picsum.photos/seed/office/600/400"
+                    alt="Our team working in the office"
+                    width={600}
+                    height={400}
+                    className="rounded-lg object-cover"
+                    data-ai-hint="office team collaboration"
+                  />
                 </div>
             </div>
             
@@ -163,6 +123,46 @@ export default function ContactPage() {
                 </form>
               </CardContent>
             </Card>
+
+            <div className="space-y-4">
+                  <h2 className="text-2xl font-bold font-headline">Our Offices</h2>
+                    <div className="grid sm:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                          <h3 className="font-semibold">United States</h3>
+                          <address className="not-italic text-muted-foreground space-y-2">
+                            <p className="flex items-start gap-2">
+                              <MapPin className="h-5 w-5 mt-1 shrink-0" />
+                              <span>742 Evergreen Terrace<br/>Springfield, OR<br/>97477, USA</span>
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <Phone className="h-5 w-5" />
+                              <a href="tel:+15415550199" className="hover:underline">+1 (541) 555-0199</a>
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <Mail className="h-5 w-5" />
+                              <a href="mailto:sales@boxmoc.com" className="hover:underline">sales@boxmoc.com</a>
+                            </p>
+                          </address>
+                      </div>
+                        {/* <div className="space-y-2">
+                          <h3 className="font-semibold">France</h3>
+                          <address className="not-italic text-muted-foreground space-y-2">
+                              <p className="flex items-start gap-2">
+                                  <MapPin className="h-5 w-5 mt-1 shrink-0" />
+                                  <span>266 Place Ernest Granier<br/>34000 Montpellier<br/>France</span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                  <Phone className="h-5 w-5" />
+                                  <a href="tel:+33512182188" className="hover:underline">+33 5 12 18 21 88</a>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                  <Mail className="h-5 w-5" />
+                                  <a href="mailto:sales.fr@boxmoc.com" className="hover:underline">sales.fr@boxmoc.com</a>
+                              </p>
+                          </address>
+                      </div> */}
+                  </div>
+                </div>
           </div>
         </div>
       </main>

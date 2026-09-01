@@ -150,7 +150,7 @@ export default function PricingPage() {
       <AnnouncementBar />
       <Navbar />
       <main className="flex-grow py-12 md:py-24">
-        <div className="container px-4 md:px-6 max-w-5xl mx-auto">
+        <div className="container px-4 md:px-6 max-w-7xl mx-auto">
           <div className="text-center space-y-4 mb-12">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tighter font-headline">Find the perfect plan for your creative needs</h1>
             <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl">
@@ -167,55 +167,69 @@ export default function PricingPage() {
             </Tabs>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 items-start">
             {pricingPlans.map((plan) => {
                 const isYearly = billingCycle === 'yearly';
                 const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
                 const isCustom = plan.priceText === 'Custom';
                 const priceId = isYearly ? plan.priceIdYearly : plan.priceIdMonthly;
-                const isCurrentPlan = user?.stripePriceId === priceId;
+                // const isCurrentPlan = user?.stripePriceId === priceId;
                 
                 return (
                   <div key={plan.name} className="relative pt-6 h-full">
                     {plan.isTrial && (
-                      <Badge className="absolute top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 hover:bg-amber-400/90 font-bold px-4 py-1 text-sm">
+                      <Badge className="absolute top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 hover:bg-amber-400/90 font-bold px-4 py-1 text-xs uppercase">
                         7-DAY FREE TRIAL
                       </Badge>
                     )}
                     <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border border-transparent bg-origin-border bg-clip-content,padding-box,border-box bg-gradient-to-r from-accent to-primary shadow-xl' : 'border')}>
                       <div className={`${plan.popular ? "border-2 border-transparent rounded-2xl bg-gradient-to-r from-accent to-primary [background-clip:padding-box,border-box] [background-origin:border-box] bg-[linear-gradient(to_right,hsl(var(--card)),hsl(var(--card)))] h-full" : ""}`}>
-                        <CardHeader className="items-start space-y-4">
-                            <div className="flex items-center gap-4 w-full">
-                                <div className="p-3 bg-muted rounded-lg">
-                                    <plan.icon className="h-6 w-6 text-primary" />
-                                </div>
-                                <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
-                                {plan.popular && <Badge className="ml-auto bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90 border border-primary">Most Popular</Badge>}
-                            </div>
+                        <CardHeader className="grid grid-cols-[minmax(0,1fr)] auto-rows-[57px] w-full justify-stretch items-start gap-4">
+                          <div className="flex items-center gap-4 w-full">
+                              <div className="p-3 bg-muted rounded-lg">
+                                <plan.icon className="h-6 w-6 text-primary" />
+                              </div>
+                              <CardTitle className="font-headline text-xl">{plan.name}</CardTitle>
+                              {plan.popular && <Badge className="ml-auto bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90 border border-primary text-xs">Popular</Badge>}
+                          </div>
                           <CardDescription className="pt-2">{plan.description}</CardDescription>
+                          <div className="flex gap-2 justify-between items-baseline">
+                              {isCustom ? (
+                                  <p className="text-4xl font-bold">{plan.priceText}</p>
+                              ) : (
+                                  <p>
+                                      <span className="text-4xl font-bold">${price}</span>
+                                      <span className="text-muted-foreground">/month</span>
+                                  </p>
+                              )}
+                              {!isCustom && isYearly && (
+                                  <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
+                              )}
+                          </div>
+                          {/* {plan.isTrial && plan.discountInfo && !isYearly && (
+                            <div className="bg-muted/50 text-center p-3 rounded-lg border">
+                              <p className="font-semibold text-sm text-foreground">{plan.discountInfo.text}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{plan.discountInfo.subtext}</p>
+                            </div>
+                          )} */}
+                          <Button 
+                            onClick={() => handleSubscribe(plan)}
+                            // disabled={isCurrentPlan || isLoading === priceId}
+                            variant={plan.popular ? 'default' : 'outline'} 
+                            className={cn('w-full', 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
+                            )}
+                            // className={cn('w-full', 
+                            //     plan.popular && !isCurrentPlan && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
+                            //     plan.isTrial && !isCurrentPlan && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
+                            //     plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
+                            // )}
+                          >
+                            {isLoading === priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {/* {isCurrentPlan ? 'Current Plan' : plan.buttonText} */}
+                            {plan.buttonText}
+                          </Button>
                         </CardHeader>
                         <CardContent className="flex-grow space-y-6">
-                            <div className="flex justify-between items-baseline">
-                                {isCustom ? (
-                                    <p className="text-4xl font-bold">{plan.priceText}</p>
-                                ) : (
-                                    <p>
-                                        <span className="text-4xl font-bold">${price}</span>
-                                        <span className="text-muted-foreground"> per month</span>
-                                    </p>
-                                )}
-                                {!isCustom && isYearly && (
-                                    <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
-                                )}
-                            </div>
-
-                            {/* {plan.isTrial && plan.discountInfo && !isYearly && (
-                              <div className="bg-muted/50 text-center p-3 rounded-lg border">
-                                <p className="font-semibold text-sm text-foreground">{plan.discountInfo.text}</p>
-                                <p className="text-xs text-muted-foreground mt-1">{plan.discountInfo.subtext}</p>
-                              </div>
-                            )} */}
-                        
                           <ul className="space-y-3 text-sm">
                             {plan.features.map((feature, i) => (
                               <li key={i} className="flex items-center gap-3">
@@ -225,24 +239,9 @@ export default function PricingPage() {
                             ))}
                           </ul>
                         </CardContent>
-                        <CardFooter>
-                          <Button 
-                                onClick={() => handleSubscribe(plan)}
-                                // disabled={isCurrentPlan || isLoading === priceId}
-                                variant={plan.popular ? 'default' : 'outline'} 
-                                className={cn('w-full', 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
-                                )}
-                                // className={cn('w-full', 
-                                //     plan.popular && !isCurrentPlan && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
-                                //     plan.isTrial && !isCurrentPlan && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
-                                //     plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
-                                // )}
-                            >
-                                {isLoading === priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                {/* {isCurrentPlan ? 'Current Plan' : plan.buttonText} */}
-                                {plan.buttonText}
-                          </Button>
-                        </CardFooter>
+                        {/* <CardFooter>
+                          
+                        </CardFooter> */}
                       </div>
                     </Card>
                   </div>

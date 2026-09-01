@@ -12,31 +12,31 @@ import Link from "next/link"
 
 const services = [
     {
-        value: "item-4",
+        value: "item-1",
         title: "General Use",
         description: "Design and purchase custom branded boxes for various use cases to meet your promotional needs",
         learnMoreUrl: "#"
     },
     {
-        value: "item-1",
+        value: "item-2",
         title: "Product Design",
         description: "A single platform for product teams to deliver customer value faster. From strategic planning to production-ready packaging and promotional materials, it all lives here.",
         learnMoreUrl: "#"
     },
     {
-        value: "item-2",
+        value: "item-3",
         title: "Marketing",
         description: "Empower your marketing campaigns with stunning, on-brand designs for package boxes for your team that capture attention. Fast, collaborative, and scalable.",
         learnMoreUrl: "#"
     },
     {
-        value: "item-3",
+        value: "item-4",
         title: "E-commerce Brands",
         description: "Create unforgettable brand experiences for your customers. Design everything from custom packaging that elevate your brand identity.",
         learnMoreUrl: "#"
     },
     {
-        value: "item-4",
+        value: "item-5",
         title: "Event Planners",
         description: "Create and deliver captivating custom gift boxes for your events. Ensure every touchpoint is perfectly on-brand.",
         learnMoreUrl: "#"
