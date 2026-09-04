@@ -8,9 +8,17 @@ import Link from "next/link";
 
 const features = [
   {
+    value: "customization",
+    title: "Easy Customization",
+    description: "Take full control of your designs. Easily upload logos, add custom text with various fonts, and use our intuitive tools to design what you need. For specialized requests, you can even connect with our expert designers directly through the in-app chat.",
+    imageUrl: "https://images.unsplash.com/photo-1716193348750-9e22b67718c6?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
+    imageHint: "design tool palette",
+    learnMoreUrl: "#",
+  },
+  {
     value: "ai-generation",
     title: "AI Re-imagined",
-    description: "Describe your vision in plain text. Our advanced AI generates unique concepts for branded products like package boxes, and more in minutes. It's like having a dedicated designer, available 24/7.",
+    description: "Describe your vision in plain text. Our advanced AI generates unique concepts for branded package boxes in minutes. It's like having a dedicated designer, available 24/7.",
     imageUrl: "https://images.unsplash.com/photo-1595246007497-15e0ed4b8d96?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
     imageHint: "AI design interface",
     learnMoreUrl: "#",
@@ -21,14 +29,6 @@ const features = [
     description: "Don't just imagine it—see it. Rotate, zoom, and inspect your designs from every angle with our dynamic, real-time 3D previews for packaging and products. Ensure every detail is perfect.",
     imageUrl: "https://images.unsplash.com/photo-1651848849058-faea0856dd51?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3", //photo-1719488134786-a4c27373393 1#photo-1693387593111-124ff0e01e2 3# photo-1716193348750-9e22b67718c6
     imageHint: "3d box render",
-    learnMoreUrl: "#",
-  },
-  {
-    value: "customization",
-    title: "Easy Customization",
-    description: "Take full control of your designs. Easily upload logos, add custom text with various fonts, and use our intuitive tools to design what you need. For specialized requests, you can even connect with our expert designers directly through the in-app chat.",
-    imageUrl: "https://images.unsplash.com/photo-1716193348750-9e22b67718c6?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-    imageHint: "design tool palette",
     learnMoreUrl: "#",
   }
 ];

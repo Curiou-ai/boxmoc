@@ -183,7 +183,8 @@ export default function PricingPage() {
                       </Badge>
                     )}
                     <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border border-transparent bg-origin-border bg-clip-content,padding-box,border-box bg-gradient-to-r from-accent to-primary shadow-xl' : 'border')}>
-                      <div className={`${plan.popular ? "border-2 border-transparent rounded-2xl bg-gradient-to-r from-accent to-primary [background-clip:padding-box,border-box] [background-origin:border-box] bg-[linear-gradient(to_right,hsl(var(--card)),hsl(var(--card)))] h-full" : ""}`}>
+                      {/* bg-gradient-to-r from-accent to-primary */}
+                      <div className={`${plan.popular ? "border-2 border-transparent rounded-2xl [background-clip:padding-box,border-box] [background-origin:border-box] bg-[linear-gradient(to_right,hsl(var(--card)),hsl(var(--card)))] h-full" : ""}`}>
                         <CardHeader className="grid grid-cols-[minmax(0,1fr)] auto-rows-[57px] w-full justify-stretch items-start gap-4">
                           <div className="flex items-center gap-4 w-full">
                               <div className="p-3 bg-muted rounded-lg">

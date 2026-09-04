@@ -5,8 +5,8 @@ import { BrainCircuit, Paintbrush, PackageCheck, Truck } from 'lucide-react';
 const workflowSteps = [
     {
         icon: <BrainCircuit className="h-10 w-10 text-primary" />,
-        title: "1. Describe Your Vision",
-        description: "Start with a simple text prompt. Describe your idea, and our AI will generate unique design concepts for packaging, cards, flyers, and more in seconds."
+        title: "1. Design Your Vision",
+        description: "Choose from a variety of templates, or start with a simple text prompt to describe your idea with AI, and we will generate unique design concepts for your boxes in seconds."
     },
     {
         icon: <Paintbrush className="h-10 w-10 text-primary" />,

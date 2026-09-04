@@ -60,7 +60,7 @@ export default function LandingPage() {
                   {headline}
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-                  Create custom branded packaging and marketing materials in minutes. Delivered right to your doorstep.
+                  Create custom branded boxes. Delivered right to your doorstep.
                 </p>
               </div>
               <div className="w-full max-w-xs space-y-8 mb-6">
@@ -73,7 +73,7 @@ export default function LandingPage() {
                   />
                   <Button type="submit" asChild size="lg" className="w-full mb-8">
                     <Link href="/creator">
-                      Get Started for Free
+                      Get Started
                     </Link>
                   </Button>
                 </form>

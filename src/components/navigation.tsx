@@ -18,34 +18,34 @@ export default function Navbar(){
                 {/* Desktop Navigation */}
                 <nav className="hidden items-center gap-6 lg:flex">
                     <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
-                        Product <ChevronDown className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem>Packaging</DropdownMenuItem>
-                        <DropdownMenuItem>Marketing Materials</DropdownMenuItem>
-                        <DropdownMenuItem>Event Promotions</DropdownMenuItem>
-                    </DropdownMenuContent>
+                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                            Product <ChevronDown className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className='absolute top-4 left-[130] -translate-x-1/4 rounded-2xl max-w-7xl container mx-auto w-[100vw] h-[600px] overflow-hidden p-4 sm:p-6 backdrop-blur-sm'>
+                            <DropdownMenuItem>Packaging</DropdownMenuItem>
+                            <DropdownMenuItem>Marketing Materials</DropdownMenuItem>
+                            <DropdownMenuItem>Event Promotions</DropdownMenuItem>
+                        </DropdownMenuContent>
                     </DropdownMenu>
                     <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
-                        Solutions <ChevronDown className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem>For E-commerce</DropdownMenuItem>
-                        <DropdownMenuItem>For Agencies</DropdownMenuItem>
-                        <DropdownMenuItem>For Startups</DropdownMenuItem>
-                    </DropdownMenuContent>
+                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                            Solutions <ChevronDown className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className='absolute top-4 left-[30] -translate-x-1/4 rounded-2xl max-w-7xl container mx-auto w-[100vw] h-[600px] overflow-hidden p-4 sm:p-6 backdrop-blur-sm'>
+                            <DropdownMenuItem>For E-commerce</DropdownMenuItem>
+                            <DropdownMenuItem>For Agencies</DropdownMenuItem>
+                            <DropdownMenuItem>For Startups</DropdownMenuItem>
+                        </DropdownMenuContent>
                     </DropdownMenu>
                     <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
-                        Resources <ChevronDown className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem>Blog</DropdownMenuItem>
-                        <DropdownMenuItem>Help Center</DropdownMenuItem>
-                        <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
-                    </DropdownMenuContent>
+                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground outline-none transition-colors hover:text-foreground">
+                            Resources <ChevronDown className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className='absolute top-4 -left-[80] -translate-x-1/4 rounded-2xl max-w-7xl container mx-auto w-[100vw] h-[600px] overflow-hidden p-4 sm:p-6 backdrop-blur-sm'>
+                            <DropdownMenuItem>Blog</DropdownMenuItem>
+                            <DropdownMenuItem>Help Center</DropdownMenuItem>
+                            <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
+                        </DropdownMenuContent>
                     </DropdownMenu>
                     <Link href="/pricing" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                     Pricing
