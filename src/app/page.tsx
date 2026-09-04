@@ -139,7 +139,7 @@ export default function LandingPage() {
               </div>
               <div className="bg-accent/50 rounded-2xl min-[896px]:w-1/2">
                   <Image
-                    src="https://images.unsplash.com/photo-1758691737217-77302c5f988f?q=80&w=2070&h=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
+                    src="https://images.unsplash.com/photo-1716471330463-f475b00f0506?q=80&w=2070&h=2070&auto=format&fit=crop&ixlib=rb-4.0.3"
                     width="2070"
                     height="2070"
                     alt="Design team collaborating"
@@ -161,10 +161,10 @@ export default function LandingPage() {
                     From corporate events to e-commerce brands, Boxmoc provides the tools and flexibility for any team to create the perfect promotional materials, packaging, and more.
                 </p>
                 </div>
-
+                {/* photo-1609143739217-01b60dad1c67 */}
                 <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
                 <div>
-                    <div className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-muted/30 mb-8">
+                    {/* <div className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-muted/30 mb-8">
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12.22 2h-4.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.44.25a2 2 0 0 1-2 1.73V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.29a2 2 0 0 0-1-1.73l-4.44-2.54a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><path d="M18 13.13V22"></path><path d="M6 13.13V22"></path><path d="M12 13.13V22"></path></svg></div>
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="m7.5 4.27 9 5.15"></path><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
@@ -173,6 +173,16 @@ export default function LandingPage() {
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><circle cx="12" cy="12" r="10"></circle><path d="m14.31 8 5.74 9.94"></path><path d="M9.69 8h11.48"></path><path d="m7.38 12 5.74-9.94"></path><path d="M9.69 16 3.95 6.06"></path><path d="M14.31 16H2.83"></path><path d="m16.62 12-5.74 9.94"></path></svg></div>
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l10-10A1 1 0 0 0 22 12V2h-4"></path><path d="M7 7h.01"></path></svg></div>
                         <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
+                    </div> */}
+                    <div className="relative mb-8 overflow-hidden rounded-xl">
+                    <Image
+                        src="https://images.unsplash.com/photo-1609143739217-01b60dad1c67?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3"
+                        width={600}
+                        height={450}
+                        alt="Custom API integration example"
+                        data-ai-hint="code editor API"
+                        className="w-full h-full object-cover"
+                    />
                     </div>
                     <h3 className="text-2xl font-bold font-headline">For Any Industry</h3>
                     <p className="mt-4 text-muted-foreground">

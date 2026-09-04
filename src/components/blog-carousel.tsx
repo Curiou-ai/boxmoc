@@ -63,7 +63,7 @@ export function BlogCarousel() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-background overflow-hidden">
       <div className="container px-4 md:px-6 mx-auto max-w-7xl">
-        <div className="flex flex-col md:flex-row items-end justify-between mb-10 gap-4">
+        <div className="flex flex-col md:flex-row justify-between mb-10 gap-4">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Insights & Inspiration</h2>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
@@ -71,7 +71,7 @@ export function BlogCarousel() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex gap-2 mr-4">
+            <div className="flex gap-2 mr-4">
                 <Button 
                     variant="outline" 
                     size="icon" 
@@ -106,7 +106,7 @@ export function BlogCarousel() {
             {blogPosts.map((post) => {
               const img = placeholderData.blog.find(i => i.id === post.imageId);
               return (
-                <Card key={post.id} className="min-w-[300px] md:min-w-[400px] flex-shrink-0 snap-start flex flex-col border-none shadow-none bg-transparent group">
+                <Card key={post.id} className="max-w-[300px] md:max-w-[400px] flex-shrink-0 snap-start flex flex-col border-none shadow-none bg-transparent group">
                   <CardHeader className="p-0 mb-4 overflow-hidden rounded-xl bg-muted">
                     <Image
                       src={img?.url || ''}
@@ -118,10 +118,10 @@ export function BlogCarousel() {
                     />
                   </CardHeader>
                   <CardContent className="p-0 flex-1 space-y-3">
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    {/* <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {post.date}</span>
                       <span className="flex items-center gap-1"><User className="h-3 w-3" /> {post.author}</span>
-                    </div>
+                    </div> */}
                     <h3 className="text-xl font-bold font-headline leading-tight group-hover:text-primary transition-colors line-clamp-2">
                       {post.title}
                     </h3>
