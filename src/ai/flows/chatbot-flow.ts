@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A chatbot flow for handling user queries.
@@ -21,20 +20,29 @@ A: You provide a text prompt describing your idea, and our AI generates design c
 
 Q: Can I talk to a real person?
 A: Yes, if the AI cannot answer your question, you can ask to be transferred to a live support agent.
+
+Q: How long does shipping take?
+A: Shipping times vary by location and product, but typically take 7-14 business days after production is complete.
 `;
 
 const PRIVACY_POLICY = `
-Boxmoc is committed to protecting your privacy. We collect information you provide to us, such as your name and email, to process your requests. We do not sell your data. For more details, please contact our support team.
+Boxmoc is committed to protecting your privacy. We collect information you provide to us, such as your name and email, to process your requests and manage your account. We do not sell your data. For more details, please contact our support team.
 `;
 
 const TERMS_CONDITIONS = `
-By using Boxmoc, you agree to our terms of service. You are responsible for the content you create and must ensure it does not violate any copyright or trademark laws. Boxmoc provides the tools, but you own your designs.
+By using Boxmoc, you agree to our terms of service. You are responsible for the content you create and must ensure it does not violate any copyright or trademark laws. Boxmoc provides the tools, but you own your designs. Subscriptions are billed monthly or annually.
 `;
 
 const COMPANY_INFO = `
-About Boxmoc: We are a design platform that makes it easy to create stunning, custom designs for packaging, marketing materials, and events using AI.
-Services: We offer AI design generation, an intuitive design editor, 3D previews, and project management. We can create designs for custom packaging, flyers, cards, engravings, and event promotions.
-Contact: You can reach us at info@boxmoc.com or call us at +1 (234) 567-890.
+About Boxmoc: We are an AI-powered design platform specializing in custom packaging, marketing materials, and promotional items.
+Core Features:
+- AI Design Generator: Create concepts from text prompts.
+- Intuitive Editor: Add logos, text, and adjust layouts.
+- 3D Preview: Real-time 3D models of your designs.
+- Supply Chain: Integrated network for high-quality production and global shipping.
+Services: Custom boxes, flyers, business cards, engravings, and event materials.
+Target Audience: SMEs, e-commerce brands, event planners, and marketing teams.
+Contact: info@boxmoc.com | +1 (234) 567-890 | 742 Evergreen Terrace, Springfield, OR.
 `;
 
 // Tools definition
@@ -71,7 +79,7 @@ const getTermsAndConditions = ai.defineTool(
 const getCompanyInfo = ai.defineTool(
     {
         name: 'getCompanyInfo',
-        description: 'Get information about the company, its services, and how to contact us. Use this if the user asks for the company email or phone number.',
+        description: 'Get information about the company, its services, features, and how to contact us.',
         inputSchema: z.object({}),
         outputSchema: z.string(),
     },
@@ -82,7 +90,7 @@ const getCompanyInfo = ai.defineTool(
 const transferToLiveAgent = ai.defineTool(
     {
         name: 'transferToLiveAgent',
-        description: 'Transfers the user to a live support agent when the AI cannot answer the question.',
+        description: 'Transfers the user to a live support agent when the AI cannot answer the question or if the user asks for human help.',
         inputSchema: z.object({ query: z.string().describe('The user\'s original query to pass to the agent.') }),
         outputSchema: z.string(),
     },
@@ -95,12 +103,12 @@ const transferToLiveAgent = ai.defineTool(
 const contactTeam = ai.defineTool(
     {
         name: 'contactTeam',
-        description: 'Use this when the user wants to contact the support team, file a support ticket, or send a message to the company for non-live-chat inquiries.',
+        description: 'Directs the user to the contact page or provides details on how to reach the support team for inquiries outside my current knowledge.',
         inputSchema: z.object({}),
         outputSchema: z.string(),
     },
     async () => {
-        return "I can help with that. To create a support ticket for you, please provide the following details:\n\n*   Your full name\n*   Your email address\n*   A brief message outlining your request.\n\nI'll make sure it gets to the right team.";
+        return "You can reach our support team directly by visiting our contact page at /contact or by emailing support@boxmoc.com. I am strictly authorized to help with inquiries related to our website content!";
     }
 );
 
@@ -126,19 +134,24 @@ export async function askChatbot(input: ChatbotInput): Promise<ChatbotOutput> {
   return chatbotFlow(input);
 }
 
-const systemPrompt = `You are a support assistant for Boxmoc.
-    Your ONLY function is to answer questions about Boxmoc's services, policies, and FAQs using the provided tools.
-    - Use 'getCompanyInfo' for questions about what Boxmoc does, its services, or how to contact us.
-    - Use 'getFaq' for frequently asked questions.
-    - Use 'getPrivacyPolicy' for privacy-related questions.
-    - Use 'getTermsAndConditions' for questions about terms of service.
-    - Use 'contactTeam' if the user explicitly wants to send a message or contact the team.
+const systemPrompt = `You are a support assistant for Boxmoc. 
+    Your ONLY function is to answer questions about Boxmoc's services, policies, and FAQs based strictly on the content of the webpage provided via your tools.
+
+    Scope of coverage:
+    - Boxmoc's services (packaging, marketing, events).
+    - Features (AI generation, 3D preview, customization).
+    - Frequently Asked Questions.
+    - Company information and contact details.
+    - Privacy Policy and Terms & Conditions.
+
+    STRICT RULES:
+    1. Only answer queries regarding the content mentioned above.
+    2. If a user asks a question that is NOT related to Boxmoc or is outside the scope of your tools (e.g., general knowledge, personal advice, unrelated tasks), you MUST politely decline.
+    3. When declining, you MUST explicitly inform the user that you can only assist with inquiries regarding Boxmoc's website content.
+    4. For any out-of-scope query, or if the user requires human assistance, you MUST offer to redirect them to a live agent (using 'transferToLiveAgent') or suggest they visit the contact page (/contact).
+    5. Do not hallucinate information not provided in the tools.
     
-    If a user asks a question that is not related to Boxmoc or cannot be answered with your tools, you MUST politely decline. 
-    
-    Format your responses using Markdown.
-    
-    If the user asks to speak to a person or agent, use the 'transferToLiveAgent' tool.`;
+    Format your responses using Markdown.`;
 
 const chatbotPrompt = ai.definePrompt({
     name: 'chatbotPrompt',
@@ -173,7 +186,7 @@ const chatbotFlow = ai.defineFlow(
         const openAiKey = process.env.OPENAI_API_KEY;
 
         if (!openAiUrl || !openAiKey) {
-            return 'I am having trouble connecting to my brain right now. Please try again in a moment.';
+            return 'I am having trouble connecting to my knowledge base right now. Please try again in a moment.';
         }
         
         try {
