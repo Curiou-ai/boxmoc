@@ -1,11 +1,12 @@
 'use client'; 
 
-import { Package, Share2, Save, Bell, Box, LogOut, User, CreditCard, Settings, ShoppingBag, LayoutDashboard } from 'lucide-react';
+import { Package, Share2, Save, Bell, Box, LogOut, User, CreditCard, Settings, ShoppingBag, LayoutDashboard, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
 import React from 'react';
 import { useAuth } from '@/context/auth-context';
+import { useCart } from '@/context/cart-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Badge } from '@/components/ui/badge';
 
 interface AppHeaderProps {
   mobileSidebar?: React.ReactNode;
@@ -21,6 +23,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ mobileSidebar }: AppHeaderProps) {
   const { user, signOut } = useAuth();
+  const { items } = useCart();
   const isAdmin = user?.role === 'admin';
   
   return (
@@ -34,18 +37,24 @@ export function AppHeader({ mobileSidebar }: AppHeaderProps) {
       </div>
       
       <div className="flex-1 text-center">
-        {/* Title removed for cleaner header */}
       </div>
 
       <div className="flex items-center gap-3">
-        {/* <Button variant="outline" size="sm">
-          <Share2 className="h-4 w-4 md:mr-2" />
-          <span className="hidden md:inline">Share</span>
-        </Button> */}
+        <Link href="/creator/checkout">
+          <Button size="sm" variant="ghost" className="relative">
+            <ShoppingCart className="h-5 w-5" />
+            {items.length > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] bg-primary">
+                {items.length}
+              </Badge>
+            )}
+          </Button>
+        </Link>
+
         <Button size="sm" variant="ghost">
           <Bell className="h-4 w-4" />
-          {/* <span className="hidden md:inline">Save</span> */}
         </Button>
+
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

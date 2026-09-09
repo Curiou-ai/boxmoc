@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
 import { CookieBanner } from '@/components/cookie-banner';
 import { AuthProvider } from '@/context/auth-context';
+import { CartProvider } from '@/context/cart-context';
 import { PageLoader } from '@/components/page-loader';
 import { Suspense } from 'react';
 
@@ -29,10 +30,12 @@ export default function RootLayout({
           <PageLoader />
         </Suspense>
         <AuthProvider>
-          {children}
-          <Chatbot />
-          <CookieBanner />
-          <Toaster />
+          <CartProvider>
+            {children}
+            <Chatbot />
+            <CookieBanner />
+            <Toaster />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

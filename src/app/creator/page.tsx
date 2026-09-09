@@ -5,7 +5,7 @@ import AiDesignForm from '@/components/ai-design-form';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2, Maximize2, Check } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2, Maximize2, Check, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,14 +22,16 @@ import { cn } from '@/lib/utils';
 import { loadStripe } from '@stripe/stripe-js';
 import { handleCreateOrderSession, handleUploadDesignImage, getUserAssets, type Asset } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
+import { useCart } from '@/context/cart-context';
+import { useRouter } from 'next/navigation';
 
-const BOX_SIZES = [
-    { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4 },
-    { id: 'medium-cube', label: 'Medium Cube (8"x8"x8")', width: 8, height: 8, depth: 8 },
-    { id: 'large-cube', label: 'Large Cube (12"x12"x12")', width: 12, height: 12, depth: 12 },
-    { id: 'small-mailer', label: 'Small Mailer (6"x6"x2")', width: 6, height: 2, depth: 6 },
-    { id: 'medium-mailer', label: 'Medium Mailer (10"x8"x2")', width: 10, height: 2, depth: 8 },
-    { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5 },
+export const BOX_SIZES = [
+    { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4, shortLabel: 'S' },
+    { id: 'medium-cube', label: 'Medium Cube (8"x8"x8")', width: 8, height: 8, depth: 8, shortLabel: 'M' },
+    { id: 'large-cube', label: 'Large Cube (12"x12"x12")', width: 12, height: 12, depth: 12, shortLabel: 'L' },
+    { id: 'small-mailer', label: 'Small Mailer (6"x6"x2")', width: 6, height: 2, depth: 6, shortLabel: 'XL' },
+    { id: 'medium-mailer', label: 'Medium Mailer (10"x8"x2")', width: 10, height: 2, depth: 8, shortLabel: 'XXL' },
+    { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5, shortLabel: '3XL' },
 ];
 
 const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
@@ -198,8 +200,9 @@ export default function CreatorPage() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedSizeId, setSelectedSizeId] = useState('medium-cube');
   const [isUploading, setIsUploading] = useState(false);
-  const [isOrdering, setIsOrdering] = useState(false);
   const { toast } = useToast();
+  const { addItem } = useCart();
+  const router = useRouter();
 
   const currentSize = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
 
@@ -233,39 +236,33 @@ export default function CreatorPage() {
       toast({ title: 'Success', description: 'Image uploaded and applied to design.' });
   };
   
-  const handleOrder = async () => {
+  const handleAddToCart = () => {
     if (!design.imageUrl || !design.description) {
         toast({
-            title: 'No design to order',
-            description: 'Please generate or upload a design first before ordering a print.',
+            title: 'No design to add',
+            description: 'Please generate or upload a design first.',
             variant: 'destructive'
         });
         return;
     }
-    setIsOrdering(true);
-    try {
-        const { sessionId, error } = await handleCreateOrderSession({
-            designImageUrl: design.imageUrl,
-            designDescription: `${design.description} (Size: ${currentSize.label})`,
-        });
 
-        if (error) {
-            toast({ title: 'Error', description: error, variant: 'destructive'});
-            setIsOrdering(false);
-            return;
-        }
+    addItem({
+      designId: Math.random().toString(36).substr(2, 9),
+      imageUrl: design.imageUrl,
+      description: design.description,
+      sizeId: currentSize.id,
+      sizeLabel: currentSize.shortLabel,
+      quantity: 1,
+      price: 4999, // 49.99
+      dimensions: { width: currentSize.width, height: currentSize.height, depth: currentSize.depth }
+    });
 
-        if (sessionId) {
-            const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-            if (!stripe) {
-                throw new Error('Stripe.js not loaded');
-            }
-            await stripe.redirectToCheckout({ sessionId });
-        }
-    } catch (err: any) {
-        toast({ title: 'Error', description: err.message, variant: 'destructive'});
-        setIsOrdering(false);
-    }
+    toast({
+      title: 'Added to Cart',
+      description: 'Review your items and proceed to checkout.',
+    });
+
+    router.push('/creator/checkout');
   };
   
   return (
@@ -348,13 +345,9 @@ export default function CreatorPage() {
                     <span className="flex items-center gap-1"><Maximize2 className="h-3 w-3" /> Size: {currentSize.label}</span>
                     <span>Format: High-Res Print Ready</span>
                 </div>
-                <Button onClick={handleOrder} disabled={!design.imageUrl || isOrdering || isUploading} className="w-full py-6 text-lg font-bold">
-                    {isOrdering ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    ) : (
-                        <ShoppingBag className="mr-2 h-5 w-5" />
-                    )}
-                    {isOrdering ? 'Processing Order...' : 'Order Custom Print ($49.99)'}
+                <Button onClick={handleAddToCart} disabled={!design.imageUrl || isUploading} className="w-full py-6 text-lg font-bold">
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Add to Cart ($49.99)
                 </Button>
             </CardFooter>
           </Card>
