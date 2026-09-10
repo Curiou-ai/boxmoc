@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-const protectedRoutes = ['/admin'];
+const protectedRoutes = ['/creator','/admin'];
 const authRoutes = ['/login', '/signup'];
 
 let redis: Redis | null = null;
@@ -134,9 +134,12 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoute && sessionCookie) {
     return NextResponse.redirect(new URL('/creator', request.url));
   }
-
-  if (isProtectedRoute && !sessionCookie) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (process.env.NODE_ENV !== 'production') {
+    return NextResponse.next()
+  } else {
+    if (isProtectedRoute && !sessionCookie) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
   }
 
   return NextResponse.next();
