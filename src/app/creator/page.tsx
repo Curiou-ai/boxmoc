@@ -1,357 +1,344 @@
+
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import AiDesignForm from '@/components/ai-design-form';
+import { useState, useEffect } from 'react';
 import ThreePreview from '@/components/three-preview';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Shapes, Package2, Sparkles, Box, CreditCard, ShoppingBag, Users, Loader2, Maximize2, Check, ShoppingCart } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Package2, Sparkles, Box, ShoppingCart, Minus, Plus, Settings2, Image as ImageIcon, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import RequestHelpDialog from '@/components/request-help-dialog';
+import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { loadStripe } from '@stripe/stripe-js';
-import { handleCreateOrderSession, handleUploadDesignImage, getUserAssets, type Asset } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/context/cart-context';
 import { useRouter } from 'next/navigation';
+import { getUserAssets, handleUploadDesignImage, type Asset, handleGenerateDesign } from '@/app/actions';
+import { useActionState } from 'react';
 
 export const BOX_SIZES = [
-    { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4, shortLabel: 'S' },
-    { id: 'medium-cube', label: 'Medium Cube (8"x8"x8")', width: 8, height: 8, depth: 8, shortLabel: 'M' },
-    { id: 'large-cube', label: 'Large Cube (12"x12"x12")', width: 12, height: 12, depth: 12, shortLabel: 'L' },
-    { id: 'small-mailer', label: 'Small Mailer (6"x6"x2")', width: 6, height: 2, depth: 6, shortLabel: 'XL' },
-    { id: 'medium-mailer', label: 'Medium Mailer (10"x8"x2")', width: 10, height: 2, depth: 8, shortLabel: 'XXL' },
-    { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5, shortLabel: '3XL' },
+    { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4, shortLabel: 'S', price: 1.45 },
+    { id: 'medium-cube', label: 'Medium Cube (8"x8"x8")', width: 8, height: 8, depth: 8, shortLabel: 'M', price: 2.82 },
+    { id: 'large-cube', label: 'Large Cube (12"x12"x12")', width: 12, height: 12, depth: 12, shortLabel: 'L', price: 4.15 },
+    { id: 'small-mailer', label: 'Small Mailer (6"x6"x2")', width: 6, height: 2, depth: 6, shortLabel: 'XL', price: 1.95 },
+    { id: 'medium-mailer', label: 'Medium Mailer (10"x8"x2")', width: 10, height: 2, depth: 8, shortLabel: 'XXL', price: 3.25 },
+    { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5, shortLabel: '3XL', price: 5.50 },
 ];
-
-const AiToolDialog = ({ onDesignGenerated }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; }) => {
-  const [open, setOpen] = useState(false);
-  
-  const handleGenerated = (design: { imageUrl: string; description: string }) => {
-    onDesignGenerated(design);
-    setOpen(false);
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <TooltipTrigger asChild>
-        <DialogTrigger asChild>
-           <Button variant="ghost" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0 text-primary
-                                              lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
-                <Sparkles className="h-5 w-5 lg:h-6 lg:w-6" />
-                <span className="text-xs lg:text-base">AI Create</span>
-            </Button>
-        </DialogTrigger>
-      </TooltipTrigger>
-      <DialogContent className="sm:max-w-[480px]">
-        <DialogHeader>
-          <DialogTitle className="font-headline text-xl">AI Designer</DialogTitle>
-           <DialogDescription>Describe your idea and let AI create a design for you.</DialogDescription>
-        </DialogHeader>
-        <AiDesignForm onDesignGenerated={handleGenerated} />
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-const EditorSidebar = ({ onDesignGenerated, onImageUploaded, isUploading, className }: { onDesignGenerated: (design: { imageUrl: string; description: string }) => void; onImageUploaded: (url: string) => void; isUploading: boolean; className?: string }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleUploadClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('image', file);
-        onImageUploaded('UPLOAD_START'); // Signal start
-        
-        try {
-            const result = await handleUploadDesignImage(formData);
-            if (result.success && result.imageUrl) {
-                onImageUploaded(result.imageUrl);
-            } else {
-                onImageUploaded('UPLOAD_ERROR:' + result.message);
-            }
-        } catch (err) {
-            onImageUploaded('UPLOAD_ERROR:Unexpected error during upload.');
-        }
-    };
-
-    const tools = [
-        { icon: Type, label: 'Text', tooltip: 'Add Text' },
-        { icon: Brush, label: 'Edit', tooltip: 'Edit Design' },
-        { icon: Save, label: 'Save', tooltip: 'Save' },
-        { icon: Share2, label: 'Share', tooltip: 'Share' },
-    ];
-
-    return (
-        <aside id="toolbar" className={cn("flex flex-row lg:flex-col w-full lg:w-64 justify-between items-center lg:items-stretch border-b lg:border-r lg:border-b-0 bg-background p-2 lg:p-0", className)}>
-             <div className="flex flex-row lg:flex-col items-center lg:items-stretch gap-2 lg:space-y-2 lg:p-4 lg:mt-4 overflow-x-auto">
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <AiToolDialog onDesignGenerated={onDesignGenerated} />
-                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">AI Create</TooltipContent>
-                      <TooltipContent side="bottom" className="lg:hidden">AI Create</TooltipContent>
-                  </Tooltip>
-                  
-                  <Tooltip>
-                      <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            disabled={isUploading}
-                            onClick={handleUploadClick}
-                            className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0 lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3"
-                          >
-                              {isUploading ? <Loader2 className="h-5 w-5 lg:h-6 lg:w-6 animate-spin" /> : <Upload className="h-5 w-5 lg:h-6 lg:w-6" />}
-                              <span className="text-xs lg:text-base">Upload</span>
-                          </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Upload Image (Max 10MB)</TooltipContent>
-                      <TooltipContent side="bottom" className="lg:hidden">Upload Image</TooltipContent>
-                  </Tooltip>
-                  <input type="file" ref={fileInputRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} />
-
-                  <Separator orientation="vertical" className="h-8 lg:hidden" />
-                  <Separator className="my-4 hidden lg:block" />
-
-                  {tools.map(tool => (
-                      <Tooltip key={tool.label}>
-                          <TooltipTrigger asChild>
-                              <Button variant="ghost" className="flex flex-col items-center justify-center h-auto w-16 gap-1 p-2 flex-shrink-0
-                                                                  lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
-                                  <tool.icon className="h-5 w-5 lg:h-6 lg:w-6" />
-                                  <span className="text-xs lg:text-base">{tool.label}</span>
-                              </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="right" sideOffset={5} className="hidden lg:block">{tool.tooltip}</TooltipContent>
-                          <TooltipContent side="bottom" className="lg:hidden">{tool.tooltip}</TooltipContent>
-                      </Tooltip>
-                  ))}
-                </TooltipProvider>
-             </div>
-
-              <div className="lg:mt-auto lg:border-t lg:p-4 p-2">
-                    <RequestHelpDialog>
-                         <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="secondary" className="flex flex-col items-center justify-center h-auto w-18 gap-1 p-2 flex-shrink-0
-                                                                          lg:flex-row lg:w-full lg:justify-start lg:h-12 lg:gap-4 lg:px-3">
-                                        <Users className="h-5 w-5 lg:h-6 lg:w-6" />
-                                        <span className="text-xs lg:text-base">Support</span>
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right" sideOffset={5} className="hidden lg:block">Request Help</TooltipContent>
-                                <TooltipContent side="bottom" className="lg:hidden">Request Help</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </RequestHelpDialog>
-                </div>
-        </aside>
-    );
-};
-
-const AssetLibrary = ({ assets, onSelect, activeUrl }: { assets: Asset[], onSelect: (url: string) => void, activeUrl?: string }) => {
-    if (assets.length === 0) return null;
-
-    return (
-        <div className="space-y-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">My Assets</h4>
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
-                {assets.map(asset => (
-                    <button
-                        key={asset.id}
-                        onClick={() => onSelect(asset.url)}
-                        className={cn(
-                            "aspect-square rounded-md overflow-hidden border-2 transition-all hover:scale-105 relative",
-                            activeUrl === asset.url ? "border-primary ring-2 ring-primary/20" : "border-muted"
-                        )}
-                    >
-                        <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
-                        {activeUrl === asset.url && (
-                            <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
-                                <Check className="text-primary h-4 w-4 bg-background rounded-full p-0.5" />
-                            </div>
-                        )}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-};
-
 
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedSizeId, setSelectedSizeId] = useState('medium-cube');
+  const [quantity, setQuantity] = useState(150);
   const [isUploading, setIsUploading] = useState(false);
+  const [aiInput, setAiInput] = useState('');
   const { toast } = useToast();
   const { addItem } = useCart();
   const router = useRouter();
 
   const currentSize = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
+  const unitPrice = currentSize.price;
+
+  const [generateState, generateAction, isGenerating] = useActionState(handleGenerateDesign, { message: '' });
+
+  useEffect(() => {
+    if (generateState.success && generateState.design) {
+      setDesign({ 
+        imageUrl: generateState.design.imageUrl, 
+        description: generateState.design.designDescription 
+      });
+      setAiInput('');
+      fetchAssets();
+    } else if (generateState.message && !generateState.success) {
+      toast({ title: 'AI Generation Failed', description: generateState.message, variant: 'destructive' });
+    }
+  }, [generateState]);
 
   const fetchAssets = async () => {
-      const data = await getUserAssets();
-      setAssets(data);
+    const data = await getUserAssets();
+    setAssets(data);
   };
 
   useEffect(() => {
-      fetchAssets();
+    fetchAssets();
   }, []);
 
-  const handleDesignGenerated = (newDesign: { imageUrl: string; description:string }) => {
-    setDesign(newDesign);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const result = await handleUploadDesignImage(formData);
+      if (result.success && result.imageUrl) {
+        setDesign({ imageUrl: result.imageUrl, description: 'Custom uploaded design' });
+        fetchAssets();
+        toast({ title: 'Asset Uploaded', description: 'Design applied to the box.' });
+      }
+    } catch (err) {
+      toast({ title: 'Upload Failed', description: 'Could not process image.', variant: 'destructive' });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const handleImageUploaded = (result: string) => {
-      if (result === 'UPLOAD_START') {
-          setIsUploading(true);
-          return;
-      }
-      if (result.startsWith('UPLOAD_ERROR:')) {
-          toast({ title: 'Upload Failed', description: result.split('UPLOAD_ERROR:')[1], variant: 'destructive' });
-          setIsUploading(false);
-          return;
-      }
-      
-      setDesign({ imageUrl: result, description: 'Custom uploaded design' });
-      setIsUploading(false);
-      fetchAssets(); // Refresh library
-      toast({ title: 'Success', description: 'Image uploaded and applied to design.' });
-  };
-  
   const handleAddToCart = () => {
-    if (!design.imageUrl || !design.description) {
-        toast({
-            title: 'No design to add',
-            description: 'Please generate or upload a design first.',
-            variant: 'destructive'
-        });
+    if (!design.imageUrl) {
+        toast({ title: 'No design', description: 'Please generate or upload a design first.', variant: 'destructive' });
         return;
     }
-
     addItem({
       designId: Math.random().toString(36).substr(2, 9),
       imageUrl: design.imageUrl,
-      description: design.description,
+      description: design.description || 'Custom Box Design',
       sizeId: currentSize.id,
       sizeLabel: currentSize.shortLabel,
-      quantity: 1,
-      price: 4999, // 49.99
+      quantity,
+      price: Math.round(unitPrice * 100),
       dimensions: { width: currentSize.width, height: currentSize.height, depth: currentSize.depth }
     });
-
-    toast({
-      title: 'Added to Cart',
-      description: 'Review your items and proceed to checkout.',
-    });
-
     router.push('/creator/checkout');
   };
-  
+
   return (
-    <div className="flex flex-col lg:flex-row flex-1 h-full lg:h-[calc(100vh-60px)]">
-      <EditorSidebar 
-        onDesignGenerated={handleDesignGenerated} 
-        onImageUploaded={handleImageUploaded}
-        isUploading={isUploading}
-      />
-      
-      <div className="flex-1 flex flex-col p-2 sm:p-4 lg:p-6 overflow-auto">
-        <div className="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-          <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                <div>
-                  <CardTitle className="font-headline">3D Real-time Preview</CardTitle>
-                  <CardDescription>Rotate with cursor to see all sides.</CardDescription>
-                </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                    <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
-                        <SelectTrigger className="w-full sm:w-[220px]">
-                            <SelectValue placeholder="Standard Dimensions" />
+    <div className="relative w-full h-[calc(100vh-60px)] overflow-hidden bg-[#F8F9FA]">
+      {/* 1. Full Screen 3D Workspace */}
+      <div className="absolute inset-0 z-0">
+         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+         <ThreePreview 
+            key={`${design.imageUrl}-${selectedSizeId}`} 
+            imageUrl={design.imageUrl} 
+            dimensions={{ width: currentSize.width, height: currentSize.height, depth: currentSize.depth }}
+          />
+      </div>
+
+      {/* 2. Floating Top Toolbar */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
+         <div className="flex items-center gap-1 bg-white/80 backdrop-blur-md border border-white shadow-xl rounded-full px-4 py-2">
+            <TooltipProvider>
+                <label className="cursor-pointer">
+                    <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="rounded-full">
+                                {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Upload Artwork</TooltipContent>
+                    </Tooltip>
+                </label>
+                <Separator orientation="vertical" className="h-6 mx-2" />
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full"><Type className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Add Text</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full"><Brush className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Edit Mode</TooltipContent>
+                </Tooltip>
+                <Separator orientation="vertical" className="h-6 mx-2" />
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full"><Save className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Save Template</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full"><Share2 className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Share Preview</TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+         </div>
+      </div>
+
+      {/* 3. Floating Left Sidebar: Box Settings */}
+      <div className="absolute left-6 top-6 bottom-6 z-20 w-80 hidden lg:block">
+         <Card className="h-full bg-white/90 backdrop-blur-md border-white/50 shadow-2xl flex flex-col rounded-2xl overflow-hidden">
+            <CardHeader className="pb-4 bg-primary/5 border-b border-primary/10">
+                <CardTitle className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                    <Settings2 className="h-4 w-4" /> Box Settings
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 space-y-6 pt-6 overflow-y-auto custom-scrollbar">
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Product Type</label>
+                    <Select defaultValue="mailer">
+                        <SelectTrigger className="bg-white/50">
+                            <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
-                            {BOX_SIZES.map(size => (
-                                <SelectItem key={size.id} value={size.id}>{size.label}</SelectItem>
+                            <SelectItem value="mailer">Mailer Box</SelectItem>
+                            <SelectItem value="shipping">Shipping Box</SelectItem>
+                            <SelectItem value="product">Product Box</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Size</label>
+                    <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
+                        <SelectTrigger className="bg-white/50">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {BOX_SIZES.map(s => (
+                                <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 min-h-0 bg-muted/20 rounded-b-lg">
-              <ThreePreview 
-                key={`${design.imageUrl}-${selectedSizeId}`} 
-                imageUrl={design.imageUrl} 
-                productType="box" 
-                dimensions={{ width: currentSize.width, height: currentSize.height, depth: currentSize.depth }}
-              />
-            </CardContent>
-          </Card>
-          <Card className="flex flex-col shadow-lg min-h-[50vh] xl:min-h-0">
-            <CardHeader>
-              <CardTitle className="font-headline">Design Assets</CardTitle>
-              <CardDescription>Manage your generated or uploaded imagery.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-6">
-              <div className="w-full aspect-square bg-muted/50 rounded-lg flex items-center justify-center overflow-hidden border group relative">
-                  {design.imageUrl ? (
-                      <img src={design.imageUrl} alt="Active design" className="w-full h-full object-contain" />
-                  ) : (
-                      <div className="text-center text-muted-foreground p-4">
-                          <Package2 size={48} className="mx-auto mb-2 opacity-50" />
-                          <p>Your design will appear here.</p>
-                      </div>
-                  )}
-                  {isUploading && (
-                      <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center">
-                          <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-                          <p className="text-sm font-medium">Processing upload...</p>
-                      </div>
-                  )}
-              </div>
 
-              <AssetLibrary 
-                assets={assets} 
-                activeUrl={design.imageUrl} 
-                onSelect={(url) => setDesign({ imageUrl: url, description: 'Applied from library' })} 
-              />
-
-              <div className="p-4 bg-muted/50 rounded-lg text-sm h-24 overflow-y-auto border">
-                  <p className="text-muted-foreground italic">
-                    {design.description || "The description of the current design will be shown here. Use the sidebar tools to generate a new design or upload your own assets."}
-                  </p>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-3">
-                <div className="flex w-full items-center justify-between text-sm text-muted-foreground px-1">
-                    <span className="flex items-center gap-1"><Maximize2 className="h-3 w-3" /> Size: {currentSize.label}</span>
-                    <span>Format: High-Res Print Ready</span>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Material</label>
+                    <Select defaultValue="white">
+                        <SelectTrigger className="bg-white/50">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="white">E-flute White Corrugated</SelectItem>
+                            <SelectItem value="kraft">Kraft Natural Corrugated</SelectItem>
+                            <SelectItem value="premium">Premium Glossy Finish</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
-                <Button onClick={handleAddToCart} disabled={!design.imageUrl || isUploading} className="w-full py-6 text-lg font-bold">
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    Add to Cart ($49.99)
-                </Button>
-            </CardFooter>
-          </Card>
-        </div>
+
+                <div className="space-y-4 pt-4 border-t border-muted/50">
+                    <div className="flex justify-between items-center">
+                         <label className="text-[10px] font-bold uppercase text-muted-foreground">Quantity</label>
+                         <span className="text-sm font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">{quantity}</span>
+                    </div>
+                    <Slider 
+                        value={[quantity]} 
+                        min={10} 
+                        max={1000} 
+                        step={10} 
+                        onValueChange={(v) => setQuantity(v[0])}
+                        className="py-4"
+                    />
+                </div>
+
+                <div className="bg-primary/5 rounded-xl p-4 space-y-2 border border-primary/10">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Unit price</span>
+                        <span className="font-bold text-primary">${unitPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-bold text-foreground">
+                        <span>Total</span>
+                        <span>${(unitPrice * quantity).toFixed(2)}</span>
+                    </div>
+                </div>
+            </CardContent>
+         </Card>
+      </div>
+
+      {/* 4. Floating Right Sidebar: Box Design & AI Chatbot */}
+      <div className="absolute right-6 top-6 bottom-6 z-20 w-80 hidden xl:block">
+         <Card className="h-full bg-white/90 backdrop-blur-md border-white/50 shadow-2xl flex flex-col rounded-2xl overflow-hidden">
+            <CardHeader className="pb-4 bg-primary/5 border-b border-primary/10">
+                <CardTitle className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4" /> Box Design
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+                {/* Artwork Library */}
+                <div className="p-4 space-y-3">
+                     <label className="text-[10px] font-bold uppercase text-muted-foreground">Artwork Library</label>
+                     <div className="grid grid-cols-4 gap-2">
+                        {assets.slice(0, 8).map(asset => (
+                            <button 
+                                key={asset.id} 
+                                onClick={() => setDesign({ imageUrl: asset.url, description: 'Applied from library' })}
+                                className={cn("aspect-square rounded-md overflow-hidden border-2 transition-all hover:scale-105", design.imageUrl === asset.url ? 'border-primary ring-2 ring-primary/20' : 'border-muted')}
+                            >
+                                <img src={asset.url} alt="asset" className="w-full h-full object-cover" />
+                            </button>
+                        ))}
+                     </div>
+                </div>
+
+                <Separator />
+
+                {/* AI Chatbot Interface */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <div className="p-4 flex items-center justify-between">
+                         <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                            <Sparkles className="h-3 w-3 text-primary" /> AI Designer Chat
+                         </label>
+                         <div className="flex gap-1">
+                             <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                             <span className="text-[9px] text-muted-foreground uppercase font-medium">Assistant Online</span>
+                         </div>
+                    </div>
+
+                    <div className="flex-1 px-4 overflow-y-auto space-y-4 custom-scrollbar pb-4">
+                        <div className="bg-muted/50 p-3 rounded-2xl rounded-tl-none text-xs text-muted-foreground leading-relaxed italic">
+                            "Hello! Describe the vision for your box and I'll generate a custom texture for you."
+                        </div>
+                        {isGenerating && (
+                             <div className="flex items-center gap-2 bg-primary/5 p-3 rounded-2xl animate-pulse">
+                                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                <span className="text-xs text-primary font-medium">Generating your masterpiece...</span>
+                             </div>
+                        )}
+                        {design.imageUrl && design.description && !isGenerating && (
+                            <div className="space-y-2">
+                                <div className="bg-primary/10 p-3 rounded-2xl rounded-tr-none text-xs text-primary-foreground bg-primary/80">
+                                    I've created a {design.description.toLowerCase()} concept for you.
+                                </div>
+                                <div className="rounded-xl overflow-hidden border-2 border-primary/20 shadow-lg">
+                                    <img src={design.imageUrl} alt="AI Preview" className="w-full aspect-video object-cover" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="p-4 mt-auto border-t bg-white/50">
+                        <form action={generateAction} className="relative">
+                            <Input 
+                                name="prompt"
+                                value={aiInput}
+                                onChange={(e) => setAiInput(e.target.value)}
+                                placeholder="Describe: e.g. Minimalist coffee beans pattern..." 
+                                className="pr-10 h-10 text-xs rounded-full bg-white border-muted/50 focus-visible:ring-primary/20"
+                                disabled={isGenerating}
+                            />
+                            <Button 
+                                type="submit" 
+                                size="icon" 
+                                variant="ghost" 
+                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                                disabled={isGenerating || !aiInput.trim()}
+                            >
+                                <Send className="h-4 w-4" />
+                            </Button>
+                        </form>
+                    </div>
+                </div>
+
+                <div className="p-4 bg-primary/5 border-t">
+                     <Button onClick={handleAddToCart} disabled={!design.imageUrl} className="w-full rounded-full py-6 font-bold shadow-lg shadow-primary/20">
+                        <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
+                     </Button>
+                </div>
+            </CardContent>
+         </Card>
+      </div>
+
+      {/* Mobile/Small Screen fallback message or restricted view */}
+      <div className="lg:hidden absolute inset-0 z-50 bg-background/95 flex flex-col items-center justify-center p-6 text-center space-y-4">
+          <Box className="h-12 w-12 text-primary" />
+          <h2 className="text-xl font-bold font-headline">Desktop Experience Preferred</h2>
+          <p className="text-muted-foreground text-sm">The 3D design studio is optimized for wide screens. Please use a desktop for the full creative experience.</p>
+          <Button asChild variant="outline"><a href="/">Back Home</a></Button>
       </div>
     </div>
   );

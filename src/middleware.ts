@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-const protectedRoutes = ['/creator', '/admin'];
+const protectedRoutes = ['/admin'];
 const authRoutes = ['/login', '/signup'];
 
 let redis: Redis | null = null;
