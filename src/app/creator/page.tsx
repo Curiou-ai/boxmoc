@@ -4,9 +4,9 @@ import { useState, useEffect, useActionState } from 'react';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Menu, Info, Layers } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Menu, Info, Layers, Ruler } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -19,12 +19,23 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Badge } from '@/components/ui/badge';
 
 export const BOX_SIZES = [
-    { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4, shortLabel: 'S', price: 1.45 },
-    { id: 'medium-cube', label: 'Medium Cube (8"x8"x8")', width: 8, height: 8, depth: 8, shortLabel: 'M', price: 2.82 },
-    { id: 'large-cube', label: 'Large Cube (12"x12"x12")', width: 12, height: 12, depth: 12, shortLabel: 'L', price: 4.15 },
-    { id: 'small-mailer', label: 'Small Mailer (6"x6"x2")', width: 6, height: 2, depth: 6, shortLabel: 'XL', price: 1.95 },
-    { id: 'medium-mailer', label: 'Medium Mailer (10"x8"x2")', width: 10, height: 2, depth: 8, shortLabel: 'XXL', price: 3.25 },
-    { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5, shortLabel: '3XL', price: 5.50 },
+    // Square Box Presets
+    { id: 'square-small', label: 'The Favor Box (3"x3"x2")', width: 3, height: 3, depth: 2, shortLabel: 'S', price: 1.25, category: 'Square' },
+    { id: 'square-medium', label: 'The Tech Cube (5"x5"x3.5")', width: 5, height: 5, depth: 3.5, shortLabel: 'M', price: 2.45, category: 'Square' },
+    { id: 'square-large', label: 'The Gala Box (8"x8"x5")', width: 8, height: 8, depth: 5, shortLabel: 'L', price: 4.85, category: 'Square' },
+    
+    // Rectangle Box Presets
+    { id: 'rect-small', label: 'Executive Pen Box (7"x3"x1.5")', width: 7, height: 3, depth: 1.5, shortLabel: 'Slim', price: 1.95, category: 'Rectangle' },
+    { id: 'rect-medium', label: 'The Creator Package (9"x6"x3")', width: 9, height: 6, depth: 3, shortLabel: 'Std', price: 3.75, category: 'Rectangle' },
+    { id: 'rect-large', label: 'The Wide Display (9.8"x7.5"x4")', width: 9.8, height: 7.5, depth: 4, shortLabel: 'Max', price: 5.50, category: 'Rectangle' },
+
+    // Existing / Legacy Sizes (kept per instructions)
+    { id: 'small-cube', label: 'Legacy Cube (4"x4"x4")', width: 4, height: 4, depth: 4, shortLabel: 'L1', price: 1.45, category: 'Legacy' },
+    { id: 'medium-cube', label: 'Legacy Cube (8"x8"x8")', width: 8, height: 8, depth: 8, shortLabel: 'L2', price: 2.82, category: 'Legacy' },
+    { id: 'large-cube', label: 'Legacy Cube (12"x12"x12")', width: 12, height: 12, depth: 12, shortLabel: 'L3', price: 4.15, category: 'Legacy' },
+    
+    // Special Option
+    { id: 'custom', label: 'Custom Dimensions', width: 0, height: 0, depth: 0, shortLabel: 'Custom', price: 4.00, category: 'Special' },
 ];
 
 export const PRODUCT_TIERS = [
@@ -63,19 +74,25 @@ export const PRODUCT_TIERS = [
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [selectedSizeId, setSelectedSizeId] = useState('medium-cube');
+  const [selectedSizeId, setSelectedSizeId] = useState('square-medium');
   const [selectedTierId, setSelectedTierId] = useState('shipper');
   const [quantity, setQuantity] = useState(150);
   const [isUploading, setIsUploading] = useState(false);
   const [aiInput, setAiInput] = useState('');
+  const [customDims, setCustomDims] = useState({ width: 5, height: 5, depth: 3.5 });
+  
   const { toast } = useToast();
   const { addItem } = useCart();
   const router = useRouter();
 
-  const currentSize = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
   const currentTier = PRODUCT_TIERS.find(t => t.id === selectedTierId) || PRODUCT_TIERS[0];
-  
-  const unitPrice = currentSize.price * currentTier.multiplier;
+  const isCustomSize = selectedSizeId === 'custom';
+  const sizePreset = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
+
+  const currentWidth = isCustomSize ? customDims.width : sizePreset.width;
+  const currentHeight = isCustomSize ? customDims.height : sizePreset.height;
+  const currentDepth = isCustomSize ? customDims.depth : sizePreset.depth;
+  const unitPrice = (isCustomSize ? 4.00 : sizePreset.price) * currentTier.multiplier;
 
   const [generateState, generateAction, isGenerating] = useActionState(handleGenerateDesign, { message: '' });
 
@@ -102,11 +119,28 @@ export default function CreatorPage() {
   }, []);
 
   useEffect(() => {
-      // Ensure quantity respects MOQ when tier changes
       if (quantity < currentTier.minQty) {
           setQuantity(currentTier.minQty);
       }
-  }, [selectedTierId]);
+      
+      // Auto-correct custom dims if they exceed 3D print limit when switching to Tier 3
+      if (selectedTierId === 'keepsake' && isCustomSize) {
+          setCustomDims(prev => ({
+              width: Math.min(prev.width, 9.8),
+              height: Math.min(prev.height, 9.8),
+              depth: Math.min(prev.depth, 9.8)
+          }));
+      }
+  }, [selectedTierId, selectedSizeId]);
+
+  const handleCustomDimChange = (dim: 'width' | 'height' | 'depth', val: string) => {
+      let num = parseFloat(val) || 0;
+      // Cap at 9.8 for 3D printing, or reasonable limit for others
+      const maxVal = selectedTierId === 'keepsake' ? 9.8 : 24; 
+      if (num > maxVal) num = maxVal;
+      
+      setCustomDims(prev => ({ ...prev, [dim]: num }));
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,11 +171,11 @@ export default function CreatorPage() {
       designId: Math.random().toString(36).substr(2, 9),
       imageUrl: design.imageUrl,
       description: `${currentTier.name} - ${design.description || 'Custom Box Design'}`,
-      sizeId: currentSize.id,
-      sizeLabel: currentSize.shortLabel,
+      sizeId: selectedSizeId,
+      sizeLabel: isCustomSize ? 'Custom' : sizePreset.shortLabel,
       quantity,
       price: Math.round(unitPrice * 100),
-      dimensions: { width: currentSize.width, height: currentSize.height, depth: currentSize.depth }
+      dimensions: { width: currentWidth, height: currentHeight, depth: currentDepth }
     });
     router.push('/creator/checkout');
   };
@@ -178,17 +212,74 @@ export default function CreatorPage() {
         </div>
 
         <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground">Box Size</label>
+            <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                <Ruler className="h-3 w-3" /> Box Dimensions
+            </label>
             <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
                 <SelectTrigger className="bg-white/50 dark:bg-muted/50">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                    {BOX_SIZES.map(s => (
-                        <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
-                    ))}
+                    <SelectGroup>
+                        <SelectLabel>Square Boxes</SelectLabel>
+                        {BOX_SIZES.filter(s => s.category === 'Square').map(s => (
+                            <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                        ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                        <SelectLabel>Rectangle Boxes</SelectLabel>
+                        {BOX_SIZES.filter(s => s.category === 'Rectangle').map(s => (
+                            <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                        ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                        <SelectLabel>Other Options</SelectLabel>
+                        {BOX_SIZES.filter(s => s.category === 'Special' || s.category === 'Legacy').map(s => (
+                            <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                        ))}
+                    </SelectGroup>
                 </SelectContent>
             </Select>
+
+            {isCustomSize && (
+                <div className="grid grid-cols-3 gap-2 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="space-y-1">
+                        <label className="text-[9px] uppercase font-bold opacity-50">Width</label>
+                        <Input 
+                            type="number" 
+                            step="0.1"
+                            value={customDims.width} 
+                            onChange={(e) => handleCustomDimChange('width', e.target.value)}
+                            className="h-8 text-xs bg-white/30"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[9px] uppercase font-bold opacity-50">Height</label>
+                        <Input 
+                            type="number" 
+                            step="0.1"
+                            value={customDims.height} 
+                            onChange={(e) => handleCustomDimChange('height', e.target.value)}
+                            className="h-8 text-xs bg-white/30"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[9px] uppercase font-bold opacity-50">Depth</label>
+                        <Input 
+                            type="number" 
+                            step="0.1"
+                            value={customDims.depth} 
+                            onChange={(e) => handleCustomDimChange('depth', e.target.value)}
+                            className="h-8 text-xs bg-white/30"
+                        />
+                    </div>
+                    {selectedTierId === 'keepsake' && (
+                        <p className="col-span-3 text-[9px] text-amber-500 font-medium">
+                            * 3D Print Zone Limit: 9.8" Max
+                        </p>
+                    )}
+                </div>
+            )}
         </div>
 
         <div className="space-y-4 pt-4 border-t border-muted/50">
@@ -324,9 +415,9 @@ export default function CreatorPage() {
       <div className="absolute inset-0 z-0">
          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
          <ThreePreview 
-            key={`${design.imageUrl}-${selectedSizeId}-${selectedTierId}`} 
+            key={`${design.imageUrl}-${selectedSizeId}-${selectedTierId}-${currentWidth}-${currentHeight}-${currentDepth}`} 
             imageUrl={design.imageUrl} 
-            dimensions={{ width: currentSize.width, height: currentSize.height, depth: currentSize.depth }}
+            dimensions={{ width: currentWidth, height: currentHeight, depth: currentDepth }}
           />
       </div>
 
