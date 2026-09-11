@@ -4,7 +4,7 @@ import { useState, useEffect, useActionState } from 'react';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Menu, Info, Layers, Ruler } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Info, Layers, Ruler, Maximize2, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { getUserAssets, handleUploadDesignImage, type Asset, handleGenerateDesign } from '@/app/actions';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const BOX_SIZES = [
     // Square Box Presets
@@ -80,6 +81,7 @@ export default function CreatorPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [aiInput, setAiInput] = useState('');
   const [customDims, setCustomDims] = useState({ width: 5, height: 5, depth: 3.5 });
+  const [shapeType, setShapeType] = useState<'square' | 'rectangle'>('square');
   
   const { toast } = useToast();
   const { addItem } = useCart();
@@ -123,23 +125,32 @@ export default function CreatorPage() {
           setQuantity(currentTier.minQty);
       }
       
-      // Auto-correct custom dims if they exceed 3D print limit when switching to Tier 3
-      if (selectedTierId === 'keepsake' && isCustomSize) {
+      const maxLimit = 9.8;
+      if (selectedTierId === 'keepsake') {
           setCustomDims(prev => ({
-              width: Math.min(prev.width, 9.8),
-              height: Math.min(prev.height, 9.8),
-              depth: Math.min(prev.depth, 9.8)
+              width: Math.min(prev.width, maxLimit),
+              height: Math.min(prev.height, maxLimit),
+              depth: Math.min(prev.depth, maxLimit)
           }));
       }
-  }, [selectedTierId, selectedSizeId]);
+  }, [selectedTierId]);
 
-  const handleCustomDimChange = (dim: 'width' | 'height' | 'depth', val: string) => {
-      let num = parseFloat(val) || 0;
-      // Cap at 9.8 for 3D printing, or reasonable limit for others
-      const maxVal = selectedTierId === 'keepsake' ? 9.8 : 24; 
-      if (num > maxVal) num = maxVal;
+  const updateDim = (dim: 'width' | 'height' | 'depth', val: number) => {
+      const maxVal = selectedTierId === 'keepsake' ? 9.8 : 24;
+      const safeVal = Math.min(Math.max(0.1, val), maxVal);
       
-      setCustomDims(prev => ({ ...prev, [dim]: num }));
+      setCustomDims(prev => {
+          let next = { ...prev, [dim]: safeVal };
+          if (shapeType === 'square') {
+              if (dim === 'width') next.depth = safeVal;
+              if (dim === 'depth') next.width = safeVal;
+          }
+          return next;
+      });
+
+      if (selectedSizeId !== 'custom') {
+          setSelectedSizeId('custom');
+      }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,138 +191,186 @@ export default function CreatorPage() {
     router.push('/creator/checkout');
   };
 
-  const BoxSettingsContent = () => (
-    <div className="space-y-6 pt-2">
-        <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                <Layers className="h-3 w-3" /> Market Tier
-            </label>
-            <Select value={selectedTierId} onValueChange={setSelectedTierId}>
-                <SelectTrigger className="bg-white/50 dark:bg-muted/50 h-12">
-                    <SelectValue placeholder="Select Tier" />
-                </SelectTrigger>
-                <SelectContent>
-                    {PRODUCT_TIERS.map(tier => (
-                        <SelectItem key={tier.id} value={tier.id}>
-                            <div className="flex flex-col text-left py-1">
-                                <span className="font-bold text-sm">{tier.name}</span>
-                                <span className="text-[10px] opacity-70">{tier.material}</span>
-                            </div>
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-            <div className="bg-primary/5 p-3 rounded-lg border border-primary/10 space-y-1 mt-2">
-                <p className="text-[11px] font-bold text-primary flex items-center gap-1">
-                    <Info className="h-3 w-3" /> {currentTier.tier} Positioning
-                </p>
-                <p className="text-[10px] text-muted-foreground leading-relaxed italic">
-                    "{currentTier.angle}"
-                </p>
+  const BoxSettingsContent = () => {
+    const maxLimit = selectedTierId === 'keepsake' ? 9.8 : 24;
+
+    return (
+        <div className="space-y-6 pt-2 pb-10">
+            <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                    <Layers className="h-3 w-3" /> Market Tier
+                </label>
+                <Select value={selectedTierId} onValueChange={setSelectedTierId}>
+                    <SelectTrigger className="bg-white/50 dark:bg-muted/50 h-12">
+                        <SelectValue placeholder="Select Tier" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {PRODUCT_TIERS.map(tier => (
+                            <SelectItem key={tier.id} value={tier.id}>
+                                <div className="flex flex-col text-left py-1">
+                                    <span className="font-bold text-sm">{tier.name}</span>
+                                    <span className="text-[10px] opacity-70">{tier.material}</span>
+                                </div>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <div className="bg-primary/5 p-3 rounded-lg border border-primary/10 space-y-1 mt-2">
+                    <p className="text-[11px] font-bold text-primary flex items-center gap-1">
+                        <Info className="h-3 w-3" /> {currentTier.tier} Positioning
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                        "{currentTier.angle}"
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                <Ruler className="h-3 w-3" /> Box Dimensions
-            </label>
-            <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
-                <SelectTrigger className="bg-white/50 dark:bg-muted/50">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Square Boxes</SelectLabel>
-                        {BOX_SIZES.filter(s => s.category === 'Square').map(s => (
-                            <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
-                        ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                        <SelectLabel>Rectangle Boxes</SelectLabel>
-                        {BOX_SIZES.filter(s => s.category === 'Rectangle').map(s => (
-                            <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
-                        ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                        <SelectLabel>Other Options</SelectLabel>
-                        {BOX_SIZES.filter(s => s.category === 'Special' || s.category === 'Legacy').map(s => (
-                            <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
-                        ))}
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                    <Ruler className="h-3 w-3" /> Size Presets
+                </label>
+                <Select value={selectedSizeId} onValueChange={(val) => {
+                    setSelectedSizeId(val);
+                    const preset = BOX_SIZES.find(s => s.id === val);
+                    if (preset && preset.id !== 'custom') {
+                        setCustomDims({ width: preset.width, height: preset.height, depth: preset.depth });
+                        setShapeType(preset.category === 'Square' ? 'square' : 'rectangle');
+                    }
+                }}>
+                    <SelectTrigger className="bg-white/50 dark:bg-muted/50 h-10">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Square Boxes</SelectLabel>
+                            {BOX_SIZES.filter(s => s.category === 'Square').map(s => (
+                                <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                            ))}
+                        </SelectGroup>
+                        <SelectGroup>
+                            <SelectLabel>Rectangle Boxes</SelectLabel>
+                            {BOX_SIZES.filter(s => s.category === 'Rectangle').map(s => (
+                                <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                            ))}
+                        </SelectGroup>
+                        <SelectGroup>
+                            <SelectLabel>Other Options</SelectLabel>
+                            {BOX_SIZES.filter(s => s.category === 'Special' || s.category === 'Legacy').map(s => (
+                                <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
 
-            {isCustomSize && (
-                <div className="grid grid-cols-3 gap-2 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                    <div className="space-y-1">
-                        <label className="text-[9px] uppercase font-bold opacity-50">Width</label>
-                        <Input 
-                            type="number" 
-                            step="0.1"
-                            value={customDims.width} 
-                            onChange={(e) => handleCustomDimChange('width', e.target.value)}
-                            className="h-8 text-xs bg-white/30"
+            <div className="space-y-6 pt-4 border-t border-muted/50">
+                <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                        <Settings2 className="h-3 w-3" /> Manual Fine-Tuning
+                    </label>
+                    <Tabs value={shapeType} onValueChange={(v: any) => {
+                        setShapeType(v);
+                        if (v === 'square') {
+                            updateDim('width', customDims.width);
+                        }
+                    }} className="h-7">
+                        <TabsList className="h-7 p-0.5 bg-muted/50">
+                            <TabsTrigger value="square" className="h-6 text-[9px] px-2"><Square className="h-2 w-2 mr-1" /> Square</TabsTrigger>
+                            <TabsTrigger value="rectangle" className="h-6 text-[9px] px-2"><Maximize2 className="h-2 w-2 mr-1" /> Rect</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Width / Length Slider */}
+                    <div className="space-y-3">
+                        <div className="flex justify-between">
+                            <span className="text-[10px] font-medium text-muted-foreground">{shapeType === 'square' ? 'Size (W & D)' : 'Width'}</span>
+                            <span className="text-[10px] font-bold text-primary">{customDims.width.toFixed(1)}"</span>
+                        </div>
+                        <Slider 
+                            value={[customDims.width]} 
+                            min={1} 
+                            max={maxLimit} 
+                            step={0.1} 
+                            onValueChange={(v) => updateDim('width', v[0])}
                         />
                     </div>
-                    <div className="space-y-1">
-                        <label className="text-[9px] uppercase font-bold opacity-50">Height</label>
-                        <Input 
-                            type="number" 
-                            step="0.1"
-                            value={customDims.height} 
-                            onChange={(e) => handleCustomDimChange('height', e.target.value)}
-                            className="h-8 text-xs bg-white/30"
+
+                    {/* Height Slider */}
+                    <div className="space-y-3">
+                        <div className="flex justify-between">
+                            <span className="text-[10px] font-medium text-muted-foreground">Height</span>
+                            <span className="text-[10px] font-bold text-primary">{customDims.height.toFixed(1)}"</span>
+                        </div>
+                        <Slider 
+                            value={[customDims.height]} 
+                            min={1} 
+                            max={maxLimit} 
+                            step={0.1} 
+                            onValueChange={(v) => updateDim('height', v[0])}
                         />
                     </div>
-                    <div className="space-y-1">
-                        <label className="text-[9px] uppercase font-bold opacity-50">Depth</label>
-                        <Input 
-                            type="number" 
-                            step="0.1"
-                            value={customDims.depth} 
-                            onChange={(e) => handleCustomDimChange('depth', e.target.value)}
-                            className="h-8 text-xs bg-white/30"
-                        />
-                    </div>
+
+                    {/* Depth Slider - only independent if rectangle */}
+                    {shapeType === 'rectangle' && (
+                        <div className="space-y-3">
+                            <div className="flex justify-between">
+                                <span className="text-[10px] font-medium text-muted-foreground">Depth</span>
+                                <span className="text-[10px] font-bold text-primary">{customDims.depth.toFixed(1)}"</span>
+                            </div>
+                            <Slider 
+                                value={[customDims.depth]} 
+                                min={1} 
+                                max={maxLimit} 
+                                step={0.1} 
+                                onValueChange={(v) => updateDim('depth', v[0])}
+                            />
+                        </div>
+                    )}
+
                     {selectedTierId === 'keepsake' && (
-                        <p className="col-span-3 text-[9px] text-amber-500 font-medium">
-                            * 3D Print Zone Limit: 9.8" Max
-                        </p>
+                        <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-md">
+                            <p className="text-[9px] text-amber-500 font-bold leading-tight">
+                                <Info className="inline h-2 w-2 mr-1" />
+                                BAMBU P1S SAFETY ZONE: Dimensions are capped at 9.8" (250mm) for 3D Printing.
+                            </p>
+                        </div>
                     )}
                 </div>
-            )}
-        </div>
+            </div>
 
-        <div className="space-y-4 pt-4 border-t border-muted/50">
-            <div className="flex justify-between items-center">
-                 <label className="text-[10px] font-bold uppercase text-muted-foreground">Order Quantity</label>
-                 <div className="flex items-center gap-2">
-                     {quantity === currentTier.minQty && <Badge variant="outline" className="text-[8px] h-4">Min Order</Badge>}
-                     <span className="text-sm font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">{quantity}</span>
-                 </div>
+            <div className="space-y-4 pt-4 border-t border-muted/50">
+                <div className="flex justify-between items-center">
+                     <label className="text-[10px] font-bold uppercase text-muted-foreground">Order Quantity</label>
+                     <div className="flex items-center gap-2">
+                         {quantity === currentTier.minQty && <Badge variant="outline" className="text-[8px] h-4">Min Order</Badge>}
+                         <span className="text-sm font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">{quantity}</span>
+                     </div>
+                </div>
+                <Slider 
+                    value={[quantity]} 
+                    min={currentTier.minQty} 
+                    max={1000} 
+                    step={currentTier.id === 'keepsake' ? 1 : 10} 
+                    onValueChange={(v) => setQuantity(v[0])}
+                    className="py-4"
+                />
             </div>
-            <Slider 
-                value={[quantity]} 
-                min={currentTier.minQty} 
-                max={1000} 
-                step={currentTier.id === 'keepsake' ? 1 : 10} 
-                onValueChange={(v) => setQuantity(v[0])}
-                className="py-4"
-            />
-        </div>
 
-        <div className="bg-primary/5 rounded-xl p-4 space-y-2 border border-primary/10">
-            <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Unit price ({currentTier.material})</span>
-                <span className="font-bold text-primary">${unitPrice.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-lg font-bold text-foreground">
-                <span>Total Est.</span>
-                <span>${(unitPrice * quantity).toFixed(2)}</span>
+            <div className="bg-primary/5 rounded-xl p-4 space-y-2 border border-primary/10">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Unit price ({currentTier.material})</span>
+                    <span className="font-bold text-primary">${unitPrice.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold text-foreground">
+                    <span>Total Est.</span>
+                    <span>${(unitPrice * quantity).toFixed(2)}</span>
+                </div>
             </div>
         </div>
-    </div>
-  );
+    );
+  };
 
   const BoxDesignContent = () => (
     <div className="flex flex-col h-full overflow-hidden">
