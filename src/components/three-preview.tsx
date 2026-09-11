@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useRef, useEffect } from 'react';
@@ -45,10 +44,10 @@ const ThreePreview: React.FC<ThreePreviewProps> = ({
     controls.minDistance = 5;
     controls.maxDistance = 50;
 
-    // Modern Grid Helper
-    const grid = new THREE.GridHelper(100, 50, 0x000000, 0x000000);
+    // Modern Grid Helper - Optimized for visibility in dark/neutral themes
+    const grid = new THREE.GridHelper(100, 50, 0x888888, 0x333333);
     if (grid.material instanceof THREE.Material) {
-      grid.material.opacity = 0.05;
+      grid.material.opacity = 0.2;
       grid.material.transparent = true;
     }
     grid.position.y = -(height / 2) - 0.01;

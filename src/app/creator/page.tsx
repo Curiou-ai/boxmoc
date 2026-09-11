@@ -287,7 +287,7 @@ export default function CreatorPage() {
                         <TooltipContent>Upload Artwork</TooltipContent>
                     </Tooltip>
                 </label>
-                <Separator orientation="vertical" className="h-6 mx-2" />
+                {/* <Separator orientation="vertical" className="h-6 mx-2" /> */}
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full"><Type className="h-4 w-4" /></Button>
@@ -300,7 +300,7 @@ export default function CreatorPage() {
                     </TooltipTrigger>
                     <TooltipContent>Edit Mode</TooltipContent>
                 </Tooltip>
-                <Separator orientation="vertical" className="h-6 mx-2" />
+                {/* <Separator orientation="vertical" className="h-6 mx-2" /> */}
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full"><Save className="h-4 w-4" /></Button>
