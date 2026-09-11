@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useActionState } from 'react';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Menu } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Menu, Info, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,8 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/context/cart-context';
 import { useRouter } from 'next/navigation';
 import { getUserAssets, handleUploadDesignImage, type Asset, handleGenerateDesign } from '@/app/actions';
-import { useActionState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
 
 export const BOX_SIZES = [
     { id: 'small-cube', label: 'Small Cube (4"x4"x4")', width: 4, height: 4, depth: 4, shortLabel: 'S', price: 1.45 },
@@ -27,10 +27,44 @@ export const BOX_SIZES = [
     { id: 'large-mailer', label: 'Large Mailer (12.5"x9.5"x4")', width: 12.5, height: 4, depth: 9.5, shortLabel: '3XL', price: 5.50 },
 ];
 
+export const PRODUCT_TIERS = [
+    { 
+        id: 'shipper', 
+        name: 'The Custom Shipper', 
+        tier: 'Tier 1',
+        material: 'Cardboard',
+        target: 'E-commerce startups',
+        angle: 'Low minimums, fast shipping, and sharp branding.',
+        multiplier: 1.0,
+        minQty: 10
+    },
+    { 
+        id: 'retailer', 
+        name: 'The Elegant Retailer', 
+        tier: 'Tier 2',
+        material: 'Thick Paper',
+        target: 'Boutiques & Bakeries',
+        angle: 'Crisp, clean, minimalist luxury. Custom-cut for premium presentations.',
+        multiplier: 2.5,
+        minQty: 5
+    },
+    { 
+        id: 'keepsake', 
+        name: 'The Bespoke Keepsake', 
+        tier: 'Tier 3',
+        material: '100% 3D Printed',
+        target: 'Ultra-high-end gifts & VIPs',
+        angle: 'Solid, indestructible piece of art that lives on your client\'s desk forever.',
+        multiplier: 15.0,
+        minQty: 1
+    }
+];
+
 export default function CreatorPage() {
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedSizeId, setSelectedSizeId] = useState('medium-cube');
+  const [selectedTierId, setSelectedTierId] = useState('shipper');
   const [quantity, setQuantity] = useState(150);
   const [isUploading, setIsUploading] = useState(false);
   const [aiInput, setAiInput] = useState('');
@@ -39,7 +73,9 @@ export default function CreatorPage() {
   const router = useRouter();
 
   const currentSize = BOX_SIZES.find(s => s.id === selectedSizeId) || BOX_SIZES[1];
-  const unitPrice = currentSize.price;
+  const currentTier = PRODUCT_TIERS.find(t => t.id === selectedTierId) || PRODUCT_TIERS[0];
+  
+  const unitPrice = currentSize.price * currentTier.multiplier;
 
   const [generateState, generateAction, isGenerating] = useActionState(handleGenerateDesign, { message: '' });
 
@@ -64,6 +100,13 @@ export default function CreatorPage() {
   useEffect(() => {
     fetchAssets();
   }, []);
+
+  useEffect(() => {
+      // Ensure quantity respects MOQ when tier changes
+      if (quantity < currentTier.minQty) {
+          setQuantity(currentTier.minQty);
+      }
+  }, [selectedTierId]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -93,7 +136,7 @@ export default function CreatorPage() {
     addItem({
       designId: Math.random().toString(36).substr(2, 9),
       imageUrl: design.imageUrl,
-      description: design.description || 'Custom Box Design',
+      description: `${currentTier.name} - ${design.description || 'Custom Box Design'}`,
       sizeId: currentSize.id,
       sizeLabel: currentSize.shortLabel,
       quantity,
@@ -106,21 +149,36 @@ export default function CreatorPage() {
   const BoxSettingsContent = () => (
     <div className="space-y-6 pt-2">
         <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground">Product Type</label>
-            <Select defaultValue="mailer">
-                <SelectTrigger className="bg-white/50 dark:bg-muted/50">
-                    <SelectValue placeholder="Select type" />
+            <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                <Layers className="h-3 w-3" /> Market Tier
+            </label>
+            <Select value={selectedTierId} onValueChange={setSelectedTierId}>
+                <SelectTrigger className="bg-white/50 dark:bg-muted/50 h-12">
+                    <SelectValue placeholder="Select Tier" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="mailer">Mailer Box</SelectItem>
-                    <SelectItem value="shipping">Shipping Box</SelectItem>
-                    <SelectItem value="product">Product Box</SelectItem>
+                    {PRODUCT_TIERS.map(tier => (
+                        <SelectItem key={tier.id} value={tier.id}>
+                            <div className="flex flex-col text-left py-1">
+                                <span className="font-bold text-sm">{tier.name}</span>
+                                <span className="text-[10px] opacity-70">{tier.material}</span>
+                            </div>
+                        </SelectItem>
+                    ))}
                 </SelectContent>
             </Select>
+            <div className="bg-primary/5 p-3 rounded-lg border border-primary/10 space-y-1 mt-2">
+                <p className="text-[11px] font-bold text-primary flex items-center gap-1">
+                    <Info className="h-3 w-3" /> {currentTier.tier} Positioning
+                </p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                    "{currentTier.angle}"
+                </p>
+            </div>
         </div>
 
         <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground">Size</label>
+            <label className="text-[10px] font-bold uppercase text-muted-foreground">Box Size</label>
             <Select value={selectedSizeId} onValueChange={setSelectedSizeId}>
                 <SelectTrigger className="bg-white/50 dark:bg-muted/50">
                     <SelectValue />
@@ -133,30 +191,19 @@ export default function CreatorPage() {
             </Select>
         </div>
 
-        <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-muted-foreground">Material</label>
-            <Select defaultValue="white">
-                <SelectTrigger className="bg-white/50 dark:bg-muted/50">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="white">E-flute White Corrugated</SelectItem>
-                    <SelectItem value="kraft">Kraft Natural Corrugated</SelectItem>
-                    <SelectItem value="premium">Premium Glossy Finish</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-
         <div className="space-y-4 pt-4 border-t border-muted/50">
             <div className="flex justify-between items-center">
-                 <label className="text-[10px] font-bold uppercase text-muted-foreground">Quantity</label>
-                 <span className="text-sm font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">{quantity}</span>
+                 <label className="text-[10px] font-bold uppercase text-muted-foreground">Order Quantity</label>
+                 <div className="flex items-center gap-2">
+                     {quantity === currentTier.minQty && <Badge variant="outline" className="text-[8px] h-4">Min Order</Badge>}
+                     <span className="text-sm font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">{quantity}</span>
+                 </div>
             </div>
             <Slider 
                 value={[quantity]} 
-                min={10} 
+                min={currentTier.minQty} 
                 max={1000} 
-                step={10} 
+                step={currentTier.id === 'keepsake' ? 1 : 10} 
                 onValueChange={(v) => setQuantity(v[0])}
                 className="py-4"
             />
@@ -164,11 +211,11 @@ export default function CreatorPage() {
 
         <div className="bg-primary/5 rounded-xl p-4 space-y-2 border border-primary/10">
             <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Unit price</span>
+                <span>Unit price ({currentTier.material})</span>
                 <span className="font-bold text-primary">${unitPrice.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-lg font-bold text-foreground">
-                <span>Total</span>
+                <span>Total Est.</span>
                 <span>${(unitPrice * quantity).toFixed(2)}</span>
             </div>
         </div>
@@ -190,6 +237,12 @@ export default function CreatorPage() {
                         <img src={asset.url} alt="asset" className="w-full h-full object-cover" />
                     </button>
                 ))}
+                {assets.length === 0 && (
+                    <div className="col-span-4 py-8 border-2 border-dashed rounded-lg flex flex-col items-center justify-center opacity-40">
+                         <ImageIcon className="h-6 w-6 mb-1" />
+                         <span className="text-[8px] uppercase font-bold">No assets</span>
+                    </div>
+                )}
              </div>
         </div>
 
@@ -199,17 +252,17 @@ export default function CreatorPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-4 flex items-center justify-between">
                  <label className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-primary" /> AI Designer Chat
+                    <Sparkles className="h-3 w-3 text-primary" /> AI Designer Assistant
                  </label>
                  <div className="flex gap-1">
                      <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-                     <span className="text-[9px] text-muted-foreground uppercase font-medium">Assistant Online</span>
+                     <span className="text-[9px] text-muted-foreground uppercase font-medium">Online</span>
                  </div>
             </div>
 
             <div className="flex-1 px-4 overflow-y-auto space-y-4 custom-scrollbar pb-4">
                 <div className="bg-muted/50 p-3 rounded-2xl rounded-tl-none text-xs text-muted-foreground leading-relaxed italic">
-                    "Hello! Describe the vision for your box and I'll generate a custom texture for you."
+                    "Describe your brand vision and I'll generate a production-ready concept for your {currentTier.material} box."
                 </div>
                 {isGenerating && (
                      <div className="flex items-center gap-2 bg-primary/5 p-3 rounded-2xl animate-pulse">
@@ -218,12 +271,17 @@ export default function CreatorPage() {
                      </div>
                 )}
                 {design.imageUrl && design.description && !isGenerating && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="bg-primary/10 p-3 rounded-2xl rounded-tr-none text-xs text-primary-foreground bg-primary/80">
-                            I've created a {design.description.toLowerCase()} concept for you.
+                            Check out this concept for {currentTier.name}.
                         </div>
-                        <div className="rounded-xl overflow-hidden border-2 border-primary/20 shadow-lg">
+                        <div className="rounded-xl overflow-hidden border-2 border-primary/20 shadow-lg group relative">
                             <img src={design.imageUrl} alt="AI Preview" className="w-full aspect-video object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Button size="sm" variant="secondary" className="h-7 text-[10px] uppercase font-bold" onClick={() => fetchAssets()}>
+                                    Refresh View
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -235,7 +293,7 @@ export default function CreatorPage() {
                         name="prompt"
                         value={aiInput}
                         onChange={(e) => setAiInput(e.target.value)}
-                        placeholder="Describe pattern..." 
+                        placeholder="e.g. Minimalist floral pattern..." 
                         className="pr-10 h-10 text-xs rounded-full bg-white dark:bg-background border-muted/50 focus-visible:ring-primary/20"
                         disabled={isGenerating}
                     />
@@ -253,8 +311,8 @@ export default function CreatorPage() {
         </div>
 
         <div className="p-4 bg-primary/5 border-t">
-             <Button onClick={handleAddToCart} disabled={!design.imageUrl} className="w-full rounded-full py-6 font-bold shadow-lg shadow-primary/20">
-                <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
+             <Button onClick={handleAddToCart} disabled={!design.imageUrl} className="w-full rounded-full py-6 font-bold shadow-lg shadow-primary/20 uppercase tracking-tighter">
+                <ShoppingCart className="h-4 w-4 mr-2" /> Add {currentTier.name} to Cart
              </Button>
         </div>
     </div>
@@ -266,7 +324,7 @@ export default function CreatorPage() {
       <div className="absolute inset-0 z-0">
          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
          <ThreePreview 
-            key={`${design.imageUrl}-${selectedSizeId}`} 
+            key={`${design.imageUrl}-${selectedSizeId}-${selectedTierId}`} 
             imageUrl={design.imageUrl} 
             dimensions={{ width: currentSize.width, height: currentSize.height, depth: currentSize.depth }}
           />
@@ -287,7 +345,6 @@ export default function CreatorPage() {
                         <TooltipContent>Upload Artwork</TooltipContent>
                     </Tooltip>
                 </label>
-                {/* <Separator orientation="vertical" className="h-6 mx-2" /> */}
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full"><Type className="h-4 w-4" /></Button>
@@ -300,7 +357,6 @@ export default function CreatorPage() {
                     </TooltipTrigger>
                     <TooltipContent>Edit Mode</TooltipContent>
                 </Tooltip>
-                {/* <Separator orientation="vertical" className="h-6 mx-2" /> */}
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full"><Save className="h-4 w-4" /></Button>
@@ -322,7 +378,7 @@ export default function CreatorPage() {
          <Card className="h-full bg-white/90 dark:bg-black/60 backdrop-blur-md border-white/20 shadow-2xl flex flex-col rounded-2xl overflow-hidden">
             <CardHeader className="pb-4 bg-primary/5 border-b border-primary/10">
                 <CardTitle className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                    <Settings2 className="h-4 w-4" /> Box Settings
+                    <Settings2 className="h-4 w-4" /> Package Config
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto custom-scrollbar">
@@ -336,7 +392,7 @@ export default function CreatorPage() {
          <Card className="h-full bg-white/90 dark:bg-black/60 backdrop-blur-md border-white/20 shadow-2xl flex flex-col rounded-2xl overflow-hidden">
             <CardHeader className="pb-4 bg-primary/5 border-b border-primary/10">
                 <CardTitle className="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                    <ImageIcon className="h-4 w-4" /> Box Design
+                    <ImageIcon className="h-4 w-4" /> AI Design Studio
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
@@ -355,7 +411,7 @@ export default function CreatorPage() {
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[80vh] rounded-t-[32px] px-6">
                 <SheetHeader className="mb-4">
-                    <SheetTitle className="text-left font-headline">Box Settings</SheetTitle>
+                    <SheetTitle className="text-left font-headline">Package Configuration</SheetTitle>
                 </SheetHeader>
                 <div className="overflow-y-auto pb-10">
                     <BoxSettingsContent />
@@ -366,12 +422,12 @@ export default function CreatorPage() {
         <Sheet>
             <SheetTrigger asChild>
                 <Button size="lg" variant="secondary" className="flex-1 rounded-full shadow-lg gap-2">
-                    <ImageIcon className="h-4 w-4" /> Design
+                    <ImageIcon className="h-4 w-4" /> AI Studio
                 </Button>
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[90vh] rounded-t-[32px] p-0 flex flex-col">
                 <SheetHeader className="p-6 pb-2">
-                    <SheetTitle className="text-left font-headline">Box Design & AI</SheetTitle>
+                    <SheetTitle className="text-left font-headline">Design & AI assistant</SheetTitle>
                 </SheetHeader>
                 <div className="flex-1 overflow-hidden">
                     <BoxDesignContent />
