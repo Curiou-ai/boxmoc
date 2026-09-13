@@ -1,0 +1,78 @@
+
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Extended user data including Shopify and Stripe associations.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "shopifyCustomerId": { "type": "string", "description": "Unique Shopify Customer GID" },
+        "role": { "type": "string", "enum": ["user", "admin", "supplier"] },
+        "status": { "type": "string", "enum": ["active", "onboarding", "churned"] }
+      }
+    },
+    "Design": {
+      "title": "3D Design Parameters",
+      "description": "Full capture of the 3D canvas state for manufacturing.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "boxTier": { "type": "string", "enum": ["shipper", "retailer", "keepsake"] },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "number" },
+            "height": { "type": "number" },
+            "depth": { "type": "number" }
+          }
+        },
+        "canvasJson": {
+          "type": "object",
+          "description": "Stores SVG coordinates: x, y, rotation, scale"
+        },
+        "logoSvgUrl": { "type": "string", "description": "Path to the uploaded vector logo" },
+        "previewUrl": { "type": "string", "description": "Snapshot for visual verification" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "boxTier", "dimensions", "canvasJson"]
+    },
+    "Order": {
+      "title": "Fulfillment Order",
+      "description": "Production tracking record synced from Shopify.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "designId": { "type": "string" },
+        "shopifyOrderId": { "type": "string" },
+        "shopifyOrderName": { "type": "string", "description": "e.g. #1024" },
+        "quantity": { "type": "number" },
+        "amountTotal": { "type": "number" },
+        "printStatus": { 
+          "type": "string", 
+          "enum": ["PENDING", "READY", "PRINTING", "COMPLETED", "SHIPPED"],
+          "default": "PENDING"
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Root user profiles"
+    },
+    "/designs/{designId}": {
+      "schema": { "$ref": "#/entities/Design" },
+      "description": "Global design registry"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Production queue"
+    }
+  }
+}
