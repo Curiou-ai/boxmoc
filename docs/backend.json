@@ -19,7 +19,7 @@
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
-        "boxTier": { "type": "string", "enum": ["shipper", "retailer", "keepsake"] },
+        "boxTier": { "type": "string", "enum": ["shipper", "retailer", "bespoke"] },
         "dimensions": {
           "type": "object",
           "properties": {

@@ -61,8 +61,8 @@ export const PRODUCT_TIERS = [
         minQty: 5
     },
     { 
-        id: 'keepsake', 
-        name: 'The Bespoke Keepsake', 
+        id: 'bespoke', 
+        name: 'The Bespoke', 
         tier: 'Tier 3',
         material: '100% 3D Printed',
         target: 'Ultra-high-end gifts & VIPs',
@@ -129,7 +129,7 @@ function CreatorContent() {
       }
       
       const maxLimit = 9.8;
-      if (selectedTierId === 'keepsake') {
+      if (selectedTierId === 'bespoke') {
           setCustomDims(prev => ({
               width: Math.min(prev.width, maxLimit),
               height: Math.min(prev.height, maxLimit),
@@ -139,7 +139,7 @@ function CreatorContent() {
   }, [selectedTierId]);
 
   const updateDim = (dim: 'width' | 'height' | 'depth', val: number) => {
-      const maxVal = selectedTierId === 'keepsake' ? 9.8 : 24;
+      const maxVal = selectedTierId === 'bespoke' ? 9.8 : 24;
       const safeVal = Math.min(Math.max(0.1, val), maxVal);
       
       setCustomDims(prev => {
@@ -195,7 +195,7 @@ function CreatorContent() {
   };
 
   const BoxSettingsContent = () => {
-    const maxLimit = selectedTierId === 'keepsake' ? 9.8 : 24;
+    const maxLimit = selectedTierId === 'bespoke' ? 9.8 : 24;
 
     return (
         <div className="space-y-6 pt-2 pb-10">
@@ -332,7 +332,7 @@ function CreatorContent() {
                         </div>
                     )}
 
-                    {selectedTierId === 'keepsake' && (
+                    {selectedTierId === 'bespoke' && (
                         <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-md">
                             <p className="text-[9px] text-amber-500 font-bold leading-tight">
                                 <Info className="inline h-2 w-2 mr-1" />
@@ -355,7 +355,7 @@ function CreatorContent() {
                     value={[quantity]} 
                     min={currentTier.minQty} 
                     max={1000} 
-                    step={currentTier.id === 'keepsake' ? 1 : 10} 
+                    step={currentTier.id === 'bespoke' ? 1 : 10} 
                     onValueChange={(v) => setQuantity(v[0])}
                     className="py-4"
                 />

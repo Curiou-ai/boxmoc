@@ -478,7 +478,7 @@ export async function handleUploadDesignImage(formData: FormData): Promise<Uploa
 
 // --- Shopify Integration Types ---
 export interface DesignParams {
-    boxTier: 'shipper' | 'retailer' | 'keepsake';
+    boxTier: 'shipper' | 'retailer' | 'bespoke';
     dimensions: { width: number; height: number; depth: number };
     canvasJson: any;
     logoSvgUrl: string;
@@ -513,7 +513,7 @@ export async function handleAddToCartFlow(params: DesignParams) {
         const variantMap = {
             shipper: process.env.SHOPIFY_VARIANT_SHIPPER_ID || '123',
             retailer: process.env.SHOPIFY_VARIANT_RETAILER_ID || '456',
-            keepsake: process.env.SHOPIFY_VARIANT_KEEPSAKE_ID || '789'
+            bespoke: process.env.SHOPIFY_VARIANT_BESPOKE_ID || '789'
         };
 
         const cart = await addCustomBoxToCart({
