@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useActionState } from 'react';
+import { useState, useEffect, useActionState, Suspense } from 'react';
 import ThreePreview from '@/components/three-preview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Brush, Share2, Type, Save, Sparkles, Box, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Info, Layers, Ruler, Maximize2, Square } from 'lucide-react';
+import { Upload, Brush, Share2, Type, Save, Sparkles, ShoppingCart, Settings2, Image as ImageIcon, Send, Loader2, Info, Layers, Ruler, Maximize2, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -13,7 +13,7 @@ import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/context/cart-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getUserAssets, handleUploadDesignImage, type Asset, handleGenerateDesign } from '@/app/actions';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -72,11 +72,14 @@ export const PRODUCT_TIERS = [
     }
 ];
 
-export default function CreatorPage() {
+function CreatorContent() {
+  const searchParams = useSearchParams();
+  const initialTier = searchParams.get('tier') || 'shipper';
+  
   const [design, setDesign] = useState<{ imageUrl?: string; description?: string }>({});
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedSizeId, setSelectedSizeId] = useState('square-medium');
-  const [selectedTierId, setSelectedTierId] = useState('shipper');
+  const [selectedTierId, setSelectedTierId] = useState(initialTier);
   const [quantity, setQuantity] = useState(150);
   const [isUploading, setIsUploading] = useState(false);
   const [aiInput, setAiInput] = useState('');
@@ -593,5 +596,13 @@ export default function CreatorPage() {
           </Button>
       </div>
     </div>
+  );
+}
+
+export default function CreatorPage() {
+  return (
+    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>}>
+      <CreatorContent />
+    </Suspense>
   );
 }
