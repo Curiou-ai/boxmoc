@@ -163,3 +163,217 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     return NextResponse.json({ error: 'Invalid route' }, { status: 404 });
 }
+
+//PostgresSql Prisma
+/*
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+import { sendEmail } from '@/lib/email-service';
+import WelcomeEmail from '@/emails/WelcomeEmail';
+import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
+import { stripe } from '@/lib/stripe';
+
+/**
+ * Password validation schema to ensure security best practices.
+ */
+const passwordSchema = z.string()
+  .min(8, { message: "Password must be at least 8 characters long." })
+  .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
+  .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter." })
+  .regex(/[0-9]/, { message: "Password must contain at least one number." })
+  .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character." });
+
+// Initialize Supabase client for server-side operations
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export async function POST(request: NextRequest, { params }: { params: Promise<{ route: string[] }> }) {
+    const { route: routeArray } = await params;
+    const route = routeArray.join('/');
+    const body = await request.formData();
+    const cookieStore = await cookies();
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: { persistSession: false }
+    });
+
+    try {
+        if (route === 'login') {
+            const email = body.get('email') as string;
+            const password = body.get('password') as string;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) throw error;
+            const session = data.session;
+
+            const response = NextResponse.redirect(new URL('/creator', request.url));
+            
+            // Set Supabase session tokens in cookies
+            if (session) {
+                response.cookies.set('sb-access-token', session.access_token, {
+                    maxAge: session.expires_in,
+                    httpOnly: true,
+                    secure: true,
+                    path: '/',
+                    sameSite: 'lax',
+                });
+                response.cookies.set('sb-refresh-token', session.refresh_token, {
+                    maxAge: 60 * 60 * 24 * 30, // 30 days
+                    httpOnly: true,
+                    secure: true,
+                    path: '/',
+                    sameSite: 'lax',
+                });
+            }
+            
+            // Security notification for new login
+            await sendEmail({
+              to: email,
+              subject: `New Sign-In to Your Boxmoc Account`,
+              react: SignInNotificationEmail({
+                email: email,
+                signInTime: new Date(),
+                ipAddress: request.headers.get('x-forwarded-for') || undefined,
+                userAgent: request.headers.get('user-agent'),
+                appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'
+              })
+            });
+
+            return response;
+
+        } else if (route === 'signup') {
+            const email = body.get('email') as string;
+            const password = body.get('password') as string;
+            const displayName = body.get('displayName') as string;
+
+            const passwordValidation = passwordSchema.safeParse(password);
+            if (!passwordValidation.success) {
+                const errorMessage = passwordValidation.error.errors[0].message;
+                const url = request.nextUrl.clone();
+                url.pathname = '/signup';
+                url.searchParams.set('error', errorMessage);
+                return NextResponse.redirect(url);
+            }
+
+            // Create Supabase Auth user
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { display_name: displayName }
+                }
+            });
+
+            if (authError || !authData.user) {
+                throw authError || new Error('Failed to create user');
+            }
+
+            const userId = authData.user.id;
+
+            // Create Stripe Customer
+            const stripeCustomer = await stripe.customers.create({
+                email,
+                name: displayName,
+                metadata: { supabaseUID: userId },
+            });
+            
+            // Create User Record in PostgreSQL via Prisma
+            await prisma.user.create({
+                data: {
+                    id: userId, // Matches Supabase Auth UUID
+                    email: authData.user.email!,
+                    displayName: displayName || '',
+                    photoURL: null,
+                    role: 'user',
+                    stripeCustomerId: stripeCustomer.id,
+                    status: 'active'
+                }
+            });
+            
+            await sendEmail({
+              to: email,
+              subject: `Welcome to ${process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc'}!`,
+              react: WelcomeEmail({ name: displayName, appName: process.env.NEXT_PUBLIC_APP_NAME || 'Boxmoc' })
+            });
+
+            const response = NextResponse.redirect(new URL('/creator', request.url));
+            
+            if (authData.session) {
+                response.cookies.set('sb-access-token', authData.session.access_token, {
+                    maxAge: authData.session.expires_in,
+                    httpOnly: true,
+                    secure: true,
+                    path: '/',
+                    sameSite: 'lax',
+                });
+                response.cookies.set('sb-refresh-token', authData.session.refresh_token, {
+                    maxAge: 60 * 60 * 24 * 30,
+                    httpOnly: true,
+                    secure: true,
+                    path: '/',
+                    sameSite: 'lax',
+                });
+            }
+            
+            return response;
+
+        } else if (route === 'google-signin') {
+            return NextResponse.redirect(new URL('/google-auth-handler', request.url));
+
+        } else if (route === 'logout') {
+            await supabase.auth.signOut();
+            const response = NextResponse.redirect(new URL('/login', request.url));
+            response.cookies.delete('sb-access-token');
+            response.cookies.delete('sb-refresh-token');
+            return response;
+        }
+
+    } catch (error: any) {
+        console.error('Auth API Error:', error);
+        const url = request.nextUrl.clone();
+        url.pathname = route === 'login' ? '/login' : '/signup';
+        url.searchParams.set('error', error.message);
+        return NextResponse.redirect(url);
+    }
+
+    return NextResponse.json({ error: 'Invalid route' }, { status: 404 });
+}
+
+export async function GET(request: NextRequest, { params }: { params: Promise<{ route: string[] }> }) {
+    const { route: routeArray } = await params;
+    const route = routeArray.join('/');
+
+    if (route === 'session') {
+        const cookieStore = await cookies();
+        const accessToken = cookieStore.get('sb-access-token')?.value;
+        
+        if (!accessToken) return NextResponse.json({ session: null }, { status: 401 });
+        
+        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: { persistSession: false }
+        });
+
+        try {
+            const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+            if (error || !user) return NextResponse.json({ session: null }, { status: 401 });
+
+            // Optionally fetch extended user profile from Prisma if needed
+            const userProfile = await prisma.user.findUnique({
+                where: { id: user.id }
+            });
+
+            return NextResponse.json({ session: { user, profile: userProfile } });
+        } catch {
+            return NextResponse.json({ session: null }, { status: 401 });
+        }
+    }
+    return NextResponse.json({ error: 'Invalid route' }, { status: 404 });
+}
+*/
