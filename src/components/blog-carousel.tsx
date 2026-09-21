@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useRef } from 'react';
@@ -6,26 +5,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, ChevronLeft, Calendar, User } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import placeholderData from '@/app/lib/placeholder-images.json';
 
 const blogPosts = [
   {
+    id: 6,
+    title: "Packaging for Purpose: Delivering Hope to Marginalized Communities.",
+    description: "How Boxmoc's durable shipper boxes are being used to combat food insecurity and provide critical healthcare resources to displaced and underserved populations.",
+    date: "May 18, 2024",
+    imageId: "community-aid-packages"
+  },
+  {
     id: 1,
-    title: "Our Origin Story: Building a faster path to professional marketing.",
-    description: "The journey of Boxmoc from a simple idea to a powerhouse design platform built specifically for creators and small businesses.",
-    date: "May 05, 2024",
-    imageId: "origin-story"
-  },
-  {
-    id: 5,
-    title: "Bespoke Souvenirs: Crafting lasting memories for your most important celebrations.",
-    description: "Explore how our Tier 3 3D-printed keepsake boxes are redefining event gifting, providing a solid, indestructible home for souvenirs that commemorate life's biggest milestones.",
-    date: "May 15, 2024",
-    imageId: "bespoke-souvenirs"
-  },
-  {
-    id: 2,
     title: "Solving branding exposure issues for SMEs who need care packages for their workforce.",
     description: "Discover how custom-branded care packages can boost employee morale while turning every team member into a brand ambassador.",
     date: "May 12, 2024",
@@ -33,13 +25,27 @@ const blogPosts = [
   },
   {
     id: 3,
+    title: "Bespoke Souvenirs: Crafting lasting memories for your most important events.",
+    description: "Explore how our bespoke boxes are redefining event gifting, providing a solid option for small gifts and souvenirs that commemorate an occasion.",
+    date: "May 15, 2024",
+    imageId: "bespoke-souvenirs"
+  },
+  {
+    id: 2,
+    title: "Our Origin Story: Building a faster path to professional marketing.",
+    description: "The journey of Boxmoc from a simple idea to a powerhouse design platform built specifically for creators and small businesses.",
+    date: "May 05, 2024",
+    imageId: "origin-story"
+  },
+  {
+    id: 4,
     title: "How we develop our supply chains to help equip growing demand.",
     description: "An inside look at Boxmoc's scalable logistics network and how we ensure rapid delivery even as order volumes skyrocket.",
     date: "May 10, 2024",
     imageId: "supply-chain-growth"
   },
   {
-    id: 4,
+    id: 5,
     title: "Taking control of event planning: Cutting labor costs and time with DIY branding.",
     description: "Learn how individuals are using our AI tools to design professional materials for weddings and parties without the agency price tag.",
     date: "May 08, 2024",
