@@ -10,18 +10,18 @@ import placeholderData from '@/app/lib/placeholder-images.json';
 
 const blogPosts = [
   {
-    id: 6,
-    title: "Packaging for Purpose: Delivering Hope to Marginalized Communities.",
-    description: "How Boxmoc's durable shipper boxes are being used to combat food insecurity and provide critical healthcare resources to displaced and underserved populations.",
-    date: "May 18, 2024",
-    imageId: "community-aid-packages"
-  },
-  {
     id: 1,
     title: "Solving branding exposure issues for SMEs who need care packages for their workforce.",
     description: "Discover how custom-branded care packages can boost employee morale while turning every team member into a brand ambassador.",
     date: "May 12, 2024",
     imageId: "sme-care-packages"
+  },
+  {
+    id: 2,
+    title: "Packaging for Purpose: Delivering Hope to Marginalized Communities.",
+    description: "How Boxmoc's durable shipper and supplier boxes are being used to combat food insecurity and provide critical healthcare resources to displaced and underserved populations.",
+    date: "May 18, 2024",
+    imageId: "community-aid-packages"
   },
   {
     id: 3,
@@ -31,21 +31,21 @@ const blogPosts = [
     imageId: "bespoke-souvenirs"
   },
   {
-    id: 2,
+    id: 4,
     title: "Our Origin Story: Building a faster path to professional marketing.",
     description: "The journey of Boxmoc from a simple idea to a powerhouse design platform built specifically for creators and small businesses.",
     date: "May 05, 2024",
     imageId: "origin-story"
   },
   {
-    id: 4,
+    id: 5,
     title: "How we develop our supply chains to help equip growing demand.",
     description: "An inside look at Boxmoc's scalable logistics network and how we ensure rapid delivery even as order volumes skyrocket.",
     date: "May 10, 2024",
     imageId: "supply-chain-growth"
   },
   {
-    id: 5,
+    id: 6,
     title: "Taking control of event planning: Cutting labor costs and time with DIY branding.",
     description: "Learn how individuals are using our AI tools to design professional materials for weddings and parties without the agency price tag.",
     date: "May 08, 2024",
