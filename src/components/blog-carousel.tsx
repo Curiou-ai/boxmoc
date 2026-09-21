@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useRef } from 'react';
@@ -11,36 +12,39 @@ import placeholderData from '@/app/lib/placeholder-images.json';
 const blogPosts = [
   {
     id: 1,
-    title: "Solving branding exposure issues for SMEs who need care packages for their workforce.",
-    description: "Discover how custom-branded care packages can boost employee morale while turning every team member into a brand ambassador.",
-    date: "May 12, 2024",
-    author: "Elena Rodriguez",
-    imageId: "sme-care-packages"
-  },
-  {
-    id: 2,
-    title: "How we develop our supply chains to help equip growing demand.",
-    description: "An inside look at Boxmoc's scalable logistics network and how we ensure rapid delivery even as order volumes skyrocket.",
-    date: "May 10, 2024",
-    author: "Marcus Chen",
-    imageId: "supply-chain-growth"
-  },
-  {
-    id: 3,
-    title: "Taking control of event planning: Cutting labor costs and time with DIY branding.",
-    description: "Learn how individuals are using our AI tools to design professional materials for weddings and parties without the agency price tag.",
-    date: "May 08, 2024",
-    author: "Sarah Jenkins",
-    imageId: "event-planning-control"
-  },
-  {
-    id: 4,
     title: "Our Origin Story: Building a faster path to professional marketing.",
     description: "The journey of Boxmoc from a simple idea to a powerhouse design platform built specifically for creators and small businesses.",
     date: "May 05, 2024",
-    author: "David Volek",
     imageId: "origin-story"
-  }
+  },
+  {
+    id: 5,
+    title: "Bespoke Souvenirs: Crafting lasting memories for your most important celebrations.",
+    description: "Explore how our Tier 3 3D-printed keepsake boxes are redefining event gifting, providing a solid, indestructible home for souvenirs that commemorate life's biggest milestones.",
+    date: "May 15, 2024",
+    imageId: "bespoke-souvenirs"
+  },
+  {
+    id: 2,
+    title: "Solving branding exposure issues for SMEs who need care packages for their workforce.",
+    description: "Discover how custom-branded care packages can boost employee morale while turning every team member into a brand ambassador.",
+    date: "May 12, 2024",
+    imageId: "sme-care-packages"
+  },
+  {
+    id: 3,
+    title: "How we develop our supply chains to help equip growing demand.",
+    description: "An inside look at Boxmoc's scalable logistics network and how we ensure rapid delivery even as order volumes skyrocket.",
+    date: "May 10, 2024",
+    imageId: "supply-chain-growth"
+  },
+  {
+    id: 4,
+    title: "Taking control of event planning: Cutting labor costs and time with DIY branding.",
+    description: "Learn how individuals are using our AI tools to design professional materials for weddings and parties without the agency price tag.",
+    date: "May 08, 2024",
+    imageId: "event-planning-control"
+  },
 ];
 
 export function BlogCarousel() {
@@ -110,18 +114,14 @@ export function BlogCarousel() {
                   <CardHeader className="p-0 mb-4 overflow-hidden rounded-xl bg-muted">
                     <Image
                       src={img?.url || ''}
-                      width={img?.width}
-                      height={img?.height}
+                      width={img?.width || 600}
+                      height={img?.height || 400}
                       alt={img?.alt || ''}
                       data-ai-hint={img?.hint}
                       className="aspect-[3/2] object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </CardHeader>
                   <CardContent className="p-0 flex-1 space-y-3">
-                    {/* <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {post.date}</span>
-                      <span className="flex items-center gap-1"><User className="h-3 w-3" /> {post.author}</span>
-                    </div> */}
                     <h3 className="text-xl font-bold font-headline leading-tight group-hover:text-primary transition-colors line-clamp-2">
                       {post.title}
                     </h3>

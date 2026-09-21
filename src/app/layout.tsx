@@ -10,7 +10,7 @@ import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Boxmoc',
-  description: 'Create stunning designs for packaging, promotions, and events with AI',
+  description: 'Custom packaging solutions for your everyday needs',
 };
 
 export default function RootLayout({
