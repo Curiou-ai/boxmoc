@@ -1,8 +1,7 @@
-
 'use client';
 
 import { useState, useTransition } from 'react';
-import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu, ChevronDown, Languages } from 'lucide-react'
+import { ArrowRight, Box, BrainCircuit, Paintbrush, Menu, ChevronDown, Languages, Users, Info } from 'lucide-react'
 import Navbar from '@/components/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -17,6 +16,7 @@ import { translateHeadline } from './actions';
 import DashboardHero from '@/components/ui/dashboard';
 import BoxmocAI from '@/components/ui/chatbot-svg';
 import { BlogCarousel } from '@/components/blog-carousel';
+import { Badge } from '@/components/ui/badge';
 
 const languages = [
     { code: 'en', name: 'English', original: 'Your Brand, Delivered' },
@@ -65,12 +65,6 @@ export default function LandingPage() {
               </div>
               <div className="w-full max-w-xs space-y-8 mb-6">
                 <form className="flex flex-col gap-5">
-                  {/* <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="h-12"
-                    aria-label="Email"
-                  /> */}
                   <Button type="submit" asChild size="lg" className="w-full mb-8">
                     <Link href="/creator">
                       Get Started
@@ -80,6 +74,56 @@ export default function LandingPage() {
               </div>
               <div className="w-full mx-auto">
                 <DashboardHero />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* About Section - Teaser inspired by design reference */}
+        <section className="w-full py-16 md:py-24 bg-background flex items-center justify-center border-y">
+          <div className="container px-4 md:px-6 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <Badge variant="outline" className="px-4 py-1 text-primary border-primary/30 bg-primary/5 uppercase tracking-widest font-bold text-[10px]">
+                  Innovating since 2024
+                </Badge>
+                <h2 className="text-3xl md:text-5xl font-bold font-headline leading-tight">
+                  Innovating the future of custom brand expression
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Boxmoc is more than just a packaging platform. We are a dedicated team focused on building 
+                  intelligent, AI-powered design tools that simplify complexity and drive meaningful growth 
+                  for modern creators.
+                </p>
+                <Button asChild size="lg" className="rounded-full px-8 group">
+                  <Link href="/about">
+                    Learn Our Story <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4 relative">
+                <div className="space-y-4 pt-12">
+                   <div className="bg-primary/10 rounded-2xl aspect-square flex items-center justify-center p-6 border border-primary/20">
+                      <BrainCircuit className="h-12 w-12 text-primary" />
+                   </div>
+                   <div className="bg-accent/10 rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border border-accent/20">
+                      <Image 
+                        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=400&h=600&auto=format&fit=crop"
+                        width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
+                      />
+                   </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="bg-card rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border shadow-xl">
+                      <div className="text-center">
+                         <p className="text-4xl font-bold font-headline mb-1">99%</p>
+                         <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Precision</p>
+                      </div>
+                   </div>
+                   <div className="bg-muted rounded-2xl aspect-square flex items-center justify-center p-6 border">
+                      <Users className="h-12 w-12 text-muted-foreground/50" />
+                   </div>
+                </div>
               </div>
             </div>
           </div>
@@ -161,19 +205,8 @@ export default function LandingPage() {
                     From corporate events to e-commerce brands, Boxmoc provides the tools and flexibility for any team to create the perfect promotional materials, packaging, and more.
                 </p>
                 </div>
-                {/* photo-1609143739217-01b60dad1c67 */}
                 <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
                 <div>
-                    {/* <div className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-muted/30 mb-8">
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12.22 2h-4.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.44.25a2 2 0 0 1-2 1.73V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7.29a2 2 0 0 0-1-1.73l-4.44-2.54a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><path d="M18 13.13V22"></path><path d="M6 13.13V22"></path><path d="M12 13.13V22"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="m7.5 4.27 9 5.15"></path><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M12 12h.01"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><circle cx="12" cy="12" r="10"></circle><path d="m14.31 8 5.74 9.94"></path><path d="M9.69 8h11.48"></path><path d="m7.38 12 5.74-9.94"></path><path d="M9.69 16 3.95 6.06"></path><path d="M14.31 16H2.83"></path><path d="m16.62 12-5.74 9.94"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l10-10A1 1 0 0 0 22 12V2h-4"></path><path d="M7 7h.01"></path></svg></div>
-                        <div className="flex items-center justify-center p-2 bg-background rounded-lg shadow-sm aspect-square"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-primary"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
-                    </div> */}
                     <div className="relative mb-8 overflow-hidden rounded-xl">
                     <Image
                         src="https://images.unsplash.com/photo-1609143739217-01b60dad1c67?q=80&w=1920&h=1080&auto=format&fit=crop&ixlib=rb-4.0.3"
@@ -272,7 +305,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="w-full shrink-0 border-t">
-        <div className="container flex flex-col gap-2 sm:flex-row py-6 max-w-7xl items-center px-4 md:px-6">
+        <div className="container flex flex-col gap-2 sm:flex-row py-6 max-w-7xl mx-auto items-center px-4 md:px-6">
             <p className="text-xs text-muted-foreground text-center sm:text-left">&copy; 2024 Boxmoc. All rights reserved.</p>
             <nav className="sm:ml-auto flex gap-4 sm:gap-6">
               <Link href="/contact" className="text-xs hover:underline underline-offset-4">

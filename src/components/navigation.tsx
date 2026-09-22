@@ -42,6 +42,7 @@ export default function Navbar(){
                             Resources <ChevronDown className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className='absolute top-4 -left-[80] -translate-x-1/4 rounded-2xl max-w-7xl container mx-auto w-[100vw] h-[600px] overflow-hidden p-4 sm:p-6 backdrop-blur-sm'>
+                            <DropdownMenuItem asChild><Link href="/about">About Us</Link></DropdownMenuItem>
                             <DropdownMenuItem>Blog</DropdownMenuItem>
                             <DropdownMenuItem>Help Center</DropdownMenuItem>
                             <DropdownMenuItem asChild><Link href="/contact">Contact</Link></DropdownMenuItem>
@@ -84,6 +85,7 @@ export default function Navbar(){
                         <Box className="h-6 w-6 text-primary" />
                         <span className="font-bold">Boxmoc</span>
                         </Link>
+                        <Link href="/about" className="text-muted-foreground hover:text-foreground">About Us</Link>
                         <Link href="#" className="text-muted-foreground hover:text-foreground">Product</Link>
                         <Link href="#" className="text-muted-foreground hover:text-foreground">Solutions</Link>
                         <Link href="#" className="text-muted-foreground hover:text-foreground">Resources</Link>

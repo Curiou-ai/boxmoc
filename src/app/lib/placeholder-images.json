@@ -48,5 +48,39 @@
       "alt": "Luxury bespoke souvenir box",
       "hint": "luxury gift"
     }
+  ],
+  "about": [
+    {
+      "id": "founder",
+      "url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2000&auto=format&fit=crop",
+      "width": 800,
+      "height": 800,
+      "alt": "Boxmoc Founder",
+      "hint": "professional man"
+    },
+    {
+      "id": "floating-1",
+      "url": "https://images.unsplash.com/photo-1595246007497-15e0ed4b8d96?q=80&w=600&auto=format&fit=crop",
+      "width": 300,
+      "height": 300,
+      "alt": "Design Sample 1",
+      "hint": "package design"
+    },
+    {
+      "id": "floating-2",
+      "url": "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600&auto=format&fit=crop",
+      "width": 300,
+      "height": 300,
+      "alt": "Design Sample 2",
+      "hint": "abstract design"
+    },
+    {
+      "id": "floating-3",
+      "url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+      "width": 300,
+      "height": 300,
+      "alt": "Design Sample 3",
+      "hint": "graphic design"
+    }
   ]
 }
