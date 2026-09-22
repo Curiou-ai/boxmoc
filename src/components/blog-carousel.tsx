@@ -77,7 +77,7 @@ export function BlogCarousel() {
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Insights & Inspiration</h2>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              Stay updated with the latest trends in custom branding, design efficiency, and our company journey.
+              Stay updated with the latest inititatives
             </p>
           </div>
           <div className="flex items-center gap-2">

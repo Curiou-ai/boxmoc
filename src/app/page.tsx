@@ -17,6 +17,7 @@ import DashboardHero from '@/components/ui/dashboard';
 import BoxmocAI from '@/components/ui/chatbot-svg';
 import { BlogCarousel } from '@/components/blog-carousel';
 import { Badge } from '@/components/ui/badge';
+import { FaqSection } from '@/components/faq-section';
 
 const languages = [
     { code: 'en', name: 'English', original: 'Your Brand, Delivered' },
@@ -79,55 +80,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* About Section - Teaser inspired by design reference */}
-        <section className="w-full py-16 md:py-24 bg-background flex items-center justify-center border-y">
-          <div className="container px-4 md:px-6 max-w-6xl">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <Badge variant="outline" className="px-4 py-1 text-primary border-primary/30 bg-primary/5 uppercase tracking-widest font-bold text-[10px]">
-                  Innovating since 2024
-                </Badge>
-                <h2 className="text-3xl md:text-5xl font-bold font-headline leading-tight">
-                  Innovating the future of custom brand expression
-                </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed">
-                  Boxmoc is more than just a packaging platform. We are a dedicated team focused on building 
-                  intelligent, AI-powered design tools that simplify complexity and drive meaningful growth 
-                  for modern creators.
-                </p>
-                <Button asChild size="lg" className="rounded-full px-8 group">
-                  <Link href="/about">
-                    Learn Our Story <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </div>
-              <div className="grid grid-cols-2 gap-4 relative">
-                <div className="space-y-4 pt-12">
-                   <div className="bg-primary/10 rounded-2xl aspect-square flex items-center justify-center p-6 border border-primary/20">
-                      <BrainCircuit className="h-12 w-12 text-primary" />
-                   </div>
-                   <div className="bg-accent/10 rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border border-accent/20">
-                      <Image 
-                        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=400&h=600&auto=format&fit=crop"
-                        width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
-                      />
-                   </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="bg-card rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border shadow-xl">
-                      <div className="text-center">
-                         <p className="text-4xl font-bold font-headline mb-1">99%</p>
-                         <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Precision</p>
-                      </div>
-                   </div>
-                   <div className="bg-muted rounded-2xl aspect-square flex items-center justify-center p-6 border">
-                      <Users className="h-12 w-12 text-muted-foreground/50" />
-                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        
 
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-7xl">
@@ -177,7 +130,7 @@ export default function LandingPage() {
             <div className="flex flex-col min-[896px]:flex-row gap-10 min-[896px]:gap-16 items-center">
               <div className="space-y-6 min-[896px]:w-1/2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
-                  The one place where all teams gather to build together
+                  The one place to gather and build
                 </h2>
                 <ServicesAccordion />
               </div>
@@ -202,7 +155,7 @@ export default function LandingPage() {
                     Built for Endless Creativity
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
-                    From corporate events to e-commerce brands, Boxmoc provides the tools and flexibility for any team to create the perfect promotional materials, packaging, and more.
+                    The tools and flexibility you need to create
                 </p>
                 </div>
                 <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
@@ -241,8 +194,13 @@ export default function LandingPage() {
                     <p className="mt-4 text-muted-foreground">
                       Take full control with our easy-to-use design tools. Upload assets, create designs for cards, flyers, and packaging, and see your vision come to life in stunning 3D.
                     </p>
-                    <Button asChild variant="secondary" className="mt-6">
-                    <Link href="/creator">Explore the Tools</Link>
+                    {/* <Button asChild variant="secondary" className="mt-6">
+                    <Link href="/creator">Get Started</Link>
+                    </Button> */}
+                    <Button type="submit" asChild className="mt-6">
+                      <Link href="/creator">
+                        Get Started
+                      </Link>
                     </Button>
                 </div>
                 </div>
@@ -253,12 +211,63 @@ export default function LandingPage() {
 
         <BlogCarousel />
 
+        {/* About Section - Teaser inspired by design reference */}
+        <section className="w-full py-16 md:py-24 bg-background flex items-center justify-center">
+          <div className="container px-4 md:px-6 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                {/* <Badge variant="outline" className="px-4 py-1 text-primary border-primary/30 bg-primary/5 uppercase tracking-widest font-bold text-[10px]">
+                  Innovating since 2024
+                </Badge> */}
+                <h2 className="text-3xl md:text-5xl font-bold font-headline leading-tight">
+                  Innovating the future of custom brand expression
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Boxmoc is more than just a packaging platform. We are a dedicated team focused on building 
+                  intelligent, design tools that simplify complexity and drive meaningful growth.
+                </p>
+                <Button asChild size="lg" className="rounded-full px-8 group">
+                  <Link href="/about">
+                    Learn Our Story <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4 relative">
+                <div className="space-y-4 pt-12">
+                   <div className="bg-primary/10 rounded-2xl aspect-square flex items-center justify-center p-6 border border-primary/20">
+                      <BrainCircuit className="h-12 w-12 text-primary" />
+                   </div>
+                   <div className="bg-accent/10 rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border border-accent/20">
+                      <Image 
+                        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=400&h=600&auto=format&fit=crop"
+                        width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
+                      />
+                   </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="bg-card rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border shadow-xl">
+                      <div className="text-center">
+                         <p className="text-4xl font-bold font-headline mb-1">99%</p>
+                         <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Precision</p>
+                      </div>
+                   </div>
+                   <div className="bg-muted rounded-2xl aspect-square flex items-center justify-center p-6 border">
+                      <Users className="h-12 w-12 text-muted-foreground/50" />
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <FaqSection />
+
         <section className="w-full py-12 md:py-24 lg:py-32 border-t bg-card flex items-center justify-center">
           <div className="container grid grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-8 items-center justify-center px-4 md:px-6 max-w-7xl">
             <div className="space-y-6">
             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Ready to Create Your Masterpiece?</h2>
               <p className="max-w-md text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Start creating your custom designs today. Create an account and get started.
+                Start creating your custom boxes today. Create an account and get started.
               </p>
 
               <div className="flex items-center gap-4">

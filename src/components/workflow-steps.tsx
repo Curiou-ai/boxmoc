@@ -6,7 +6,7 @@ const workflowSteps = [
     {
         icon: <BrainCircuit className="h-10 w-10 text-primary" />,
         title: "1. Design Your Vision",
-        description: "Choose from a variety of templates, or start with a simple text prompt to describe your idea with AI, and we will generate unique design concepts for your boxes in seconds."
+        description: "Choose from a variety of templates, or start with a simple text prompt to describe your idea with AI, and we will generate unique design concepts for your boxes."
     },
     {
         icon: <Paintbrush className="h-10 w-10 text-primary" />,
