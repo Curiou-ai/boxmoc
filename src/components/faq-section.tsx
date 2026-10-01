@@ -14,7 +14,7 @@ const faqs = [
   },
   {
     question: "What are the differences between the product tiers?",
-    answer: "We offer three distinct tiers: 'The Custom Shipper' (Standard cardboard for e-commerce), 'The Elegant Retailer' (Premium heavy-duty paper for luxury boutiques), and 'The Bespoke Keepsake' (Indestructible 3D-printed materials for high-end events and VIP gifts)."
+    answer: "We offer three distinct tiers: 'Shipper' (Big sized boxes for commercial activities), 'Retailer' (Premium heavy-duty paper for luxury boutiques), and 'Bespoke' (Indestructible 3D-printed materials for high-end events and VIP gifts)."
   },
   {
     question: "Is the 3D preview accurate to the final product?",
@@ -43,7 +43,7 @@ export function FaqSection() {
             Frequently Asked Questions
           </h2>
           <p className="max-w-[700px] text-muted-foreground md:text-xl/relaxed">
-            Everything you need to know about Boxmoc's AI design platform and production process.
+            Everything you need to know about our process.
           </p>
         </div>
         <div className="w-full">

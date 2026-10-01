@@ -6,7 +6,7 @@ import Navbar from '@/components/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import { Input } from '@/components/ui/input'
+// import { Input } from '@/components/ui/input'
 import FeaturesTabs from '@/components/features-tabs'
 import { ServicesAccordion } from '@/components/services-accordion'
 import Testimonials from '@/components/testimonials'
@@ -16,7 +16,6 @@ import { translateHeadline } from './actions';
 import DashboardHero from '@/components/ui/dashboard';
 import BoxmocAI from '@/components/ui/chatbot-svg';
 import { BlogCarousel } from '@/components/blog-carousel';
-import { Badge } from '@/components/ui/badge';
 import { FaqSection } from '@/components/faq-section';
 
 const languages = [
@@ -235,25 +234,31 @@ export default function LandingPage() {
               <div className="grid grid-cols-2 gap-4 relative">
                 <div className="space-y-4 pt-12">
                    <div className="bg-primary/10 rounded-2xl aspect-square flex items-center justify-center p-6 border border-primary/20">
-                      <BrainCircuit className="h-12 w-12 text-primary" />
+                      <Image 
+                        src="https://images.unsplash.com/photo-1759563874662-0cd5fb77f469?q=80&w=400&h=600&auto=format&fit=crop"
+                        width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
+                      />                   
                    </div>
                    <div className="bg-accent/10 rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border border-accent/20">
                       <Image 
-                        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=400&h=600&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1714163342432-e362d5fab2b4?q=80&w=400&h=600&auto=format&fit=crop"
                         width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
                       />
                    </div>
                 </div>
                 <div className="space-y-4">
                   <div className="bg-card rounded-2xl aspect-[3/4] flex items-center justify-center p-6 border shadow-xl">
-                      <div className="text-center">
-                         <p className="text-4xl font-bold font-headline mb-1">99%</p>
-                         <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Precision</p>
-                      </div>
+                      <Image 
+                        src="https://images.unsplash.com/photo-1716193348750-9e22b67718c6?q=80&w=400&h=600&auto=format&fit=crop"
+                        width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
+                      />
                    </div>
                    <div className="bg-muted rounded-2xl aspect-square flex items-center justify-center p-6 border">
-                      <Users className="h-12 w-12 text-muted-foreground/50" />
-                   </div>
+                      <Image 
+                        src="https://images.unsplash.com/photo-1595246007497-15e0ed4b8d96?q=80&w=400&h=600&auto=format&fit=crop"
+                        width={400} height={600} alt="Interior Design" className="rounded-xl object-cover h-full opacity-60"
+                      />
+                  </div>
                 </div>
               </div>
             </div>
@@ -277,10 +282,9 @@ export default function LandingPage() {
                     <span className="ml-2">›</span>
                   </Link>
                 </Button>
-
                 <Link
                   href="/contact"
-                  className="text-sm font-medium hover:text-blue-400 transition"
+                  className="text-sm font-medium hover:text-primary transition"
                 >
                   Contact sales ›
                 </Link>
@@ -304,7 +308,7 @@ export default function LandingPage() {
 
               <Link
                 href="/pricing"
-                className="inline-flex items-center text-sm font-medium hover:text-blue-400 transition"
+                className="inline-flex items-center text-sm font-medium hover:text-primary transition"
               >
                 Pricing details ›
               </Link>

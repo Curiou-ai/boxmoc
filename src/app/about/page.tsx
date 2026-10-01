@@ -51,11 +51,11 @@ export default function AboutPage() {
         </section>
 
         {/* Mission & stats Section (Dark Theme) */}
-        <section className="w-full py-20 bg-[#0c0c0c] text-white flex items-center justify-center">
+        <section className="w-full py-20 bg-background text-white flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-6xl">
             <div className="text-center mb-16 space-y-4">
-              <Badge variant="outline" className="text-primary border-primary">Our Mission & Target</Badge>
-              <h2 className="text-3xl md:text-5xl font-bold font-headline">Helping brands create better<br />materials and grow smarter</h2>
+              {/* <Badge variant="outline" className="text-primary border-primary">Our Mission & Target</Badge> */}
+              <h2 className="text-3xl md:text-5xl font-bold font-headline">Helping you design<br />and grow smarter</h2>
             </div>
             
             <div className="grid md:grid-cols-2 gap-12 mb-20">
@@ -91,17 +91,17 @@ export default function AboutPage() {
               <div className="space-y-2">
                 <p className="text-4xl font-bold font-headline">99%</p>
                 <p className="text-gray-400 text-sm uppercase tracking-widest font-bold">Design Accuracy</p>
-                <p className="text-gray-500 text-xs">Precise rendering across all 3D previews.</p>
+                {/* <p className="text-gray-500 text-xs">Precise rendering across all 3D previews.</p> */}
               </div>
               <div className="space-y-2">
                 <p className="text-4xl font-bold font-headline">1.8X</p>
                 <p className="text-gray-400 text-sm uppercase tracking-widest font-bold">Faster Delivery</p>
-                <p className="text-gray-500 text-xs">Automated workflows reduce production time.</p>
+                {/* <p className="text-gray-500 text-xs">Automated workflows reduce production time.</p> */}
               </div>
               <div className="space-y-2">
                 <p className="text-4xl font-bold font-headline">95%</p>
                 <p className="text-gray-400 text-sm uppercase tracking-widest font-bold">Client Satisfaction</p>
-                <p className="text-gray-500 text-xs">Top-rated support for professional creators.</p>
+                {/* <p className="text-gray-500 text-xs">Top-rated support for professional creators.</p> */}
               </div>
             </div>
           </div>
@@ -123,20 +123,19 @@ export default function AboutPage() {
                 />
               </div>
               <div className="space-y-8">
-                <Badge variant="outline">Founder</Badge>
+                {/* <Badge variant="outline">Founder</Badge> */}
                 <h2 className="text-3xl md:text-5xl font-bold font-headline tracking-tight">The visionary behind the platform</h2>
                 <div className="relative">
-                  <Quote className="absolute -top-6 -left-6 h-12 w-12 text-primary/10" />
                   <blockquote className="text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/80">
-                    "I started this company with one belief: professional design should be predictable, 
-                    measurable, and driven by real human creativity enhanced by AI. When strategy and insight 
+                    "We believe professional design should be predictable, 
+                    measurable, and driven by real human creativity. When strategy and insight 
                     come together, brand expression becomes a powerful engine for sustainable success."
                   </blockquote>
                 </div>
-                <div>
-                  <p className="font-bold text-lg">Alex Rivera</p>
+                {/* <div>
+                  <p className="font-bold text-lg">Dennis Osafo</p>
                   <p className="text-muted-foreground uppercase text-xs tracking-widest font-bold">CEO & Founder at Boxmoc</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -146,7 +145,7 @@ export default function AboutPage() {
         <section className="w-full py-20 bg-muted/30 flex items-center justify-center">
           <div className="container px-4 md:px-6 max-w-6xl">
             <div className="text-center mb-16 space-y-4">
-              <Badge variant="outline">Awards</Badge>
+              {/* <Badge variant="outline">Awards</Badge> */}
               <h2 className="text-3xl md:text-5xl font-bold font-headline">Proven impact, celebrated<br />achievements</h2>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -175,12 +174,12 @@ export default function AboutPage() {
         {/* Final CTA */}
         <section className="w-full py-20 bg-primary text-primary-foreground flex items-center justify-center">
           <div className="container px-4 md:px-6 text-center space-y-8">
-            <h2 className="text-3xl md:text-6xl font-bold font-headline tracking-tighter">Ready to design your legacy?</h2>
+            <h2 className="text-3xl md:text-6xl font-bold font-headline tracking-tighter">Ready to build?</h2>
             <p className="max-w-2xl mx-auto opacity-90 text-lg md:text-xl">
-              Join thousands of brands that trust Boxmoc for their custom packaging and marketing needs.
+              Join thousands of individuals and brands that trust Boxmoc for their custom packaging needs.
             </p>
             <Button asChild size="lg" variant="secondary" className="rounded-full px-8 h-14 text-lg font-bold">
-              <Link href="/creator">Get Started Now <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/creator">Get Started <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           </div>
         </section>

@@ -119,7 +119,7 @@ export default function PricingPage() {
         }
         
         const priceId = billingCycle === 'yearly' ? plan.priceIdYearly : plan.priceIdMonthly;
-        setIsLoading(priceId);
+        setIsLoading(priceId ?? null);
 
         try {
             const res = await fetch('/api/stripe/create-checkout-session', {
@@ -240,9 +240,6 @@ export default function PricingPage() {
                             ))}
                           </ul>
                         </CardContent>
-                        {/* <CardFooter>
-                          
-                        </CardFooter> */}
                       </div>
                     </Card>
                   </div>

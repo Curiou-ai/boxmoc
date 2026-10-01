@@ -1,0 +1,40 @@
+name = "whatsapp-agent"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "whatsapp-agent-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "whatsapp-agent-media"
+
+[[queues.producers]]
+binding = "MESSAGE_QUEUE"
+queue = "inbound-messages"
+
+[[queues.consumers]]
+queue = "inbound-messages"
+max_batch_size = 1
+max_retries = 3
+dead_letter_queue = "inbound-messages-dlq"
+
+[vars]
+WHATSAPP_PHONE_NUMBER_ID = "REPLACE_WITH_YOUR_PHONE_NUMBER_ID"
+WHATSAPP_API_VERSION = "v21.0"
+WEBAPP_HANDOFF_WEBHOOK_URL = "https://your-webapp.example.com/api/whatsapp/handoff"
+
+# Secrets — set these with `wrangler secret put <NAME>`, never commit real values:
+#   WHATSAPP_ACCESS_TOKEN            Meta Cloud API permanent access token
+#   WHATSAPP_APP_SECRET               Meta app secret, used to verify webhook signatures
+#   WHATSAPP_VERIFY_TOKEN             Arbitrary string you choose for the GET verification handshake
+#   ANTHROPIC_API_KEY                 Claude API key
+#   WEBAPP_HANDOFF_WEBHOOK_SECRET     HMAC secret shared with your webapp for outbound handoff calls
+#   INTERNAL_API_KEY                  Shared secret your webapp's backend sends when calling /api/* here
