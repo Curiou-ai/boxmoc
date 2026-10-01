@@ -11,11 +11,14 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "db:init": "tsx scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@genkit-ai/googleai": "1.0.5",
     "@genkit-ai/next": "1.0.5",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
     "@radix-ui/react-accordion": "1.2.0",
     "@radix-ui/react-avatar": "1.1.0",
     "@radix-ui/react-checkbox": "1.1.1",
@@ -46,6 +49,7 @@
     "next": "15.5.24",
     "nodemailer": "^6.9.16",
     "nprogress": "^0.2.0",
+    "pg": "^8.13.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-email": "6.9.5",
@@ -66,6 +70,7 @@
     "@types/node": "^22.10.2",
     "@types/nodemailer": "^6.4.17",
     "@types/nprogress": "^0.2.3",
+    "@types/pg": "^8.11.10",
     "@types/react": "19.0.1",
     "@types/react-dom": "19.0.1",
     "@types/three": "^0.170.0",
