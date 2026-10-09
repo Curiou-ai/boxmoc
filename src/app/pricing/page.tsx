@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -173,7 +172,6 @@ export default function PricingPage() {
                 const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
                 const isCustom = plan.priceText === 'Custom';
                 const priceId = isYearly ? plan.priceIdYearly : plan.priceIdMonthly;
-                // const isCurrentPlan = user?.stripePriceId === priceId;
                 
                 return (
                   <div key={plan.name} className="relative pt-6 h-full">
@@ -183,7 +181,6 @@ export default function PricingPage() {
                       </Badge>
                     )}
                     <Card key={plan.name} className={cn('flex flex-col h-full rounded-2xl', plan.popular ? 'border border-transparent bg-origin-border bg-clip-content,padding-box,border-box bg-gradient-to-r from-accent to-primary shadow-xl' : 'border')}>
-                      {/* bg-gradient-to-r from-accent to-primary */}
                       <div className={`${plan.popular ? "border-2 border-transparent rounded-2xl [background-clip:padding-box,border-box] [background-origin:border-box] bg-[linear-gradient(to_right,hsl(var(--card)),hsl(var(--card)))] h-full" : ""}`}>
                         <CardHeader className="grid grid-cols-[minmax(0,1fr)] auto-rows-[57px] w-full justify-stretch items-start gap-4">
                           <div className="flex items-center gap-4 w-full">
@@ -207,26 +204,13 @@ export default function PricingPage() {
                                   <p className="text-sm font-medium text-muted-foreground">Billed annually</p>
                               )}
                           </div>
-                          {/* {plan.isTrial && plan.discountInfo && !isYearly && (
-                            <div className="bg-muted/50 text-center p-3 rounded-lg border">
-                              <p className="font-semibold text-sm text-foreground">{plan.discountInfo.text}</p>
-                              <p className="text-xs text-muted-foreground mt-1">{plan.discountInfo.subtext}</p>
-                            </div>
-                          )} */}
                           <Button 
                             onClick={() => handleSubscribe(plan)}
-                            // disabled={isCurrentPlan || isLoading === priceId}
                             variant={plan.popular ? 'default' : 'outline'} 
                             className={cn('w-full', 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
                             )}
-                            // className={cn('w-full', 
-                            //     plan.popular && !isCurrentPlan && 'bg-gradient-to-r from-pink-500 to-orange-400 text-primary-foreground hover:opacity-90',
-                            //     plan.isTrial && !isCurrentPlan && 'bg-amber-500 text-amber-900 hover:bg-amber-500/90',
-                            //     plan.name === 'Enterprise' && !plan.popular && 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:opacity-90'
-                            // )}
                           >
                             {isLoading === priceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            {/* {isCurrentPlan ? 'Current Plan' : plan.buttonText} */}
                             {plan.buttonText}
                           </Button>
                         </CardHeader>

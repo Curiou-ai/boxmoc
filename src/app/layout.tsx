@@ -1,4 +1,4 @@
-import type {Metadata} from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { Chatbot } from '@/components/chatbot';
@@ -9,8 +9,55 @@ import { PageLoader } from '@/components/page-loader';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Boxmoc',
-  description: 'Custom packaging solutions for your everyday needs',
+  metadataBase: new URL('https://boxmoc.com'),
+  title: {
+    default: 'Boxmoc | AI-Powered 3D Packaging Design',
+    template: '%s | Boxmoc'
+  },
+  description: 'Create custom printed boxes and marketing materials with the power of AI and real-time 3D previews. Professional packaging simplified.',
+  keywords: ['3D packaging', 'AI design', 'custom boxes', 'SME branding', 'event promotions', '3D printing'],
+  authors: [{ name: 'Boxmoc Team' }],
+  creator: 'Boxmoc',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://boxmoc.com',
+    siteName: 'Boxmoc',
+    title: 'Boxmoc | AI-Powered 3D Packaging Design',
+    description: 'Design and order custom packaging in minutes with our AI-driven 3D studio.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Boxmoc 3D Design Studio Preview',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Boxmoc | AI-Powered 3D Packaging Design',
+    description: 'Design and order custom packaging in minutes with our AI-driven 3D studio.',
+    images: ['/og-image.png'],
+    creator: '@boxmoc',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#445544',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
