@@ -1,6 +1,10 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -8,18 +12,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
+enum Role {
   USER
   ADMIN
   SUPPLIER
   LOGISTICS
-}
-
-enum UserStatus {
-  ACTIVE
-  CHURNED
-  ONBOARDING
-  TRIALING
 }
 
 enum PrintStatus {
@@ -30,44 +27,36 @@ enum PrintStatus {
   SHIPPED
 }
 
-enum WaitlistStatus {
-  WAITLISTED
-  ACTIVE
-  REDEEMED
-}
-
 model User {
-  id                       String      @id @default(uuid())
-  email                    String      @unique
+  id                       String    @id @default(uuid())
+  email                    String    @unique
   displayName              String?
   photoURL                 String?
-  role                     UserRole    @default(USER)
-  tenantId                 String?     @unique
-  stripeCustomerId         String?     @unique
+  role                     Role      @default(USER)
+  tenantId                 String    @unique
+  stripeCustomerId         String?   @unique
   stripeSubscriptionId     String?
   stripePriceId            String?
-  stripeCurrentPeriodEnd   Int?
   stripeSubscriptionStatus String?
-  status                   UserStatus  @default(ONBOARDING)
-  createdAt                DateTime    @default(now())
-  updatedAt                DateTime    @updatedAt
-  lastActiveAt             DateTime?
+  stripeCurrentPeriodEnd   Int?
+  status                   String?   @default("active")
+  createdAt                DateTime  @default(now())
+  lastActiveAt             DateTime? @default(now())
   
   designs                  Design[]
   orders                   Order[]
   assets                   Asset[]
-  notes                    Note[]
 }
 
 model Design {
   id          String   @id @default(uuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  boxTier     String   // e.g., 'shipper', 'retailer', 'bespoke'
-  dimensions  Json     // { width: number, height: number, depth: number }
-  canvasJson  Json?    // SVG coordinates: x, y, rotation, scale
+  boxTier     String
+  dimensions  Json     // { width, height, depth }
+  canvasJson  Json     // { x, y, rotation, scale }
   logoSvgUrl  String?
-  previewUrl  String?
+  previewUrl  String
   createdAt   DateTime @default(now())
   
   orders      Order[]
@@ -79,36 +68,14 @@ model Order {
   user             User        @relation(fields: [userId], references: [id])
   designId         String
   design           Design      @relation(fields: [designId], references: [id])
-  shopifyOrderId   String?     @unique
-  shopifyOrderName String?     // e.g. #1024
-  amountTotal      Int         // in cents
-  quantity         Int         @default(1)
+  shopifyOrderId   String      @unique
+  shopifyOrderName String
+  quantity         Int
+  amountTotal      Int         // Amount in cents
   printStatus      PrintStatus @default(PENDING)
-  shippingAddress  Json?
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
-}
-
-model ContactSubmission {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  company   String?
-  phone     String?
-  message   String
-  status    String   @default("new") // e.g., 'new', 'contacted', 'closed'
-  source    String   @default("web_form")
-  createdAt DateTime @default(now())
-  notes     Note[]
-}
-
-model Waitlist {
-  id        String         @id @default(uuid())
-  email     String         @unique
-  status    WaitlistStatus @default(WAITLISTED)
-  code      String?        @unique
-  source    String?
-  createdAt DateTime       @default(now())
+  shippingAddress  Json?
 }
 
 model Asset {
@@ -122,24 +89,18 @@ model Asset {
   createdAt DateTime @default(now())
 }
 
-model Supplier {
-  id           String   @id @default(uuid())
-  name         String
-  location     String
-  capabilities String[]
-  rating       Float    @default(0.0)
-  capacity     Int      @default(0)
-  costPerUnit  Int      // in cents
-  createdAt    DateTime @default(now())
+model Waitlist {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  status    String   @default("waitlisted")
+  code      String?
+  source    String?
+  createdAt DateTime @default(now())
 }
 
 model Note {
-  id        String             @id @default(uuid())
+  id        String   @id @default(uuid())
   content   String
   author    String
-  userId    String?
-  user      User?              @relation(fields: [userId], references: [id])
-  contactId String?
-  contact   ContactSubmission? @relation(fields: [contactId], references: [id])
-  createdAt DateTime           @default(now())
+  createdAt DateTime @default(now())
 }

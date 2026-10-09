@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const message = prompt || notes;
 
     // 1. Save to PostgreSQL via Prisma
-    await prisma.boxmoc_contact.create({
+    await prisma.b_Contact.create({
       data: {
         name,
         email,
