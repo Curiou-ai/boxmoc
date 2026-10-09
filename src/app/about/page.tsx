@@ -28,10 +28,10 @@ export default function AboutPage() {
               <h1 className="text-4xl md:text-6xl font-bold tracking-tighter font-headline leading-tight">
                 Innovating the future of custom design
               </h1>
-              <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
+              {/* <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
                 We're a dedicated team focused on building intelligent tools that simplify 
                 custom packaging and drive meaningful brand growth.
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -62,7 +62,7 @@ export default function AboutPage() {
               <div className="space-y-4">
                 <h3 className="text-xl font-bold font-headline">Driven by a clear mission</h3>
                 <p className="text-gray-400 leading-relaxed">
-                  We aim to make powerful design tools accessible and easy to use for businesses of every size. 
+                  We aim to make powerful design tools accessible and easy to use for businesses and individuals. 
                   Our mission is to simplify complexity through intuitive technology that helps brands 
                   create faster and deliver with confidence.
                 </p>
@@ -150,10 +150,10 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { title: 'Best Support', year: '2024', icon: <ShieldCheck className="h-10 w-10 text-primary" /> },
-                { title: 'AI Innovator', year: '2023', icon: <Zap className="h-10 w-10 text-primary" /> },
-                { title: 'Growth Leader', year: '2024', icon: <TrendingUp className="h-10 w-10 text-primary" /> },
-                { title: 'Top 100 SaaS', year: '2024', icon: <Award className="h-10 w-10 text-primary" /> },
+                { title: 'Best Support', year: '2027', icon: <ShieldCheck className="h-10 w-10 text-primary" /> },
+                { title: 'AI Innovator', year: '2027', icon: <Zap className="h-10 w-10 text-primary" /> },
+                { title: 'Growth Leader', year: '2027', icon: <TrendingUp className="h-10 w-10 text-primary" /> },
+                { title: 'Top 100 SaaS', year: '2027', icon: <Award className="h-10 w-10 text-primary" /> },
               ].map((award, i) => (
                 <Card key={i} className="bg-card border-none shadow-sm hover:shadow-md transition-shadow">
                   <CardContent className="p-8 flex flex-col items-center text-center space-y-4">
