@@ -50,8 +50,16 @@ export default function TermsOfServicePage() {
               <section className="space-y-4">
                 <h2 className="text-2xl font-bold font-headline text-foreground">3. Intellectual Property & Designs</h2>
                 <div className="space-y-2">
-                  <h3 className="font-bold text-foreground">User Content</h3>
-                  <p>You retain all your ownership rights to the logos and artwork you upload to Boxmoc. By using our Service, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, and display your designs solely for the purpose of fulfilling your manufacturing and printing requests.</p>
+                  <h3 className="font-bold text-foreground">User Content & Ownership</h3>
+                  <p>You retain all your ownership rights to the logos, trademarks, and artwork you upload to Boxmoc. We do not claim ownership over any items uploaded by you.</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-bold text-foreground">Trademark & Usage License</h3>
+                  <p>By uploading designs, logos, or trademarked material, you grant Boxmoc and its fulfillment partners a non-exclusive, worldwide, royalty-free license to use, reproduce, and display your designs solely for the purpose of manufacturing and printing your products at your request. This includes the right to adapt the sizing or resolution of the material to fit the selected packaging specifications.</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-bold text-foreground">Authorization</h3>
+                  <p>You represent and warrant that you own or have the necessary licenses, rights, and permissions to use and authorize Boxmoc to use all trademarks, logos, and designs uploaded. You agree to indemnify Boxmoc against any claims arising from the unauthorized use of trademarked material provided by you.</p>
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-bold text-foreground">Prohibited Content</h3>
