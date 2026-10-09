@@ -1,10 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider        = "prisma-client"
-  output          = "../generated/prisma"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -35,46 +31,48 @@ model User {
   role                     Role      @default(USER)
   tenantId                 String    @unique
   stripeCustomerId         String?   @unique
-  stripeSubscriptionId     String?
+  stripeSubscriptionId     String?   @unique
   stripePriceId            String?
   stripeSubscriptionStatus String?
   stripeCurrentPeriodEnd   Int?
-  status                   String?   @default("active")
+  status                   String    @default("active")
   createdAt                DateTime  @default(now())
-  lastActiveAt             DateTime? @default(now())
-  
+  updatedAt                DateTime  @updatedAt
+  lastActiveAt             DateTime?
   designs                  Design[]
   orders                   Order[]
   assets                   Asset[]
+  notes                    Note[]
 }
 
 model Design {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  boxTier     String
-  dimensions  Json     // { width, height, depth }
-  canvasJson  Json     // { x, y, rotation, scale }
-  logoSvgUrl  String?
-  previewUrl  String
-  createdAt   DateTime @default(now())
-  
-  orders      Order[]
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  boxTier        String
+  width          Float
+  height         Float
+  depth          Float
+  canvasJson     Json
+  logoSvgUrl     String?
+  previewUrl     String
+  createdAt      DateTime @default(now())
+  orders         Order[]
 }
 
 model Order {
   id               String      @id @default(uuid())
-  userId           String
-  user             User        @relation(fields: [userId], references: [id])
-  designId         String
-  design           Design      @relation(fields: [designId], references: [id])
   shopifyOrderId   String      @unique
   shopifyOrderName String
+  designId         String
+  design           Design      @relation(fields: [designId], references: [id])
+  userId           String?
+  user             User?       @relation(fields: [userId], references: [id])
   quantity         Int
-  amountTotal      Int         // Amount in cents
+  amountTotal      Int
   printStatus      PrintStatus @default(PENDING)
   createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  paidAt           DateTime?
   shippingAddress  Json?
 }
 
@@ -93,13 +91,27 @@ model Waitlist {
   id        String   @id @default(uuid())
   email     String   @unique
   status    String   @default("waitlisted")
-  code      String?
+  code      String?  @unique
   source    String?
+  createdAt DateTime @default(now())
+}
+
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  company   String?
+  phone     String?
+  message   String
+  source    String?
+  status    String   @default("new")
   createdAt DateTime @default(now())
 }
 
 model Note {
   id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   content   String
   author    String
   createdAt DateTime @default(now())
