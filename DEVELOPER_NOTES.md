@@ -50,9 +50,9 @@ The database is structured for tenant isolation and global reporting.
 ## Production Checklist
 To move Boxmoc into a live production environment securely and reliably, here is a professional checklist of the critical items remaining. You have a solid foundation, but these steps will ensure you are protected against common launch-day failures:
 
-🟧1. Observability & Monitoring
-- Error Tracking: Integrate Sentry or LogRocket. In production, you won't see terminal logs; you need a system to capture client-side and server-side crashes in real-time.
-- Heartbeat for MQTT: Since you have a local worker (orchestrator.ts) for the Bambu Lab printers, implement a "heartbeat." Have the worker update a last_seen timestamp in Firestore/Supabase every minute. If it stops, trigger an alert to your phone.
+1. Observability & Monitoring
+🟧- Error Tracking: Integrate Sentry or LogRocket. In production, you won't see terminal logs; you need a system to capture client-side and server-side crashes in real-time.
+- Heartbeat for MQTT: Since you have a local worker (orchestrator.ts) for the 3D printters like Bambu Lab printers, implement a "heartbeat." Have the worker update a last_seen timestamp in Supabase every minute. If it stops, trigger an alert to your phone.
 
 🟧2. DNS & Email Deliverability
 - Domain Authentication: Ensure you configure SPF, DKIM, and DMARC records on your domain (e.g., GoDaddy/Cloudflare). Without these, your Resend/Nodemailer receipts will go straight to users' spam folders.
@@ -70,7 +70,7 @@ To move Boxmoc into a live production environment securely and reliably, here is
 - Migration Strategy: Before going live, run npx prisma migrate deploy against your Supabase production instance to ensure the relational schema is perfectly synced.
 
 🟧6. Logistics & Fulfillment
-- Address Validation: Users often make typos in shipping addresses. Consider adding a service like Smarty or Loqate to the checkout flow to prevent costly shipping failures.
+- Address Validation: Users often make typos in shipping addresses. Consider adding a service like Mapbox, Smarty, or Loqate to the checkout flow to prevent costly shipping failures.
 - Tax Calculation: Ensure Shopify Tax is configured correctly for the regions you are shipping to.
 
 🟧7. Performance

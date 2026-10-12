@@ -1,6 +1,7 @@
 // src/lib/orchestrator.ts
 //Raspberry PI Server
-import { PrismaClient, PrintStatus } from '@prisma/client';
+import { PrismaClient, PrintStatus } from '@/lib/prisma/client';
+import { createClient } from '@supabase/supabase-js';
 import mqtt from 'mqtt';
 
 const prisma = new PrismaClient();
@@ -9,6 +10,21 @@ const prisma = new PrismaClient();
 const BAMBU_PRINTER_IP = process.env.BAMBU_PRINTER_IP || '192.168.1.100';
 const BAMBU_ACCESS_CODE = process.env.BAMBU_ACCESS_CODE || 'your_access_code';
 const BAMBU_SERIAL = process.env.BAMBU_SERIAL || '01S00A12345678';
+
+// Heartbeat (Supabase) Configuration
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const WORKER_ID = process.env.WORKER_ID || 'pi-bambu-p1s';
+const HEARTBEAT_INTERVAL_MS = 60 * 1000;
+
+const supabase =
+  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
+    : null;
+
+if (!supabase) {
+  console.warn('⚠️ SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set. Heartbeat disabled.');
+}
 
 // Connect securely to your local Bambu Lab P1S MQTT Broker over TLS/WSS
 const mqttClient = mqtt.connect(`mqtts://${BAMBU_PRINTER_IP}:8883`, {
@@ -58,9 +74,38 @@ mqttClient.on('message', (topic, message) => {
   }
 });
 
+// HEARTBEAT: upserts last_seen every minute. Runs on its own timer, independent of the
+// orchestrator loop, so a stuck DB query or an offline printer doesn't look like a dead worker.
+// If this stops, the Supabase watchdog (supabase/functions/worker-watchdog) pushes an alert.
+async function sendHeartbeat() {
+  if (!supabase) return;
+  try {
+    const { error } = await supabase.from('worker_heartbeats').upsert(
+      {
+        worker_id: WORKER_ID,
+        last_seen: new Date().toISOString(),
+        printer_connected: printerState.is_connected,
+        gcode_state: printerState.gcode_state,
+        chamber_temp: printerState.chamber_temp,
+      },
+      { onConflict: 'worker_id' }
+    );
+    if (error) console.error('Heartbeat upsert failed:', error.message);
+  } catch (err) {
+    // Never let a heartbeat failure (e.g. Wi-Fi blip) crash the worker
+    console.error('Heartbeat error:', err);
+  }
+}
+
+function startHeartbeat() {
+  sendHeartbeat(); // immediate beat on boot
+  setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
+}
+
 // 2. THE ORCHESTRATOR LOOP (Executes Every 10 Seconds)
 export async function startOrchestrator() {
   console.log('🤖 Automated 3D Print Orchestrator Worker Activated.');
+  startHeartbeat();
   
   setInterval(async () => {
     try {

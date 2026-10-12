@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,6 +14,16 @@ import { handleCreateOrderSession } from '@/app/actions';
 import { loadStripe } from '@stripe/stripe-js';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const ShippingAddressForm = dynamic(() => import('@/components/shipping-address-form'), {
+    ssr: false,
+    loading: () => (
+        <div className="h-64 animate-pulse bg-muted/50 rounded-xl border border-dashed flex items-center justify-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
+            Loading Address Intelligence...
+        </div>
+    )
+});
 
 export default function CheckoutPage() {
     const { items, updateQuantity, removeItem } = useCart();
@@ -140,7 +151,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Right Section: Configuration */}
-                <div className="w-full lg:w-[480px] p-6 md:p-12 space-y-8 border-l bg-card overflow-y-auto">
+                <div className="w-full lg:w-[480px] p-6 md:p-12 space-y-8 border-l bg-card overflow-y-auto custom-scrollbar">
                     <div className="space-y-2">
                         <nav className="text-xs text-muted-foreground flex items-center gap-1 uppercase tracking-widest font-bold">
                             <span>Packaging</span>
@@ -199,7 +210,12 @@ export default function CheckoutPage() {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    {/* Shipping Address with Mapbox Autofill */}
+                    <div className="pt-4 border-t">
+                        <ShippingAddressForm />
+                    </div>
+
+                    <div className="space-y-4 border-t pt-8">
                         <h3 className="text-sm font-bold uppercase text-muted-foreground">Descriptions:</h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">
                             Blending your unique creative vision with Boxmoc's premium manufacturing. This custom {activeItem.description} 
