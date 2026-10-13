@@ -1,6 +1,8 @@
+// Prisma schema for Boxmoc - Production SaaS Architecture
+
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -24,73 +26,72 @@ enum PrintStatus {
 }
 
 model User {
-  id                       String    @id @default(uuid())
-  email                    String    @unique
-  displayName              String?
-  photoURL                 String?
-  role                     Role      @default(USER)
-  tenantId                 String    @unique
-  stripeCustomerId         String?   @unique
-  stripeSubscriptionId     String?   @unique
-  stripePriceId            String?
+  id                     String    @id @default(uuid())
+  email                  String    @unique
+  displayName            String?
+  photoURL               String?
+  role                   Role      @default(USER)
+  tenantId               String    @unique
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?
+  stripePriceId          String?
+  stripeCurrentPeriodEnd Int?
   stripeSubscriptionStatus String?
-  stripeCurrentPeriodEnd   Int?
-  status                   String    @default("active")
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
-  lastActiveAt             DateTime?
-  designs                  Design[]
-  orders                   Order[]
-  assets                   Asset[]
-  notes                    Note[]
+  status                 String    @default("active")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  lastActiveAt           DateTime?
+  
+  designs                Design[]
+  orders                 Order[]
+  notes                  Note[]
 }
 
 model Design {
-  id             String   @id @default(uuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  boxTier        String
-  width          Float
-  height         Float
-  depth          Float
-  canvasJson     Json
-  logoSvgUrl     String?
-  previewUrl     String
-  createdAt      DateTime @default(now())
-  orders         Order[]
+  id          String   @id @default(uuid())
+  userId      String
+  boxTier     String   // "shipper", "retailer", "bespoke"
+  dimensions  Json     // { width, height, depth }
+  canvasJson  Json?    // Stores SVG coordinates: x, y, rotation, scale
+  logoSvgUrl  String?
+  previewUrl  String?
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+  orders      Order[]
 }
 
 model Order {
   id               String      @id @default(uuid())
+  userId           String
+  designId         String
   shopifyOrderId   String      @unique
   shopifyOrderName String
-  designId         String
-  design           Design      @relation(fields: [designId], references: [id])
-  userId           String?
-  user             User?       @relation(fields: [userId], references: [id])
   quantity         Int
-  amountTotal      Int
+  amountTotal      Int         // In cents
   printStatus      PrintStatus @default(PENDING)
   createdAt        DateTime    @default(now())
-  paidAt           DateTime?
   shippingAddress  Json?
+  paidAt           DateTime?
+
+  user             User        @relation(fields: [userId], references: [id])
+  design           Design      @relation(fields: [designId], references: [id])
 }
 
-model Asset {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  url       String
-  name      String
-  type      String
-  size      Int
-  createdAt DateTime @default(now())
+model Supplier {
+  id          String   @id @default(uuid())
+  name        String
+  location    String
+  costPerUnit Int      // In cents
+  rating      Float    @default(5.0)
+  capacity    Int      @default(0)
+  createdAt   DateTime @default(now())
 }
 
 model Waitlist {
   id        String   @id @default(uuid())
   email     String   @unique
-  status    String   @default("waitlisted")
+  status    String   @default("waitlisted") // "waitlisted", "active", "redeemed"
   code      String?  @unique
   source    String?
   createdAt DateTime @default(now())
@@ -103,16 +104,20 @@ model ContactSubmission {
   company   String?
   phone     String?
   message   String
-  source    String?
   status    String   @default("new")
+  source    String?
   createdAt DateTime @default(now())
+  notes     Note[]
 }
 
 model Note {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  content   String
-  author    String
-  createdAt DateTime @default(now())
+  id                  String             @id @default(uuid())
+  content             String
+  author              String
+  createdAt           DateTime           @default(now())
+  userId              String?
+  contactSubmissionId String?
+  
+  user                User?              @relation(fields: [userId], references: [id])
+  contactSubmission   ContactSubmission? @relation(fields: [contactSubmissionId], references: [id])
 }

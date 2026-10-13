@@ -38,6 +38,41 @@ async function shopifyFetch(query: string, variables = {}) {
   return parsed.data;
 }
 
+export interface ShopifyCartLine {
+    variantId: string;
+    quantity: number;
+    designId: string;
+    previewUrl: string;
+    boxTier: string;
+}
+
+/**
+ * Creates a Shopify Cart session for multiple custom items.
+ * Injects hidden line item properties for database linking and production tracking.
+ */
+export async function createShopifyCheckout(items: ShopifyCartLine[]) {
+  const mutation = `mutation cartCreate($input: CartInput!) {
+        cartCreate(input: $input) {
+          cart { id, checkoutUrl }
+        }
+      }`;
+
+  const lines = items.map(item => ({
+    merchandiseId: item.variantId.startsWith('gid://') ? item.variantId : `gid://shopify/ProductVariant/${item.variantId}`,
+    quantity: item.quantity,
+    attributes: [
+      { key: '_design_id', value: item.designId },
+      { key: '_preview_url', value: item.previewUrl },
+      { key: 'Box Tier Selection', value: item.boxTier.toUpperCase() }
+    ]
+  }));
+
+  const variables = { input: { lines } };
+  const data = await shopifyFetch(mutation, variables);
+  
+  return data.cartCreate.cart;
+}
+
 /**
  * Appends a custom designed product to a Shopify cart session.
  * Injects hidden line item properties for database linking.

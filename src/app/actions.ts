@@ -14,9 +14,10 @@ import { getSession, UserProfile } from '@/lib/session';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 import { ContactFormSchema, EmailSchema, NameSchema, WaitlistSchema } from '@/lib/validations';
-import { addCustomBoxToCart } from '@/lib/shopify-storefront';
+import { addCustomBoxToCart, createShopifyCheckout, type ShopifyCartLine } from '@/lib/shopify-storefront';
 import { revalidatePath } from 'next/cache';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
+import { prisma } from '@/lib/prisma';
 
 // --- Production SaaS Interfaces ---
 
@@ -96,9 +97,6 @@ export interface ContactSubmission {
     createdAt: string;
     notes?: Array<{ id: string; content: string; author: string; createdAt: string }>;
 }
-export interface CRMUser extends UserProfile {
-    uid: string;
-}
 
 export interface OrderSessionState {
   sessionId?: string;
@@ -118,14 +116,6 @@ export type HelpFormState = {
     message: string;
     success?: boolean;
     fields?: Record<string, any>;
-    // fields?: {
-    //     name?: string;
-    //     email?: string;
-    //     company?: string;
-    //     phone?: string;
-    //     prompt?: string;
-    //     notes?: string;
-    //   };
 };
 
 export type WaitlistState = {
@@ -218,10 +208,6 @@ export async function getWaitlistUsers() {
    return snapshot.docs.map(doc => ({ 
        id: doc.id, 
        ...doc.data(),
-       // email: doc.data().email,
-       // status: doc.data().status,
-       // code: doc.data().code,
-       // source: doc.data().source,
        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
    } as any));
 }
@@ -249,14 +235,6 @@ export async function getContactSubmissions(): Promise<ContactSubmission[]> {
    return snapshot.docs.map(doc => ({ 
        id: doc.id, 
        ...doc.data(),
-       // name: doc.data().name,
-       // email: doc.data().email,
-       // company: doc.data().company,
-       // phone: doc.data().phone,
-       // message: doc.data().message,
-       // status: doc.data().status || 'new',
-       // notes: doc.data().notes || [],
-       // source: doc.data().source || 'web_form',
        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
    } as ContactSubmission));
 }
@@ -284,23 +262,6 @@ export async function getUserOrders(): Promise<Order[]> {
        } as Order;
    });
 }
-
-// export async function getUserOrders() {
-//     const session = await getSession();
-//     if (!session) return [];
-
-//     const db = admin.firestore();
-//     const snapshot = await db.collection('orders')
-//         .where('userId', '==', session.uid)
-//         .orderBy('createdAt', 'desc')
-//         .get();
-
-//     return snapshot.docs.map(doc => ({
-//         id: doc.id,
-//         ...doc.data(),
-//         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-//     }));
-// }
 
 export async function updateCRMUserStatus(userId: string, status: string): Promise<{ success: boolean }> {
    const session = await getSession();
@@ -353,7 +314,6 @@ export async function sendAccessCode(email: string) {
  if (!email) return { success: false, message: "Email is required." };
  try{
    const query = await db.collection('waitlist').where('email', '==', email).limit(1).get();
-   // const query = await db.collection('waitlist').where('email', '==', email).where("status","==","waitlisted").get();
    if (query.empty) return { success: false, message: 'User not found or already active' };
 
    const accessCode = randomBytes(4).toString('hex').toUpperCase();
@@ -392,7 +352,6 @@ export async function handleValidateAccessCode(prevState: any, formData: FormDat
        return { message: 'This code has already been used.' };
    }
 
-   // In a real app, you might set a short-lived signup cookie here
    redirect(`/signup?code=${code}`);
 }
 
@@ -413,7 +372,6 @@ export async function getUserAssets(): Promise<Asset[]> {
            id: doc.id,
            url: doc.data().url,
            name: doc.data().name,
-           //...doc.data(), 
            createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
        } as Asset));
    } catch(error){
@@ -445,7 +403,6 @@ export async function handleUploadDesignImage(formData: FormData): Promise<Uploa
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = `assets/${session.uid}/${Date.now()}-${file.name}`;
-    const extension = file.type.split('/')[1];
     const bucket = admin.storage().bucket();
     const fileRef = bucket.file(fileName);
 
@@ -457,7 +414,6 @@ export async function handleUploadDesignImage(formData: FormData): Promise<Uploa
         public: true,
     });
 
-    // Make file public for preview (or use signed URLs in production)
     await fileRef.makePublic();
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
     const db = admin.firestore();
@@ -508,8 +464,6 @@ export async function handleAddToCartFlow(params: DesignParams) {
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        // 2. Add to Shopify Cart
-        // Note: variantId should be mapped from boxTier in a real production env
         const variantMap = {
             shipper: process.env.SHOPIFY_VARIANT_SHIPPER_ID || '123',
             retailer: process.env.SHOPIFY_VARIANT_RETAILER_ID || '456',
@@ -518,7 +472,7 @@ export async function handleAddToCartFlow(params: DesignParams) {
 
         const cart = await addCustomBoxToCart({
             variantId: variantMap[params.boxTier],
-            quantity: 1, // Default or passed from frontend
+            quantity: 1,
             designId: designRef.id,
             previewUrl: params.previewUrl,
             boxTier: params.boxTier
@@ -531,7 +485,60 @@ export async function handleAddToCartFlow(params: DesignParams) {
     }
 }
 
-// ... rest of existing actions remain for UI support ...
+/**
+ * Complete Shopify Checkout Orchestration for the entire cart.
+ * 1. Persists every design in the relational database.
+ * 2. Creates a Shopify checkout session with mapped variant IDs.
+ * 3. Returns the Checkout URL.
+ */
+export async function handleInitiateShopifyCheckout(cartItems: any[]) {
+    const session = await getSession();
+    if (!session) return { error: 'Unauthorized' };
+
+    try {
+        const lineItems: ShopifyCartLine[] = [];
+
+        // 1. Map Box tiers to Shopify Variant IDs (Production values should be in .env)
+        const variantMap: Record<string, string> = {
+            'shipper': process.env.SHOPIFY_VARIANT_SHIPPER_ID || 'sh_123',
+            'retailer': process.env.SHOPIFY_VARIANT_RETAILER_ID || 'rt_456',
+            'bespoke': process.env.SHOPIFY_VARIANT_BESPOKE_ID || 'bs_789'
+        };
+
+        for (const item of cartItems) {
+            // Determine tier from description or size
+            const tier = item.description.toLowerCase().includes('bespoke') ? 'bespoke' : 
+                         item.description.toLowerCase().includes('retailer') ? 'retailer' : 'shipper';
+
+            // 2. Persist Design parameters to ensure production integrity
+            const design = await prisma.design.create({
+                data: {
+                    userId: session.uid,
+                    boxTier: tier,
+                    dimensions: item.dimensions,
+                    previewUrl: item.imageUrl,
+                    canvasJson: { description: item.description },
+                }
+            });
+
+            lineItems.push({
+                variantId: variantMap[tier],
+                quantity: item.quantity,
+                designId: design.id,
+                previewUrl: item.imageUrl,
+                boxTier: tier
+            });
+        }
+
+        // 3. Create Shopify Cart and get URL
+        const shopifyCart = await createShopifyCheckout(lineItems);
+
+        return { checkoutUrl: shopifyCart.checkoutUrl };
+    } catch (error: any) {
+        console.error('Shopify Checkout Initiation Error:', error);
+        return { error: error.message };
+    }
+}
 
 export async function handleGenerateDesign(prevState: any, formData: FormData) {
   const prompt = formData.get('prompt') as string;
@@ -558,7 +565,6 @@ export async function handleJoinWaitlist(prevState: any, formData: FormData) {
     
     if (!query.empty) {
         redirect('/waitlist/congratulations');
-        // return { message: 'You are already on the list!', success: true };
     }
 
     await db.collection('waitlist').add({
@@ -590,14 +596,6 @@ export async function handleChatbotQuery(prevState: any, formData: FormData) {
 }
 
 export async function handleRequestHelp(prevState: any, formData: FormData): Promise<HelpFormState> {
-  //   const name = formData.get('name') as string;
-  //   const email = formData.get('email') as string;
-  //   const company = formData.get('company') as string;
-  //   const phone = formData.get('phone') as string;
-  //   const prompt = formData.get('prompt') as string;
-  //   const notes = formData.get('notes') as string;
-  
-  //   const validation = ContactFormSchema.safeParse({ name, email, company, phone, prompt, notes });
       const fields = {
           name: formData.get('name')?.toString() || '',
           email: formData.get('email')?.toString() || '',
@@ -610,18 +608,13 @@ export async function handleRequestHelp(prevState: any, formData: FormData): Pro
       const validation = ContactFormSchema.safeParse(fields);
   
       if (!validation.success) {
-          return { message: validation.error.errors[0].message, success: false, fields /*fields: { name, email, prompt, notes }*/ };
+          return { message: validation.error.errors[0].message, success: false, fields };
       }
       const companyEmail = process.env.COMPANY_EMAIL;
       const messageContent = fields.prompt || fields.notes;
     try {
         const db = admin.firestore();
         await db.collection('contact_submissions').add({
-          //   name,
-          //   email,
-          //   company,
-          //   phone,
-          //   message: prompt || notes,
           ...fields,
           message: messageContent,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),

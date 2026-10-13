@@ -5,16 +5,14 @@ import { useState } from 'react';
 import { useCart, CartItem } from '@/context/cart-context';
 import ThreePreview from '@/components/three-preview';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Minus, Plus, ChevronRight, Share2, ShoppingBag, Box, Trash2, LayoutGrid, Rotate3d } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Minus, Plus, ChevronRight, Share2, ShoppingBag, Trash2, LayoutGrid, Rotate3d, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BOX_SIZES } from '@/app/creator/page';
-import { handleCreateOrderSession } from '@/app/actions';
-import { loadStripe } from '@stripe/stripe-js';
+import { handleInitiateShopifyCheckout } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import ShopifyCheckoutModal from '@/components/shopify-checkout-modal';
 
 const ShippingAddressForm = dynamic(() => import('@/components/shipping-address-form'), {
     ssr: false,
@@ -30,6 +28,7 @@ export default function CheckoutPage() {
     const [selectedItemIndex, setSelectedItemIdex] = useState(0);
     const [viewMode, setViewMode] = useState<'2D' | '3D'>('3D');
     const [isOrdering, setIsOrdering] = useState(false);
+    const [shopifyUrl, setShopifyUrl] = useState<string | null>(null);
     const { toast } = useToast();
 
     const activeItem = items[selectedItemIndex];
@@ -46,25 +45,22 @@ export default function CheckoutPage() {
         
         setIsOrdering(true);
         try {
-            // For MVP, we checkout the whole cart or the first item
-            // Here we'll process the active item as a single checkout session
-            const { sessionId, error } = await handleCreateOrderSession({
-                designImageUrl: activeItem.imageUrl,
-                designDescription: `${activeItem.description} (Size: ${activeItem.sizeLabel}) x${activeItem.quantity}`,
-            });
+            // Initiate the Shopify Checkout Bridge
+            const result = await handleInitiateShopifyCheckout(items);
 
-            if (error) {
-                toast({ title: 'Error', description: error, variant: 'destructive'});
+            if (result.error) {
+                toast({ title: 'Checkout Error', description: result.error, variant: 'destructive'});
                 setIsOrdering(false);
                 return;
             }
 
-            if (sessionId) {
-                const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-                await stripe!.redirectToCheckout({ sessionId });
+            if (result.checkoutUrl) {
+                // Open the native Shopify experience in our in-app modal
+                setShopifyUrl(result.checkoutUrl);
             }
         } catch (err: any) {
             toast({ title: 'Error', description: err.message, variant: 'destructive'});
+        } finally {
             setIsOrdering(false);
         }
     };
@@ -210,7 +206,7 @@ export default function CheckoutPage() {
                         </div>
                     </div>
 
-                    {/* Shipping Address with Mapbox Autofill */}
+                    {/* Pre-checkout Address Validation (Optional/Assisted) */}
                     <div className="pt-4 border-t">
                         <ShippingAddressForm />
                     </div>
@@ -267,7 +263,7 @@ export default function CheckoutPage() {
                             disabled={isOrdering}
                             className="flex-1 md:w-80 h-14 text-lg font-bold bg-black text-white hover:bg-black/90 rounded-none uppercase tracking-tighter"
                         >
-                            {isOrdering ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Check Out'}
+                            {isOrdering ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Complete Order'}
                         </Button>
                         <Button variant="outline" size="icon" className="h-14 w-14 rounded-none border-2">
                             <ShoppingBag className="h-5 w-5" />
@@ -278,26 +274,9 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </footer>
+
+            {/* Shopify In-App Checkout Bridge */}
+            <ShopifyCheckoutModal url={shopifyUrl} onClose={() => setShopifyUrl(null)} />
         </div>
     );
-}
-
-function Loader2(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-      className={cn("animate-spin", props.className)}
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  );
 }
