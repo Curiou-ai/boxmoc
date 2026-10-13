@@ -1,5 +1,3 @@
-// Prisma schema for Boxmoc - Production SaaS Architecture
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -26,75 +24,53 @@ enum PrintStatus {
 }
 
 model User {
-  id                     String    @id @default(uuid())
-  email                  String    @unique
-  displayName            String?
-  photoURL               String?
-  role                   Role      @default(USER)
-  tenantId               String    @unique
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?
-  stripePriceId          String?
-  stripeCurrentPeriodEnd Int?
+  id                       String   @id @default(uuid())
+  email                    String   @unique
+  displayName              String?
+  photoURL                 String?
+  role                     Role     @default(USER)
+  tenantId                 String   @unique
+  stripeCustomerId         String?  @unique
+  stripeSubscriptionId     String?
+  stripePriceId            String?
   stripeSubscriptionStatus String?
-  status                 String    @default("active")
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-  lastActiveAt           DateTime?
+  stripeCurrentPeriodEnd   Int?
+  status                   String?  @default("active")
+  createdAt                DateTime @default(now())
+  lastActiveAt             DateTime @updatedAt
   
-  designs                Design[]
-  orders                 Order[]
-  notes                  Note[]
+  designs                  Design[]
+  orders                   Order[]
+  notes                    Note[]
 }
 
 model Design {
   id          String   @id @default(uuid())
   userId      String
-  boxTier     String   // "shipper", "retailer", "bespoke"
+  user        User     @relation(fields: [userId], references: [id])
+  boxTier     String   // shipper, retailer, bespoke
   dimensions  Json     // { width, height, depth }
-  canvasJson  Json?    // Stores SVG coordinates: x, y, rotation, scale
+  canvasJson  Json?
   logoSvgUrl  String?
-  previewUrl  String?
+  previewUrl  String
   createdAt   DateTime @default(now())
   
-  user        User     @relation(fields: [userId], references: [id])
   orders      Order[]
 }
 
 model Order {
   id               String      @id @default(uuid())
   userId           String
+  user             User        @relation(fields: [userId], references: [id])
   designId         String
+  design           Design      @relation(fields: [designId], references: [id])
   shopifyOrderId   String      @unique
   shopifyOrderName String
   quantity         Int
   amountTotal      Int         // In cents
   printStatus      PrintStatus @default(PENDING)
-  createdAt        DateTime    @default(now())
   shippingAddress  Json?
-  paidAt           DateTime?
-
-  user             User        @relation(fields: [userId], references: [id])
-  design           Design      @relation(fields: [designId], references: [id])
-}
-
-model Supplier {
-  id          String   @id @default(uuid())
-  name        String
-  location    String
-  costPerUnit Int      // In cents
-  rating      Float    @default(5.0)
-  capacity    Int      @default(0)
-  createdAt   DateTime @default(now())
-}
-
-model Waitlist {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  status    String   @default("waitlisted") // "waitlisted", "active", "redeemed"
-  code      String?  @unique
-  source    String?
-  createdAt DateTime @default(now())
+  createdAt        DateTime    @default(now())
 }
 
 model ContactSubmission {
@@ -104,20 +80,25 @@ model ContactSubmission {
   company   String?
   phone     String?
   message   String
-  status    String   @default("new")
-  source    String?
+  source    String?  @default("web_form")
+  status    String?  @default("new")
   createdAt DateTime @default(now())
-  notes     Note[]
+}
+
+model Waitlist {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  status    String   @default("waitlisted") // waitlisted, active, redeemed
+  code      String?
+  source    String?  @default("web_form")
+  createdAt DateTime @default(now())
 }
 
 model Note {
-  id                  String             @id @default(uuid())
-  content             String
-  author              String
-  createdAt           DateTime           @default(now())
-  userId              String?
-  contactSubmissionId String?
-  
-  user                User?              @relation(fields: [userId], references: [id])
-  contactSubmission   ContactSubmission? @relation(fields: [contactSubmissionId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  author    String
+  createdAt DateTime @default(now())
 }
