@@ -1,18 +1,18 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useCart, CartItem } from '@/context/cart-context';
 import ThreePreview from '@/components/three-preview';
 import { Button } from '@/components/ui/button';
-import { Minus, Plus, ChevronRight, Share2, ShoppingBag, Trash2, LayoutGrid, Rotate3d, Loader2 } from 'lucide-react';
+import { Minus, Plus, ChevronRight, Share2, ShoppingBag, Trash2, LayoutGrid, Rotate3d, Loader2, Sparkles, Printer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BOX_SIZES } from '@/app/creator/page';
-import { handleInitiateShopifyCheckout } from '@/app/actions';
+import { handleInitiateShopifyCheckout, handleMvpShowcasePrint } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import ShopifyCheckoutModal from '@/components/shopify-checkout-modal';
+import { useRouter } from 'next/navigation';
 
 const ShippingAddressForm = dynamic(() => import('@/components/shipping-address-form'), {
     ssr: false,
@@ -24,12 +24,14 @@ const ShippingAddressForm = dynamic(() => import('@/components/shipping-address-
 });
 
 export default function CheckoutPage() {
-    const { items, updateQuantity, removeItem } = useCart();
+    const { items, updateQuantity, removeItem, clearCart } = useCart();
     const [selectedItemIndex, setSelectedItemIdex] = useState(0);
     const [viewMode, setViewMode] = useState<'2D' | '3D'>('3D');
     const [isOrdering, setIsOrdering] = useState(false);
+    const [isMvpPrinting, setIsMvpPrinting] = useState(false);
     const [shopifyUrl, setShopifyUrl] = useState<string | null>(null);
     const { toast } = useToast();
+    const router = useRouter();
 
     const activeItem = items[selectedItemIndex];
 
@@ -45,7 +47,6 @@ export default function CheckoutPage() {
         
         setIsOrdering(true);
         try {
-            // Initiate the Shopify Checkout Bridge
             const result = await handleInitiateShopifyCheckout(items);
 
             if (result.error) {
@@ -55,13 +56,37 @@ export default function CheckoutPage() {
             }
 
             if (result.checkoutUrl) {
-                // Open the native Shopify experience in our in-app modal
                 setShopifyUrl(result.checkoutUrl);
             }
         } catch (err: any) {
             toast({ title: 'Error', description: err.message, variant: 'destructive'});
         } finally {
             setIsOrdering(false);
+        }
+    };
+
+    const handleMvpTestPrint = async () => {
+        if (items.length === 0) return;
+        
+        setIsMvpPrinting(true);
+        try {
+            const result = await handleMvpShowcasePrint(items);
+
+            if (result.error) {
+                toast({ title: 'MVP Showcase Error', description: result.error, variant: 'destructive'});
+            } else {
+                toast({ 
+                    title: '🚀 Print Command Dispatched!', 
+                    description: 'Your design is being sent to the Bambu P1S. Redirecting to production queue...',
+                    variant: 'default'
+                });
+                clearCart();
+                router.push('/creator/orders');
+            }
+        } catch (err: any) {
+            toast({ title: 'Error', description: err.message, variant: 'destructive'});
+        } finally {
+            setIsMvpPrinting(false);
         }
     };
 
@@ -253,23 +278,41 @@ export default function CheckoutPage() {
             {/* Bottom Sticky Action Bar */}
             <footer className="border-t bg-card p-4 md:p-6 sticky bottom-0 z-20">
                 <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-                    <div className="hidden md:block">
+                    <div className="hidden md:flex flex-col">
                         <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Total Amount</p>
                         <p className="text-xl font-bold font-headline">${(items.reduce((sum, item) => sum + (item.price * item.quantity), 0) / 100).toFixed(2)}</p>
                     </div>
-                    <div className="flex-1 md:flex-none flex gap-2">
+                    
+                    <div className="flex-1 md:flex-none flex items-center gap-3">
+                        {/* MVP Showcase Trigger */}
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={handleMvpTestPrint}
+                                        disabled={isMvpPrinting || isOrdering}
+                                        className="h-14 px-6 border-2 border-primary/20 text-primary hover:bg-primary/5 hidden sm:flex"
+                                    >
+                                        {isMvpPrinting ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Printer className="mr-2 h-5 w-5" /> Showcase Print ($0)</>}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>MVP Mode: Send directly to 3D printer fleet (Skip Shopify)</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
                         <Button 
                             onClick={handleCheckout} 
-                            disabled={isOrdering}
+                            disabled={isOrdering || isMvpPrinting}
                             className="flex-1 md:w-80 h-14 text-lg font-bold bg-black text-white hover:bg-black/90 rounded-none uppercase tracking-tighter"
                         >
                             {isOrdering ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Complete Order'}
                         </Button>
+                        
                         <Button variant="outline" size="icon" className="h-14 w-14 rounded-none border-2">
                             <ShoppingBag className="h-5 w-5" />
-                        </Button>
-                        <Button variant="outline" size="icon" className="h-14 w-14 rounded-none border-2">
-                            <Share2 className="h-5 w-5" />
                         </Button>
                     </div>
                 </div>

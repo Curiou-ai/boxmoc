@@ -1,4 +1,3 @@
-
 'use server';
 
 import { generateDesign, GenerateDesignInput } from '@/ai/flows/generate-box-design';
@@ -18,6 +17,7 @@ import { addCustomBoxToCart, createShopifyCheckout, type ShopifyCartLine } from 
 import { revalidatePath } from 'next/cache';
 import WaitlistAccessCodeEmail from '@/emails/WaitlistAccessCode';
 import { prisma } from '@/lib/prisma';
+import { printerService } from '@/lib/printer-service';
 
 // --- Production SaaS Interfaces ---
 
@@ -25,7 +25,7 @@ export interface Order {
     id: string;
     userId: string;
     tenantId: string;
-    status: 'CREATED' | 'PRICED' | 'MATCHED' | 'IN_PRODUCTION' | 'SHIPPED' | 'DELIVERED'; //string
+    status: 'CREATED' | 'PRICED' | 'MATCHED' | 'IN_PRODUCTION' | 'SHIPPED' | 'DELIVERED'; 
     designId: string;
     supplierId?: string;
     logisticsId?: string;
@@ -287,7 +287,7 @@ export async function addCRMNote(type: 'user' | 'contact', id: string, content: 
    
    const db = admin.firestore();
    const note = {
-       id: randomBytes(8).toString('hex'), //id: Math.random().toString(36).substr(2, 9),
+       id: randomBytes(8).toString('hex'), 
        content,
        author: session.displayName || 'Admin',
        createdAt: new Date().toISOString(),
@@ -305,7 +305,6 @@ export async function addCRMNote(type: 'user' | 'contact', id: string, content: 
 // --- Waitlist Orchestration ---
 
 export async function sendAccessCode(email: string) {
- //session to bypass the need to waitlist admins and send Access code
  const session = await getSession();
  if (!session || session.role !== 'admin') return { success: false, message: 'Unauthorized' };
 
@@ -443,9 +442,6 @@ export interface DesignParams {
 
 /**
  * Main orchestration for adding a custom box to the shopify checkout.
- * 1. Saves design parameters to Firestore.
- * 2. Appends to Shopify Cart with design metadata.
- * 3. Returns the checkout URL.
  */
 export async function handleAddToCartFlow(params: DesignParams) {
     const session = await getSession();
@@ -487,9 +483,6 @@ export async function handleAddToCartFlow(params: DesignParams) {
 
 /**
  * Complete Shopify Checkout Orchestration for the entire cart.
- * 1. Persists every design in the relational database.
- * 2. Creates a Shopify checkout session with mapped variant IDs.
- * 3. Returns the Checkout URL.
  */
 export async function handleInitiateShopifyCheckout(cartItems: any[]) {
     const session = await getSession();
@@ -498,19 +491,10 @@ export async function handleInitiateShopifyCheckout(cartItems: any[]) {
     try {
         const lineItems: ShopifyCartLine[] = [];
 
-        // 1. Map Box tiers to Shopify Variant IDs (Production values should be in .env)
-        const variantMap: Record<string, string> = {
-            'shipper': process.env.SHOPIFY_VARIANT_SHIPPER_ID || 'sh_123',
-            'retailer': process.env.SHOPIFY_VARIANT_RETAILER_ID || 'rt_456',
-            'bespoke': process.env.SHOPIFY_VARIANT_BESPOKE_ID || 'bs_789'
-        };
-
         for (const item of cartItems) {
-            // Determine tier from description or size
             const tier = item.description.toLowerCase().includes('bespoke') ? 'bespoke' : 
                          item.description.toLowerCase().includes('retailer') ? 'retailer' : 'shipper';
 
-            // 2. Persist Design parameters to ensure production integrity
             const design = await prisma.design.create({
                 data: {
                     userId: session.uid,
@@ -521,6 +505,12 @@ export async function handleInitiateShopifyCheckout(cartItems: any[]) {
                 }
             });
 
+            const variantMap: Record<string, string> = {
+                'shipper': process.env.SHOPIFY_VARIANT_SHIPPER_ID || 'sh_123',
+                'retailer': process.env.SHOPIFY_VARIANT_RETAILER_ID || 'rt_456',
+                'bespoke': process.env.SHOPIFY_VARIANT_BESPOKE_ID || 'bs_789'
+            };
+
             lineItems.push({
                 variantId: variantMap[tier],
                 quantity: item.quantity,
@@ -530,12 +520,73 @@ export async function handleInitiateShopifyCheckout(cartItems: any[]) {
             });
         }
 
-        // 3. Create Shopify Cart and get URL
         const shopifyCart = await createShopifyCheckout(lineItems);
-
         return { checkoutUrl: shopifyCart.checkoutUrl };
     } catch (error: any) {
         console.error('Shopify Checkout Initiation Error:', error);
+        return { error: error.message };
+    }
+}
+
+/**
+ * MVP Showcase Trigger: Bypasses Shopify payment for demo purposes.
+ * Directly records an order as PENDING and dispatches a 3D print command.
+ */
+export async function handleMvpShowcasePrint(cartItems: any[]) {
+    const session = await getSession();
+    if (!session) return { error: 'Unauthorized' };
+
+    try {
+        const firstItem = cartItems[0];
+        if (!firstItem) throw new Error('No items in cart.');
+
+        const tier = firstItem.description.toLowerCase().includes('bespoke') ? 'bespoke' : 
+                     firstItem.description.toLowerCase().includes('retailer') ? 'retailer' : 'shipper';
+
+        // 1. Persist Design
+        const design = await prisma.design.create({
+            data: {
+                userId: session.uid,
+                boxTier: tier,
+                dimensions: firstItem.dimensions,
+                previewUrl: firstItem.imageUrl,
+                canvasJson: { description: firstItem.description, mvp_test: true },
+            }
+        });
+
+        // 2. Create Order (marked as $0 / MVP Test)
+        const order = await prisma.order.create({
+            data: {
+                userId: session.uid,
+                designId: design.id,
+                shopifyOrderId: `mvp_${Date.now()}`,
+                shopifyOrderName: `#MVP-${Math.floor(1000 + Math.random() * 9000)}`,
+                quantity: firstItem.quantity,
+                amountTotal: 0,
+                printStatus: 'PENDING',
+                gcodeUrl: 'https://storage.boxmoc.com/static/mvp_box_preset.gcode' // Mock G-code for demo
+            }
+        });
+
+        // 3. Directly Trigger Printer via MQTT
+        const BAMBU_SERIAL = process.env.BAMBU_SERIAL || '01S00A12345678';
+        const success = await printerService.sendPrintCommand(
+            BAMBU_SERIAL, 
+            order.gcodeUrl!, 
+            order.shopifyOrderName
+        );
+
+        if (success) {
+            await prisma.order.update({
+                where: { id: order.id },
+                data: { printStatus: 'PRINTING' }
+            });
+        }
+
+        revalidatePath('/creator/orders');
+        return { success: true, orderId: order.id };
+    } catch (error: any) {
+        console.error('MVP Showcase Print Error:', error);
         return { error: error.message };
     }
 }

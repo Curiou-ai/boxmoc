@@ -38,24 +38,24 @@ model User {
   status                   String?  @default("active")
   createdAt                DateTime @default(now())
   lastActiveAt             DateTime @updatedAt
-  
-  designs                  Design[]
-  orders                   Order[]
-  notes                    Note[]
+
+  designs Design[]
+  orders  Order[]
+  notes   Note[]
 }
 
 model Design {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  boxTier     String   // shipper, retailer, bespoke
-  dimensions  Json     // { width, height, depth }
-  canvasJson  Json?
-  logoSvgUrl  String?
-  previewUrl  String
-  createdAt   DateTime @default(now())
-  
-  orders      Order[]
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  boxTier    String // shipper, retailer, bespoke
+  dimensions Json // { width, height, depth }
+  canvasJson Json?
+  logoSvgUrl String?
+  previewUrl String
+  createdAt  DateTime @default(now())
+
+  orders Order[]
 }
 
 model Order {
@@ -67,9 +67,10 @@ model Order {
   shopifyOrderId   String      @unique
   shopifyOrderName String
   quantity         Int
-  amountTotal      Int         // In cents
+  amountTotal      Int // In cents
   printStatus      PrintStatus @default(PENDING)
   shippingAddress  Json?
+  gcodeUrl         String? // Path to the G-code file for 3D printing
   createdAt        DateTime    @default(now())
 }
 
