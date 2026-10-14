@@ -14,7 +14,7 @@ const services = [
     {
         value: "item-1",
         title: "General Use",
-        description: "Design and purchase custom printed boxes for various use cases to meet your promotional needs",
+        description: "Design and purchase custom printed packages for various use cases to meet your promotional needs",
         learnMoreUrl: "#"
     },
     {

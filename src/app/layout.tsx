@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'Boxmoc | AI-Powered 3D Packaging Design',
     template: '%s | Boxmoc'
   },
-  description: 'Create custom printed boxes and marketing materials with the power of AI and real-time 3D previews. Professional packaging simplified.',
+  description: 'Create custom printed packages with the power of AI and real-time 3D previews. Professional packaging simplified.',
   keywords: ['3D packaging', 'AI design', 'custom boxes', 'SME branding', 'event promotions', '3D printing'],
   authors: [{ name: 'Boxmoc Team' }],
   creator: 'Boxmoc',

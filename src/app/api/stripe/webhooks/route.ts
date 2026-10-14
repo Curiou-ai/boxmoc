@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
-import admin from '@/lib/firebase-admin';
+import admin from '@/lib/firebase/firebase-admin';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 

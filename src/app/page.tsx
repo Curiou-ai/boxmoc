@@ -60,7 +60,7 @@ export default function LandingPage() {
                   {headline}
                 </h1>
                 <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-                  Create custom printed boxes. Delivered right to your doorstep.
+                  Create custom printed package boxes. Delivered right to your doorstep.
                 </p>
               </div>
               <div className="w-full max-w-xs space-y-8 mb-6">

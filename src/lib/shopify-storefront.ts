@@ -1,5 +1,5 @@
+import { StorefrontResponseSchema } from '@/lib/validations'
 
-import { z } from 'zod';
 
 const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 const STOREFRONT_ACCESS_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
@@ -8,10 +8,7 @@ if (!SHOPIFY_STORE_DOMAIN || !STOREFRONT_ACCESS_TOKEN) {
   console.warn('Shopify Storefront credentials missing from environment variables.');
 }
 
-const StorefrontResponseSchema = z.object({
-  data: z.any().optional(),
-  errors: z.array(z.object({ message: z.string() })).optional(),
-});
+
 
 /**
  * Executes a GraphQL mutation/query against the Shopify Storefront API.

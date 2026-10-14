@@ -152,7 +152,7 @@ prisma db seed  # Run explicitly if needed
 
 ```bash
 # v6
-prisma db execute --file ./script.sql --url "$DATABASE_URL"
+prisma db execute --file ./script.sql --url "$POSTGRES_PRISMA_URL"
 
 # v7 - configure in prisma.config.ts
 prisma db execute --file ./script.sql
@@ -172,7 +172,7 @@ prisma db execute --file ./script.sql
 
 ```bash
 # v6
-prisma migrate diff --from-url "$DATABASE_URL" --to-schema schema.prisma
+prisma migrate diff --from-url "$POSTGRES_PRISMA_URL" --to-schema schema.prisma
 
 # v7
 prisma migrate diff --from-config-datasource --to-schema schema.prisma

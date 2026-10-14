@@ -6,10 +6,10 @@ import { translateText, TranslateTextInput, TranslateTextOutput } from '@/ai/flo
 import { sendEmail } from '@/lib/email-service';
 import ContactUserConfirmation from '@/emails/ContactUserConfirmation';
 import ContactCompanyNotification from '@/emails/ContactCompanyNotification';
-import admin from '@/lib/firebase-admin';
+import admin from '@/lib/firebase/firebase-admin';
 import { redirect } from 'next/navigation';
 import { randomBytes } from 'crypto';
-import { getSession, UserProfile } from '@/lib/session';
+import { getSession, UserProfile } from '@/lib/firebase/session';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 import { ContactFormSchema, EmailSchema, NameSchema, WaitlistSchema } from '@/lib/validations';
@@ -495,7 +495,7 @@ export async function handleInitiateShopifyCheckout(cartItems: any[]) {
             const tier = item.description.toLowerCase().includes('bespoke') ? 'bespoke' : 
                          item.description.toLowerCase().includes('retailer') ? 'retailer' : 'shipper';
 
-            const design = await prisma.design.create({
+            const design = await prisma.b_Design.create({
                 data: {
                     userId: session.uid,
                     boxTier: tier,
@@ -544,7 +544,7 @@ export async function handleMvpShowcasePrint(cartItems: any[]) {
                      firstItem.description.toLowerCase().includes('retailer') ? 'retailer' : 'shipper';
 
         // 1. Persist Design
-        const design = await prisma.design.create({
+        const design = await prisma.b_Design.create({
             data: {
                 userId: session.uid,
                 boxTier: tier,
@@ -555,7 +555,7 @@ export async function handleMvpShowcasePrint(cartItems: any[]) {
         });
 
         // 2. Create Order (marked as $0 / MVP Test)
-        const order = await prisma.order.create({
+        const order = await prisma.b_Order.create({
             data: {
                 userId: session.uid,
                 designId: design.id,
@@ -577,7 +577,7 @@ export async function handleMvpShowcasePrint(cartItems: any[]) {
         );
 
         if (success) {
-            await prisma.order.update({
+            await prisma.b_Order.update({
                 where: { id: order.id },
                 data: { printStatus: 'PRINTING' }
             });

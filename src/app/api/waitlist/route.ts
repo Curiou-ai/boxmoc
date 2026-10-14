@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already on the waitlist
-    const existingEntry = await prisma.waitlist.findUnique({
+    const existingEntry = await prisma.b_Waitlist.findUnique({
       where: { email },
     });
     
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add entry to PostgreSQL via Prisma
-    await prisma.waitlist.create({
+    await prisma.b_Waitlist.create({
       data: {
         email,
         status: 'waitlisted',

@@ -3,6 +3,21 @@ import { z } from 'zod';
 export const EmailSchema = z.string().email({ message: "Please enter a valid email address." });
 export const NameSchema = z.string().min(2, { message: "Name must be at least 2 characters."});
 
+
+export const StorefrontResponseSchema = z.object({
+  data: z.any().optional(),
+  errors: z.array(z.object({ message: z.string() })).optional(),
+});
+/**
+ * Password validation schema to ensure security best practices.
+ */
+export const passwordSchema = z.string()
+  .min(8, { message: "Password must be at least 8 characters long." })
+  .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
+  .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter." })
+  .regex(/[0-9]/, { message: "Password must contain at least one number." })
+  .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character." });
+
 /**
  * Validation schema for the 'contact_submissions' table (collection).
  */

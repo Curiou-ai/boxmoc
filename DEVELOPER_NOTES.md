@@ -174,3 +174,19 @@ If you are building a custom headless storefront or utilizing an advanced applic
 1. Use Google’s Address Validation API first to maximize your 5,000 free monthly requests.
 2. If your order volume expands beyond that, transition to a pay-as-you-go model like Geocodio or leverage a self-hosted Nominatim container to act as a fallback and completely remove billing caps. [1] (https://www.geocod.io/compare-geocoding-services/geocodio-vs-smartystreets-comparison), [2] (https://cufinder.io/blog/api/best-address-validation-apis/), [3] (https://www.smarty.com/compare/google-address-validation-alternatives), [4] (https://www.benroberts.ai/directory/address-verification-and-geocoding/)
 Would you like to know more about how to set up a self-hosted instance of an address parser, or do you need assistance configuring Shopify Tax brackets for your specific shipping zones?
+
+
+## MVP Showcase
+I have implemented a dedicated MVP Showcase workflow that allows you to bypass the standard payment gateway for testing and trigger a 3D print command directly to your fleet of Bambu Lab printers.
+
+Printer Service (src/lib/printer-service.ts): Created a centralized service to handle secure MQTT communication with your 3D printers. This ensures that print commands are dispatched with the correct sequence IDs and G-code metadata required by the Bambu P1S.
+Relational Schema Update (prisma/schema.prisma): Added a gcodeUrl field to the Order model. This allows the platform to store a reference to the machine-specific instructions (G-code) generated for a particular 3D design.
+Showcase Server Action (src/app/actions.ts): Added handleMvpShowcasePrint, a dedicated action that simulates a successful $0 transaction. It creates a validated order record and immediately invokes the PrinterService to start the physical manufacturing process.
+Direct-to-Print UI (src/app/creator/checkout/page.tsx): Integrated an "MVP Showcase: Express Print" button into the checkout footer. This button is designed for live demonstrations, providing a one-click path from digital design to physical production.
+
+
+## Auth
+Testing Better Auth with ngrok
+```bash
+npx ngrok http 3000
+```

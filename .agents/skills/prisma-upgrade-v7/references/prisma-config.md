@@ -18,7 +18,7 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env('POSTGRES_PRISMA_URL'),
   },
 })
 ```
@@ -39,7 +39,7 @@ Database connection URL:
 
 ```typescript
 datasource: {
-  url: env('DATABASE_URL'),
+  url: env('POSTGRES_PRISMA_URL'),
 }
 ```
 
@@ -49,7 +49,7 @@ Direct connection URL (bypassing connection pooler):
 
 ```typescript
 datasource: {
-  url: env('DATABASE_URL'),
+  url: env('POSTGRES_PRISMA_URL'),
   directUrl: env('DIRECT_DATABASE_URL'),
 }
 ```
@@ -60,7 +60,7 @@ Shadow database for migrations:
 
 ```typescript
 datasource: {
-  url: env('DATABASE_URL'),
+  url: env('POSTGRES_PRISMA_URL'),
   shadowDatabaseUrl: env('SHADOW_DATABASE_URL'),
 }
 ```
@@ -104,7 +104,7 @@ export default defineConfig({
   
   // Database connection
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env('POSTGRES_PRISMA_URL'),
     directUrl: env('DIRECT_DATABASE_URL'),
     shadowDatabaseUrl: env('SHADOW_DATABASE_URL'),
   },
@@ -121,7 +121,7 @@ Use `env()` to reference environment variables:
 import { env } from 'prisma/config'
 
 datasource: {
-  url: env('DATABASE_URL'),
+  url: env('POSTGRES_PRISMA_URL'),
 }
 ```
 
@@ -147,7 +147,7 @@ import { defineConfig, env } from 'prisma/config'
 ```prisma
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("DIRECT_URL")
 }
 ```
@@ -161,7 +161,7 @@ import { defineConfig, env } from 'prisma/config'
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env('POSTGRES_PRISMA_URL'),
     directUrl: env('DIRECT_URL'),
   },
 })
@@ -197,7 +197,7 @@ export default defineConfig({
     path: path.join(__dirname, 'packages/database/prisma/migrations'),
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env('POSTGRES_PRISMA_URL'),
   },
 })
 ```

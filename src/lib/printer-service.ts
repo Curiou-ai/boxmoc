@@ -21,11 +21,11 @@ export class PrinterService {
       });
 
       this.client.on('connect', () => {
-        console.log('📡 Printer Service: Connected to Bambu Lab Broker');
+        console.log('Printer Service: Connected to Bambu Lab Broker');
       });
 
       this.client.on('error', (err) => {
-        console.error('❌ Printer Service Error:', err);
+        console.error('Printer Service Error:', err);
       });
     }
   }
@@ -42,7 +42,7 @@ export class PrinterService {
    */
   public async sendPrintCommand(serial: string, gcodeUrl: string, taskName: string): Promise<boolean> {
     if (!this.client || !this.client.connected) {
-      console.warn('⚠️ Printer Service: Client not connected. Command aborted.');
+      console.warn('Printer Service: Client not connected. Command aborted.');
       return false;
     }
 
@@ -63,10 +63,10 @@ export class PrinterService {
         { qos: 1 },
         (err) => {
           if (err) {
-            console.error('❌ Failed to publish print command:', err);
+            console.error('Failed to publish print command:', err);
             resolve(false);
           } else {
-            console.log(`🚀 Print command dispatched: ${taskName}`);
+            console.log(`Print command dispatched: ${taskName}`);
             resolve(true);
           }
         }

@@ -50,4 +50,5 @@ firestore-debug.log
 
 #scripts
 json/*
-/src/generated/prisma
+./src/lib/generated/*
+src/lib/generated/*

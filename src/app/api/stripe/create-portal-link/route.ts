@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/session';
+import { getSession } from '@/lib/firebase/session';
 import { stripe } from '@/lib/stripe';
 
 export async function POST(request: Request) {

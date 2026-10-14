@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getMessagingInstance } from '@/lib/firebase';
+import { getMessagingInstance } from '@/lib/firebase/firebase';
 import { getToken, onMessage, type Messaging } from 'firebase/messaging';
 import { useToast } from './use-toast';
 

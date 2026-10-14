@@ -1,6 +1,6 @@
 
 import { config } from 'dotenv';
-import admin from '../src/lib/firebase-admin';
+import admin from '../src/lib/firebase/firebase-admin';
 
 config();
 

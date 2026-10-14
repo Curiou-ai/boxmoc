@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the internal user to link the order
-    const user = await prisma.user.findUnique({
+    const user = await prisma.b_User.findUnique({
       where: { email: customerEmail },
     });
 
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         const designId = designIdAttr.value;
 
         // Verify the design exists in our relational database
-        const design = await prisma.design.findUnique({
+        const design = await prisma.b_Design.findUnique({
           where: { id: designId },
         });
 
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
         // 4. Record the transaction in the database
         // We use upsert to handle potential webhook retries from Shopify
-        return prisma.order.upsert({
+        return prisma.b_Order.upsert({
           where: { shopifyOrderId: shopifyUniqueId },
           update: {
             printStatus: 'PENDING', // Reset or maintain pending status on payment
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
               province: payload.shipping_address.province,
               country: payload.shipping_address.country,
               zip: payload.shipping_address.zip,
-            } : null,
+            } : {},
           },
         });
       }

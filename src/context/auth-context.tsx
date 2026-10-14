@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase/firebase';
 import { useRouter } from 'next/navigation';
 import { Loading } from '@/components/loading';
 import { doc, onSnapshot, DocumentData } from 'firebase/firestore';

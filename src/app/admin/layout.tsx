@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/session";
+import { getSession } from "@/lib/firebase/session";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { AppHeader } from "@/components/header";

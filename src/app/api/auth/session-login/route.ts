@@ -1,6 +1,8 @@
+//supabase + prisma
+
 
 import { NextRequest, NextResponse } from 'next/server';
-import admin from '@/lib/firebase-admin';
+import admin from '@/lib/firebase/firebase-admin';
 import { sendEmail } from '@/lib/email-service';
 import SignInNotificationEmail from '@/emails/SignInNotificationEmail';
 

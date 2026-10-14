@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { app } from '@/lib/firebase';
+import { app } from '@/lib/firebase/firebase';
 
 export default function GoogleAuthHandler() {
   const router = useRouter();

@@ -15,6 +15,10 @@ Open [http://localhost:3000](http://localhost:3000) to see the result.
 
 To get started, take a look at src/app/page.tsx
 
+## Git cXomnsa 
+```bash
+git rm -r --cached "<PATH_TO_FODLER>"
+```
 ## Deploy to GitHub from IDX
 
 <b><u>Email address privacy settings</u></b>

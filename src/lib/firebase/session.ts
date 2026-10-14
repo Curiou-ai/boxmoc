@@ -3,7 +3,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import admin from './firebase-admin';
-import { stripe } from './stripe';
+import { stripe } from '../stripe';
 
 /**
  * Defines the production-grade user profile structure.

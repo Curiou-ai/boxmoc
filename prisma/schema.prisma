@@ -1,11 +1,10 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -23,9 +22,10 @@ enum PrintStatus {
   SHIPPED
 }
 
-model User {
+model b_User {
   id                       String   @id @default(uuid())
   email                    String   @unique
+  emailVerified            Boolean  @default(false)
   displayName              String?
   photoURL                 String?
   role                     Role     @default(USER)
@@ -39,15 +39,46 @@ model User {
   createdAt                DateTime @default(now())
   lastActiveAt             DateTime @updatedAt
 
-  designs Design[]
-  orders  Order[]
-  notes   Note[]
+  designs b_Design[]
+  orders  b_Order[]
+  notes   b_Note[]
+  sessions      Session[]
+  accounts      Account[]
 }
 
-model Design {
+model b_Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String? // Better Auth handles cryptographic hashing securely here
+  createdAt             DateTime
+  updatedAt             DateTime
+}
+
+model b_Design {
   id         String   @id @default(uuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  user       b_User     @relation(fields: [userId], references: [id])
   boxTier    String // shipper, retailer, bespoke
   dimensions Json // { width, height, depth }
   canvasJson Json?
@@ -55,15 +86,15 @@ model Design {
   previewUrl String
   createdAt  DateTime @default(now())
 
-  orders Order[]
+  orders b_Order[]
 }
 
-model Order {
+model b_Order {
   id               String      @id @default(uuid())
   userId           String
-  user             User        @relation(fields: [userId], references: [id])
+  user             b_User        @relation(fields: [userId], references: [id])
   designId         String
-  design           Design      @relation(fields: [designId], references: [id])
+  design           b_Design      @relation(fields: [designId], references: [id])
   shopifyOrderId   String      @unique
   shopifyOrderName String
   quantity         Int
@@ -74,7 +105,7 @@ model Order {
   createdAt        DateTime    @default(now())
 }
 
-model ContactSubmission {
+model b_Contact {
   id        String   @id @default(uuid())
   name      String
   email     String
@@ -86,7 +117,7 @@ model ContactSubmission {
   createdAt DateTime @default(now())
 }
 
-model Waitlist {
+model b_Waitlist {
   id        String   @id @default(uuid())
   email     String   @unique
   status    String   @default("waitlisted") // waitlisted, active, redeemed
@@ -95,10 +126,10 @@ model Waitlist {
   createdAt DateTime @default(now())
 }
 
-model Note {
+model b_Note {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      b_User     @relation(fields: [userId], references: [id])
   content   String
   author    String
   createdAt DateTime @default(now())
