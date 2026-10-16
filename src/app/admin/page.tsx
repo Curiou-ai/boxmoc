@@ -5,7 +5,8 @@ import { UserTable } from "@/components/admin/user-table";
 import { ContactSubmissionTable } from "@/components/admin/contact-submission-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
+import { FormatDate } from '@/lib/date';
 import { SendAccessCodeButton } from "@/components/admin/send-access-code-button";
 
 // Ensure this page is always rendered dynamically to avoid build-time Firebase errors
@@ -71,7 +72,14 @@ export default async function AdminPage() {
                                                     'outline'
                                                 }>{user.status}</Badge>
                                             </TableCell>
-                                            <TableCell>{format(new Date(user.createdAt), 'PPpp')}</TableCell>
+                                            {/* <TableCell>{format(new Date(user.createdAt), 'PPpp')}</TableCell> */}
+                                            <TableCell>
+                                                {FormatDate(
+                                                    user.createdAt,
+                                                    'iso',
+                                                    'datetime'
+                                                )}
+                                            </TableCell>
                                             <TableCell className="text-right">
                                                 {user.status === 'waitlisted' && (
                                                     <SendAccessCodeButton email={user.email} />

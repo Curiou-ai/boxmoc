@@ -81,7 +81,10 @@ export interface Asset {
       createdAt: string;
       source?: string;
   }
-export interface CRMUser extends UserProfile {
+// export interface CRMUser extends UserProfile {
+//     uid: string;
+// }
+export interface CRMUser {
     uid: string;
 }
 

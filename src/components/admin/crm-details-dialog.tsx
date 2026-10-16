@@ -18,7 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, Plus, MessageSquare, History, User, Activity, CreditCard } from "lucide-react";
 import { CRMUser, ContactSubmission, addCRMNote, updateCRMUserStatus, updateContactStatus } from "@/app/actions";
-import { format } from "date-fns";
+// import { format } from "date-fns";
+import { FormatDate } from '@/lib/date'
 import { useToast } from "@/hooks/use-toast";
 
 interface CRMDetailsDialogProps {
@@ -38,7 +39,7 @@ export function CRMDetailsDialog({ type, record }: CRMDetailsDialogProps) {
     const handleAddNote = () => {
         if (!note.trim()) return;
         startTransition(async () => {
-            const result = await addCRMNote(type, record.id || user.uid, note);
+            const result = await addCRMNote(type, record.uid || user.uid, note);
             if (result.success) {
                 setNote('');
                 toast({ title: "Note added", description: "Internal interaction recorded successfully." });
@@ -116,12 +117,14 @@ export function CRMDetailsDialog({ type, record }: CRMDetailsDialogProps) {
                             <div className="space-y-2">
                                 <div className="text-xs">
                                     <p className="text-muted-foreground">Joined</p>
-                                    <p className="font-medium">{format(new Date(record.createdAt), 'PP')}</p>
+                                    {/* <p className="font-medium">{format(new Date(record.createdAt), 'PP')}</p> */}
+                                    <p className="font-medium">{FormatDate(record.createdAt,'iso','date')}</p>
                                 </div>
                                 {isUser && (
                                     <div className="text-xs">
                                         <p className="text-muted-foreground">Last Activity</p>
-                                        <p className="font-medium">{user.lastActiveAt ? format(new Date(user.lastActiveAt), 'PPp') : 'N/A'}</p>
+                                        {/* <p className="font-medium">{user.lastActiveAt ? format(new Date(user.lastActiveAt), 'PPp') : 'N/A'}</p> */}
+                                        <p className="font-medium">{user.lastActiveAt ? FormatDate(user.lastActiveAt,'iso','date') : 'N/A'}</p>
                                     </div>
                                 )}
                             </div>
@@ -140,7 +143,8 @@ export function CRMDetailsDialog({ type, record }: CRMDetailsDialogProps) {
                                     {user.stripeCurrentPeriodEnd && (
                                         <div className="text-xs">
                                             <p className="text-muted-foreground">Renews</p>
-                                            <p className="font-medium">{format(new Date(user.stripeCurrentPeriodEnd * 1000), 'PP')}</p>
+                                            {/* <p className="font-medium">{format(new Date(user.stripeCurrentPeriodEnd * 1000), 'PP')}</p> */}
+                                            <p className="font-medium">{FormatDate((user.stripeCurrentPeriodEnd * 1000),'medium')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -189,7 +193,15 @@ export function CRMDetailsDialog({ type, record }: CRMDetailsDialogProps) {
                                         <div key={n.id} className="p-4 bg-muted/20 rounded-lg border text-sm space-y-1">
                                             <div className="flex justify-between items-center text-[10px] uppercase text-muted-foreground font-bold">
                                                 <span>{n.author}</span>
-                                                <span>{format(new Date(n.createdAt), 'PPp')}</span>
+                                                {/* <span>{format(new Date(n.createdAt), 'PPp')}</span> */}
+                                                <span>
+                                                    {FormatDate(
+                                                        n.createdAt,
+                                                        'datetime',
+                                                        'iso',
+                                                        'en-US'
+                                                    )}
+                                                </span>
                                             </div>
                                             <p className="text-foreground leading-relaxed">{n.content}</p>
                                         </div>

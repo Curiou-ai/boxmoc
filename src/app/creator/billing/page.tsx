@@ -15,7 +15,8 @@ import { Check, Loader2, CreditCard } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { loadStripe } from '@stripe/stripe-js';
-import { format } from "date-fns";
+// import { format } from "date-fns";
+import { FormatDate } from "@/lib/date";
 
 const plans = [
     { 
@@ -167,7 +168,8 @@ export default function BillingPage() {
                     {isSubscribed && user?.stripeCurrentPeriodEnd && (
                          <CardFooter className="border-t pt-6 flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
                             <div>
-                                <p>Your plan renews on {format(new Date(user.stripeCurrentPeriodEnd * 1000), 'PPP')}.</p>
+                                {/* <p>Your plan renews on {format(new Date(user.stripeCurrentPeriodEnd * 1000), 'PPP')}.</p> */}
+                                <p>Your plan renews on {FormatDate((user.stripeCurrentPeriodEnd * 1000),'long')}.</p>
                                 <p>Status: <span className="font-semibold capitalize text-primary">{subscriptionStatus}</span></p>
                             </div>
                             <Button onClick={handleManageSubscription} disabled={isLoading === 'portal'}>

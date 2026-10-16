@@ -3,7 +3,8 @@
 import { ContactSubmission } from "@/app/actions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
+import {FormatDate} from '@/lib/date'
 import { Button } from "@/components/ui/button";
 import { Eye, Mail } from "lucide-react";
 import {
@@ -40,7 +41,8 @@ export function ContactSubmissionTable({ submissions }: { submissions: ContactSu
                         <TableCell>
                             <Badge variant="outline" className="capitalize">{sub.source}</Badge>
                         </TableCell>
-                        <TableCell>{format(new Date(sub.createdAt), 'PP')}</TableCell>
+                        {/* <TableCell>{format(new Date(sub.createdAt), 'PP')}</TableCell> */}
+                        <TableCell>{FormatDate(sub.createdAt,'medium')}</TableCell>
                         <TableCell className="text-right">
                             <Dialog>
                                 <DialogTrigger asChild>
@@ -52,7 +54,8 @@ export function ContactSubmissionTable({ submissions }: { submissions: ContactSu
                                     <DialogHeader>
                                         <DialogTitle>Submission from {sub.name}</DialogTitle>
                                         <DialogDescription>
-                                            Submitted via {sub.source} on {format(new Date(sub.createdAt), 'PPPP p')}
+                                            {/* Submitted via {sub.source} on {format(new Date(sub.createdAt), 'PPPP p')} */}
+                                            Submitted via {sub.source} on {FormatDate(sub.createdAt,'full')}
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-4 pt-4">

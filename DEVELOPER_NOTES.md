@@ -190,3 +190,13 @@ Testing Better Auth with ngrok
 ```bash
 npx ngrok http 3000
 ```
+
+## REFERENCES
+[Better Auth -Reddit Comments](https://www.reddit.com/r/nextjs/comments/1h5g09i/recommendations_for_authentication_in_nextjs/)
+[Address Verification and Standardization](https://www.reddit.com/r/dataengineering/comments/16p1smy/address_verification_and_standardization_tools/)
+[GeoPostcodes](https://www.geopostcodes.com/smarty-alternative/)
+[ArcGIS Geocoding](https://www.geopostcodes.com/smarty-alternative/)
+[Geocodio](https://www.geocod.io/)
+[GetShippo](https://goshippo.com/)
+[EasyPost](https://www.easypost.com/)
+[OpenAddresses](https://openaddresses.io/)

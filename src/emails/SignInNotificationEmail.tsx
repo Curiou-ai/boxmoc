@@ -9,7 +9,8 @@ import {
   Section,
   Hr,
 } from "@react-email/components";
-import { format } from "date-fns";
+// import { format } from "date-fns";
+import { FormatDate } from '@/lib/date'
 import * as React from "react";
 
 interface SignInNotificationEmailProps {
@@ -38,7 +39,8 @@ export const SignInNotificationEmail = ({
         </Text>
         <Section style={detailsSection}>
           <Text style={detailsText}>
-            <strong>Time:</strong> {format(signInTime, "PPPppp")}
+            {/* <strong>Time:</strong> {format(signInTime, "PPPppp")} */}
+            <strong>Time:</strong> {FormatDate(signInTime,'iso','time')}
           </Text>
           {ipAddress && (
             <Text style={detailsText}>

@@ -2,7 +2,8 @@ import { getUserOrders, Order } from "@/app/actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
+import { FormatDate } from '@/lib/date';
 import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShoppingBag } from "lucide-react";
@@ -30,9 +31,16 @@ function OrderRow({ order }: { order: Order }) {
                     </div>
                 </div>
             </TableCell>
-            <TableCell>{format(new Date(order.createdAt), 'PP')}</TableCell>
+            {/* <TableCell>{format(new Date(order.createdAt), 'PP')}</TableCell> */}
             <TableCell>
-                <Badge variant={order.status === 'shipped' ? 'default' : 'secondary'} className="capitalize">{order.status}</Badge>
+                {FormatDate(
+                    order.createdAt,
+                    'iso',
+                    'datetime',
+                )}
+            </TableCell>
+            <TableCell>
+                <Badge variant={order.status.toLowerCase() === 'shipped' ? 'default' : 'secondary'} className="capitalize">{order.status}</Badge>
             </TableCell>
             <TableCell className="text-right font-medium">
                 ${(order.amount / 100).toFixed(2)}
