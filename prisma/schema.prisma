@@ -42,8 +42,8 @@ model b_User {
   designs b_Design[]
   orders  b_Order[]
   notes   b_Note[]
-  sessions      Session[]
-  accounts      Account[]
+  sessions      b_Session[]
+  accounts      b_Account[]
 }
 
 model b_Session {
@@ -55,15 +55,15 @@ model b_Session {
   ipAddress String?
   userAgent String?
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      b_User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Account {
+model b_Account {
   id                    String    @id @default(uuid())
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  b_User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
